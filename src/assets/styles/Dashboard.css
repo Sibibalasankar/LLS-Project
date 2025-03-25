@@ -1,0 +1,52 @@
+.top_bar_nav{
+    height: 50px;
+    text-align: center;
+    border: 2px solid #2E3191 ;
+    color: #2E3191;
+    
+}
+
+.side_bar{
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    background-color: #2e31916e;
+    justify-content:flex-start;
+    align-items: center;
+    gap: 20px;
+    padding: 13px 7px;
+    border: 2px solid white ;
+    
+}
+
+button{
+    width: 250px;
+    height: auto;
+    background-color: #2E3191;
+    color: white;
+    border-style: none;
+    border-radius: 5px;
+    border: 2px solid white;
+    padding: 5px 25px;
+}
+button:hover{
+    background-color: white;
+    color: blue;
+    transition: .8s;
+    transform: scale(1.1);
+    border: 2px solid #2E3191;
+}
+
+.main_body{
+    max-height: 100vh;
+}
+
+.child_body{
+background-color: yellow;
+
+}
+
+.main_child{
+    height: 100vh;
+    
+}

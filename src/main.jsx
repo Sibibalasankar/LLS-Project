@@ -6,12 +6,15 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import App from './App';
 import User_login from './pages/User_login';
 import './assets/styles/main.css';
+import Dashboard from './components/Dashboard';
 
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {/* <Login/> */}
-    <User_login/>
+    {/* <Login/>
+    <User_login/> */}
+    <Dashboard/>
+    
   </StrictMode>,
 )
