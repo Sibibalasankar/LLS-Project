@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+.Logo {
+  background-image: url("../images/lls_logo.png");
+  width: 80px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 35px;
+  margin-left: 15px;
+}
+.Nav_bar {
+  display: flex;
+  width: 100vw;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+  font-family: "Cinzel", serif;
+}
+
+.child_bar {
+  display: flex;
+  width: 700px;
+  align-items: center;
+  justify-content: left;
+  background-color: #fff;
+  padding: 5px;
+  border-radius: 15px;
+  height: auto;
+}
+h2 {
+  padding-top: 5px;
+}
