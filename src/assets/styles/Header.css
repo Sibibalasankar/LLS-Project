@@ -10,11 +10,12 @@
 .Nav_bar {
   display: flex;
   width: 100vw;
-  position: absolute;
   align-items: center;
   justify-content: center;
   margin-top: 25px;
   font-family: "Cinzel", serif;
+  position: absolute;
+  
 }
 
 .child_bar {
@@ -22,10 +23,11 @@
   width: 700px;
   align-items: center;
   justify-content: left;
-  background-color: #fff;
+  background-color: #ffffff;
   padding: 5px;
   border-radius: 15px;
   height: auto;
+ 
 }
 h2 {
   padding-top: 5px;
