@@ -5,7 +5,7 @@
   background-size: contain;
   background-repeat: no-repeat;
   height: 35px;
-  margin-left: 15px;
+  margin-left: 29px;
 }
 .Nav_bar {
   display: flex;
@@ -15,7 +15,6 @@
   margin-top: 25px;
   font-family: "Cinzel", serif;
   position: absolute;
-  
 }
 
 .child_bar {
@@ -27,8 +26,15 @@
   padding: 5px;
   border-radius: 15px;
   height: auto;
- 
 }
 h2 {
   padding-top: 5px;
+}
+
+.main_title {
+  color: #2e3191;
+  font-family: "Times New Roman", Times, serif;
+  font-style: italic;
+  word-spacing: 10px;
+  margin-left: 50px;
 }
