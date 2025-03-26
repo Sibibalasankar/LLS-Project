@@ -20,14 +20,11 @@ const Admin_login = () => {
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setError("");
-
       login("admin-token", "admin"); // ✅ Store admin token & role
-
       alert("Login Successful!");
 
-      // Redirect to the dashboard
+      // ✅ Redirect to the dashboard
       navigate("/dashboard", { replace: true });
-      window.location.reload(); // ✅ Ensure UI updates immediately
     } else {
       setError("Invalid username or password!");
     }

@@ -1,46 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext"; // Import Auth Context
-import "../assets/styles/User_login.css";
+import { useAuth } from "../context/AuthContext"; // Import auth context
+import "../assets/styles/Admin_login.css";
 
 const User_login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get login function from context
+  const { login } = useAuth(); // Get login function from AuthProvider
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (event) => {
+  // Hardcoded User Credentials
+  const USER_USERNAME = "user";
+  const USER_PASSWORD = "user123";
+
+  // Handle Form Submission
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Trim whitespace from inputs
-    const trimmedUsername = username.trim();
-    const trimmedPassword = password.trim();
+    if (username === USER_USERNAME && password === USER_PASSWORD) {
+      setError("");
 
-    if (!trimmedUsername || !trimmedPassword) {
-      setError("Username and Password are required!");
-      return;
-    }
+      login("user-token", "user"); // ✅ Store user token & role
 
-    try {
-      // Send login request to backend
-      const response = await axios.post("http://localhost:5000/api/login", {
-        username: trimmedUsername,
-        password: trimmedPassword,
-      });
+      alert("Login Successful!");
 
-      if (response.data.token) {
-        login(response.data.token); // Store token in auth context
-        alert("Login Successful!");
-        navigate("/dashboard", { replace: true });
-        window.location.reload(); // Force refresh to update state
-      } else {
-        setError(response.data.message || "Invalid Username or Password!");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Something went wrong! Try again.");
+      // Redirect to the dashboard
+      navigate("/dashboard", { replace: true });
+      window.location.reload(); // ✅ Ensure UI updates immediately
+    } else {
+      setError("Invalid username or password!");
     }
   };
 
@@ -48,33 +37,31 @@ const User_login = () => {
     <div className="container-fluid main_login_div">
       <div className="form_div">
         <div className="login_title">
-          <p className="login_subtitle">User Login</p>
+          <p className="login_subtitle">User Login</p> {/* ✅ Changed text */}
         </div>
 
-        <form className="form_elements" onSubmit={handleLogin}>
-          <label htmlFor="username">Username</label>
+        <form className="form_elements" onSubmit={handleSubmit}>
+          <label htmlFor="user-username">Username</label>
           <input
             type="text"
-            id="username"
+            id="user-username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <label htmlFor="password">Password</label>
+          <label htmlFor="user-password">Password</label>
           <input
             type="password"
-            id="password"
+            id="user-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="user_login_btn">
-            Submit
-          </button>
+          {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+          <button type="submit" className="user_login_btn">Submit</button>
 
           {/* Back Button */}
-          <div className="back_button" onClick={() => navigate("/login", { replace: true })}>
+          <div className="back_button" onClick={() => navigate("/login")}>
             <i className="bi bi-arrow-left"></i> Back
           </div>
         </form>
