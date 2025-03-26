@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import auth context
 import "../assets/styles/Admin_login.css";
 
 const Admin_login = () => {
-  const navigate = useNavigate(); // Navigation hook
-  const [username, setUsername] = useState(""); // Username state
-  const [password, setPassword] = useState(""); // Password state
-  const [error, setError] = useState(""); // Error state
+  const navigate = useNavigate();
+  const { login } = useAuth(); // Get login function from AuthProvider
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   // Hardcoded Admin Credentials
   const ADMIN_USERNAME = "admin";
@@ -14,12 +16,18 @@ const Admin_login = () => {
 
   // Handle Form Submission
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent page refresh
+    event.preventDefault();
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setError(""); // Clear any errors
-      alert("Login Successful!"); // Show alert
-      navigate("/dashboard"); // Redirect to Dashboard
+      setError("");
+
+      login("admin-token", "admin"); // ✅ Store admin token & role
+
+      alert("Login Successful!");
+
+      // Redirect to the dashboard
+      navigate("/dashboard", { replace: true });
+      window.location.reload(); // ✅ Ensure UI updates immediately
     } else {
       setError("Invalid username or password!");
     }
@@ -52,7 +60,7 @@ const Admin_login = () => {
           {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
           <button type="submit" className="user_login_btn">Submit</button>
 
-          {/* Back Button: Always go to login page */}
+          {/* Back Button */}
           <div className="back_button" onClick={() => navigate("/login")}>
             <i className="bi bi-arrow-left"></i> Back
           </div>

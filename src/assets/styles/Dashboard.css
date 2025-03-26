@@ -3,6 +3,10 @@
   text-align: center;
   border: 2px solid #2e3191;
   color: #2e3191;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: aqua;
 }
 
 .side_bar {
@@ -70,4 +74,9 @@
   transition: 0.8s;
   transform: scale(1.1);
   border: 2px solid white;
+}
+.logout_text{
+  color: #2e3191;
+  position: absolute;
+  right: 10%;
 }

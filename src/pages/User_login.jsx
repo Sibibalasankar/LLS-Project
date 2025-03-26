@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext"; // Import Auth Context
 import "../assets/styles/User_login.css";
 
 const User_login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get login function from context
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Handle User Login
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
 
     // Trim whitespace from inputs
@@ -21,21 +23,24 @@ const User_login = () => {
       return;
     }
 
-    // Get users from localStorage
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      // Send login request to backend
+      const response = await axios.post("http://localhost:5000/api/login", {
+        username: trimmedUsername,
+        password: trimmedPassword,
+      });
 
-    // Check if user exists
-    const userExists = users.find(
-      (user) =>
-        user.username.toLowerCase() === trimmedUsername.toLowerCase() &&
-        user.password === trimmedPassword
-    );
-
-    if (userExists) {
-      alert("Login Successful!");
-      navigate("/dashboard", { replace: true }); // Redirect to Dashboard
-    } else {
-      setError("Invalid Username or Password!");
+      if (response.data.token) {
+        login(response.data.token); // Store token in auth context
+        alert("Login Successful!");
+        navigate("/dashboard", { replace: true });
+        window.location.reload(); // Force refresh to update state
+      } else {
+        setError(response.data.message || "Invalid Username or Password!");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("Something went wrong! Try again.");
     }
   };
 
@@ -68,7 +73,7 @@ const User_login = () => {
             Submit
           </button>
 
-          {/* Back Button: Always go to login page */}
+          {/* Back Button */}
           <div className="back_button" onClick={() => navigate("/login", { replace: true })}>
             <i className="bi bi-arrow-left"></i> Back
           </div>
