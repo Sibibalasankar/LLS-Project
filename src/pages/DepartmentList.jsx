@@ -37,7 +37,8 @@ const DepartmentList = () => {
   });
 
   useEffect(() => {
-    const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
+    const storedDepartments =
+      JSON.parse(localStorage.getItem("departments")) || [];
     setDepartmentData(storedDepartments);
   }, []);
 
@@ -79,13 +80,15 @@ const DepartmentList = () => {
   };
 
   const handlePrint = () => {
-    const tableContent = document.querySelector(".department-table").cloneNode(true);
-  
+    const tableContent = document
+      .querySelector(".department-table")
+      .cloneNode(true);
+
     // Remove the "Actions" column
     tableContent.querySelectorAll("tr").forEach((row) => {
       row.removeChild(row.lastElementChild);
     });
-  
+
     const printWindow = window.open("", "", "width=800,height=600");
     printWindow.document.write(`
       <html>
@@ -118,15 +121,16 @@ const DepartmentList = () => {
     printWindow.document.close();
     printWindow.print();
   };
-  
 
   return (
     <div className="department-list-container">
       <h2>Department List</h2>
+      
       <div className="department-list-header">
         <button className="add-btn" onClick={() => setShowForm(true)}>
           Add Department
         </button>
+        
         <button className="print-btn" onClick={handlePrint}>
           Print Table
         </button>
@@ -136,21 +140,30 @@ const DepartmentList = () => {
         <table className="department-table">
           <thead>
             <tr>
+              <th>S.No</th>
               <th>Department Name</th>
               <th>Auditor Email</th>
               <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {departments.map((dept, index) => (
+            {departmentData.map((dept, index) => (
               <tr key={index}>
-                <td>{dept}</td>
-                <td>{departmentData[index]?.email || "N/A"}</td>
+                <td>{index + 1}</td> {/* Serial Number Column */}
+                <td>{dept.name}</td>
+                <td>{dept.email || "N/A"}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(index)}>
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEdit(index)}
+                  >
                     Edit
                   </button>
-                  <button className="delete-btn" onClick={() => handleDelete(index)}>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(index)}
+                  >
                     Delete
                   </button>
                 </td>
@@ -163,7 +176,9 @@ const DepartmentList = () => {
       {showForm && (
         <div className="popup-overlay">
           <div className="popup-form">
-            <h3>{editingIndex !== null ? "Edit Department" : "Add Department"}</h3>
+            <h3>
+              {editingIndex !== null ? "Edit Department" : "Add Department"}
+            </h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -182,7 +197,11 @@ const DepartmentList = () => {
                 required
               />
               <div className="form-buttons">
-                <button type="button" className="close-btn" onClick={() => setShowForm(false)}>
+                <button
+                  type="button"
+                  className="close-btn"
+                  onClick={() => setShowForm(false)}
+                >
                   Close
                 </button>
                 <button type="submit" className="submit-btn">

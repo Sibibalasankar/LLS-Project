@@ -101,5 +101,8 @@
     color: #999;
   }
   
+  *{
+    user-select: none;
+  }
   
   

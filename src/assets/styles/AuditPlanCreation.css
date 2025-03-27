@@ -1,0 +1,71 @@
+.audit-plan-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .department-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .department-item {
+    padding: 10px;
+    background-color: #f4f4f4;
+    margin: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .department-item:hover {
+    background-color: #ddd;
+  }
+  
+  .back-btn {
+    margin-top: 20px;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  
+
+  .audit-plan-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .department-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .department-item {
+    padding: 10px;
+    background-color: #f4f4f4;
+    margin: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .department-item:hover {
+    background-color: #ddd;
+  }
+  
+  .audit-plan-details {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .back-btn {
+    margin-top: 20px;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+      
