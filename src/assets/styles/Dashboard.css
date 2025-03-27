@@ -7,6 +7,7 @@
   justify-content: center;
   align-items: center;
   background-color: aqua;
+  position: relative;
 }
 
 .side_bar {
@@ -31,6 +32,7 @@
   border: 2px solid white;
   padding: 10px 25px;
 }
+
 .main_btn:hover {
   background-color: white;
   color: blue;
@@ -44,12 +46,13 @@
 }
 
 .child_body {
-  background-color: yellow;
+  background-color: rgb(255, 255, 255);
 }
 
 .main_child {
   height: 100vh;
 }
+
 .plan_div {
   display: flex;
   justify-content: center;
@@ -57,6 +60,7 @@
   flex-direction: column;
   gap: 20px;
 }
+
 .sub_btn {
   width: 250px;
   height: auto;
@@ -75,8 +79,54 @@
   transform: scale(1.1);
   border: 2px solid white;
 }
-.logout_text{
-  color: #2e3191;
+
+/* Logout button - same styling as other buttons */
+.logout_btn {
+  width: 150px;
+  height: auto;
+  background-color: #2e3191;
+  color: white;
+  border-style: none;
+  border-radius: 5px;
+  border: 2px solid white;
+  padding: 3px 2px;
+  font-size: 16px;
   position: absolute;
-  right: 10%;
+  right: 1%;
+  cursor: pointer;
+}
+
+.logout_btn:hover {
+  background-color: white;
+  color: #2e3191;
+  transition: 0.8s;
+  transform: scale(1.1);
+  border: 2px solid #2e3191;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .top_bar_nav {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+  }
+
+  .logout_btn {
+    width: 100%;
+    margin-top: 10px;
+    position: static;
+  }
+
+  .side_bar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .main_btn {
+    width: 90%;
+    max-width: 250px;
+  }
 }

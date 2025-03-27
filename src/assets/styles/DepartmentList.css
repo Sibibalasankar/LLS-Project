@@ -1,0 +1,10 @@
+.print_btn_DL{
+    width: 150px;
+}
+
+@media print {
+    .no-print {
+      display: none !important;
+    }
+  }
+  

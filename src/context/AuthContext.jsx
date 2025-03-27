@@ -1,31 +1,25 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("user")) || null;
-  });
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [user]);
-
-  const login = (userData) => {
-    setUser(userData);
+  const login = (token, role) => {
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("role", role);
+    setUser({ token, role });
   };
 
   const logout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("role");
     setUser(null);
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+      {children} {/* ✅ Do not wrap with another <Router> */}
     </AuthContext.Provider>
   );
 };

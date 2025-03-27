@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Import auth context
+import { useAuth } from "../context/AuthContext";
 import "../assets/styles/Admin_login.css";
 
 const Admin_login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get login function from AuthProvider
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,10 +21,14 @@ const Admin_login = () => {
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setError("");
       login("admin-token", "admin"); // ✅ Store admin token & role
+
+      // Save role in localStorage for persistence
+      localStorage.setItem("role", "admin");
+
       alert("Login Successful!");
 
-      // ✅ Redirect to the dashboard
-      navigate("/dashboard", { replace: true });
+      // ✅ Redirect to admin dashboard
+      navigate("/admin-dashboard", { replace: true });
     } else {
       setError("Invalid username or password!");
     }

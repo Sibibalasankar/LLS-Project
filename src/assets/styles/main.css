@@ -3,4 +3,5 @@
 
 *{
 font-family: "IBM Plex Mono", monospace;
+user-select: none;
 }

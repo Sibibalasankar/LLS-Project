@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Import auth context
+import { useAuth } from "../context/AuthContext";
 import "../assets/styles/Admin_login.css";
 
 const User_login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get login function from AuthProvider
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,14 +20,15 @@ const User_login = () => {
 
     if (username === USER_USERNAME && password === USER_PASSWORD) {
       setError("");
-
       login("user-token", "user"); // ✅ Store user token & role
+
+      // Save role in localStorage for persistence
+      localStorage.setItem("role", "user");
 
       alert("Login Successful!");
 
-      // Redirect to the dashboard
-      navigate("/dashboard", { replace: true });
-      window.location.reload(); // ✅ Ensure UI updates immediately
+      // ✅ Redirect to user dashboard
+      navigate("/user-dashboard", { replace: true });
     } else {
       setError("Invalid username or password!");
     }
@@ -37,7 +38,7 @@ const User_login = () => {
     <div className="container-fluid main_login_div">
       <div className="form_div">
         <div className="login_title">
-          <p className="login_subtitle">User Login</p> {/* ✅ Changed text */}
+          <p className="login_subtitle">User Login</p>
         </div>
 
         <form className="form_elements" onSubmit={handleSubmit}>

@@ -1,32 +1,48 @@
-import { Routes, Route } from "react-router-dom";
-import Login from "./pages/login";  // ✅ Import Login component
-import Dashboard from "./components/Dashboard";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserDashboard from "./pages/UserDashboard";
 import AdminLogin from "./pages/Admin_login";
 import UserLogin from "./pages/User_login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider } from "./context/AuthContext"; // ✅ Make sure this path is correct
-
 
 function App() {
   return (
     <Routes>
-      {/* ✅ Default Route (Home Page) */}
+      {/* Default Routes */}
       <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} /> {/* ✅ Fix: Add /login route */}
+      <Route path="/login" element={<Login />} />
 
-      {/* Other Routes */}
+      {/* Admin Routes */}
       <Route path="/admin" element={<AdminLogin />} />
-      <Route path="/user" element={<UserLogin />} />
-      <Route 
-        path="/dashboard" 
+      <Route
+        path="/admin-dashboard"
         element={
-          <ProtectedRoute>
-            <Dashboard />
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
           </ProtectedRoute>
-        } 
+        }
       />
+
+      {/* User Routes */}
+      <Route path="/user" element={<UserLogin />} />
+      <Route
+        path="/user-dashboard"
+        element={
+          <ProtectedRoute requiredRole="user">
+            <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Handle "/dashboard" Route */}
+      <Route path="/dashboard" element={<Navigate to="/login" replace />} />
+
+      {/* Catch-All Route (404) */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
 export default App;
+ 

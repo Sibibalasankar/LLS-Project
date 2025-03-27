@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 
 // Import all pages
-import AuditorList from "../pages/AuditorList";
-import DepartmentList from "../pages/DepartmentList";
-import AuditPlanCreation from "../pages/AuditPlanCreation";
-import AuditPlanSheet from "../pages/AuditPlanSheet";
-import AuditIntimationMail from "../pages/AuditIntimationMail";
-import AuditObservation from "../pages/AuditObservation";
-import AuditNCCloser from "../pages/AuditNCCloser";
-import AuditNCApproval from "../pages/AuditNCApproval";
-import AuditSummary from "../pages/AuditSummary";
-import ISOManual from "../pages/ISOManual";
+import AuditorList from "./AuditorList";
+import DepartmentList from "./DepartmentList";
+import AuditPlanCreation from "./AuditPlanCreation";
+import AuditPlanSheet from "./AuditPlanSheet";
+import AuditIntimationMail from "./AuditIntimationMail";
+import AuditObservation from "./AuditObservation";
+import AuditNCCloser from "./AuditNCCloser";
+import AuditNCApproval from "./AuditNCApproval";
+import AuditSummary from "./AuditSummary";
+import ISOManual from "./ISOManual";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -24,9 +24,9 @@ const Dashboard = () => {
     <div className="container-fluid main_body">
       <div className="top_bar_nav">
         <h2 className="title_company">LLS Audit Management System</h2>
-        <p className="logout_text" onClick={() => navigate("/login")}>
+        <button className="logout_btn" onClick={() => navigate("/login")}>
           Log out
-        </p>
+        </button>
       </div>
 
       <div className="row main_child">
