@@ -141,10 +141,11 @@ const AuditorList = () => {
 
   return (
     <div className="auditor-list-container">
-       <h2>Auditor List</h2>
+      <h2>Auditor List</h2>
       <div className="auditor-list-header">
-       
-        <button className="add-btn">Add Auditor</button>
+        <button className="add-btn" onClick={() => setShowForm(true)}>
+          Add Auditor
+        </button>
         <button className="print-btn" onClick={printTable}>
           Print Table
         </button>
@@ -267,6 +268,39 @@ const AuditorList = () => {
                 placeholder="Mail ID"
                 required
               />
+              {/* Dropdowns */}
+
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>
+                  Select Department
+                </option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                name="designation"
+                value={formData.designation}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>
+                  Select Designation
+                </option>
+                {designations.map((designation, index) => (
+                  <option key={index} value={designation}>
+                    {designation}
+                  </option>
+                ))}
+              </select>
 
               <div className="form-buttons">
                 <button

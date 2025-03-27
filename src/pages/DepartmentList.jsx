@@ -1,145 +1,198 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Table, Modal, Form } from "react-bootstrap";
-import { useReactToPrint } from "react-to-print";
+import { useState, useEffect } from "react";
 import "../assets/styles/DepartmentList.css";
 
+const departments = [
+  "Quality Management System",
+  "Marketing - Industrial Automation",
+  "Marketing - Textile Automation",
+  "Marketing - Trading",
+  "Project Management",
+  "Design - Industrial Automation",
+  "Design - Textile Automation",
+  "Design - Controls",
+  "Planning and Engineering Innovation",
+  "Supply Chain Management",
+  "Machining Division (MD)",
+  "Sheet Metal Division (SMD)",
+  "Powder Coating",
+  "Product Assembly",
+  "Project Assembly",
+  "Quality - Inward",
+  "Quality - SMD",
+  "Quality - Machining Division",
+  "Quality - Assembly",
+  "Stores",
+  "Customer Service Department",
+  "Human Resources",
+  "Total Plant Maintenance",
+];
 
 const DepartmentList = () => {
-  const [departments, setDepartments] = useState(() => {
-    const savedDepartments = localStorage.getItem("departments");
-    return savedDepartments
-      ? JSON.parse(savedDepartments)
-      : [
-          { id: 1, name: "Quality Management System", mail: "" },
-          { id: 2, name: "Marketing - Industrial Automation", mail: "" },
-          { id: 3, name: "Marketing - Textile Automation", mail: "" },
-          { id: 4, name: "Marketing - Trading", mail: "" },
-          { id: 5, name: "Project Management", mail: "" },
-          { id: 6, name: "Design - Industrial Automation", mail: "" },
-          { id: 7, name: "Design - Textile Automation", mail: "" },
-          { id: 8, name: "Design - Controls", mail: "" },
-          { id: 9, name: "Planning and Engineering Innovation", mail: "" },
-          { id: 10, name: "Supply Chain Management", mail: "" },
-          { id: 11, name: "Machining Division (MD)", mail: "" },
-          { id: 12, name: "Sheet Metal Division (SMD)", mail: "" },
-          { id: 13, name: "Powder Coating", mail: "" },
-          { id: 14, name: "Product Assembly", mail: "" },
-          { id: 15, name: "Project Assembly", mail: "" },
-          { id: 16, name: "Quality - Inward", mail: "" },
-          { id: 17, name: "Quality - SMD", mail: "" },
-          { id: 18, name: "Quality - Machining Division", mail: "" },
-          { id: 19, name: "Quality - Assembly", mail: "" },
-          { id: 20, name: "Stores", mail: "" },
-          { id: 21, name: "Customer Service Department", mail: "" },
-          { id: 22, name: "Human Resources", mail: "" },
-          { id: 23, name: "Total Plant Maintenance", mail: "" }
-        ];
+  const [departmentData, setDepartmentData] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
   });
 
   useEffect(() => {
+    const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
+    setDepartmentData(storedDepartments);
+  }, []);
+
+  const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));
-  }, [departments]);
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
-  const [editedMail, setEditedMail] = useState("");
-
-  const handleEditClick = (department) => {
-    setSelectedDepartment(department);
-    setEditedMail(department.mail);
-    setShowModal(true);
   };
 
-  const handleSave = () => {
-    setDepartments((prev) =>
-      prev.map((dept) =>
-        dept.id === selectedDepartment.id ? { ...dept, mail: editedMail } : dept
-      )
-    );
-    setShowModal(false);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRemove = (id) => {
-    setDepartments((prev) =>
-      prev.map((dept) => (dept.id === id ? { ...dept, mail: "" } : dept))
-    );
-  };
-
-  const printRef = useRef(null);
-
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    onBeforePrint: () => {
-      document.querySelectorAll(".no-print").forEach(el => (el.style.display = "none"));
-    },
-    onAfterPrint: () => {
-      document.querySelectorAll(".no-print").forEach(el => (el.style.display = ""));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let updatedDepartments;
+    if (editingIndex !== null) {
+      updatedDepartments = departmentData.map((dept, index) =>
+        index === editingIndex ? formData : dept
+      );
+      setEditingIndex(null);
+    } else {
+      updatedDepartments = [...departmentData, formData];
     }
-  });
+    setDepartmentData(updatedDepartments);
+    saveToLocalStorage(updatedDepartments);
+    setShowForm(false);
+    setFormData({ name: "", email: "" });
+  };
+
+  const handleEdit = (index) => {
+    setFormData(departmentData[index]);
+    setEditingIndex(index);
+    setShowForm(true);
+  };
+
+  const handleDelete = (index) => {
+    const updatedDepartments = departmentData.filter((_, i) => i !== index);
+    setDepartmentData(updatedDepartments);
+    saveToLocalStorage(updatedDepartments);
+  };
+
+  const handlePrint = () => {
+    const tableContent = document.querySelector(".department-table").cloneNode(true);
+  
+    // Remove the "Actions" column
+    tableContent.querySelectorAll("tr").forEach((row) => {
+      row.removeChild(row.lastElementChild);
+    });
+  
+    const printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Department List</title>
+          <style>
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 12px;
+              text-align: left;
+            }
+            th {
+              background-color: #f4f4f4;
+            }
+            tbody tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Department List</h2>
+          ${tableContent.outerHTML}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+  
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center">List of Departments</h2>
-      
-      <div ref={printRef}>
-        <Table striped bordered hover>
+    <div className="department-list-container">
+      <h2>Department List</h2>
+      <div className="department-list-header">
+        <button className="add-btn" onClick={() => setShowForm(true)}>
+          Add Department
+        </button>
+        <button className="print-btn" onClick={handlePrint}>
+          Print Table
+        </button>
+      </div>
+
+      <div className="department-table-wrapper">
+        <table className="department-table">
           <thead>
             <tr>
-              <th>Sl. No</th>
-              <th>Department</th>
-              <th>Mail ID (Auditee)</th>
-              <th className="no-print">Action</th>
+              <th>Department Name</th>
+              <th>Auditor Email</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {departments.map((dept, index) => (
-              <tr key={dept.id}>
-                <td>{index + 1}</td>
-                <td>{dept.name}</td>
-                <td>{dept.mail || "-"}</td>
-                <td className="no-print">
-                  <Button variant="warning" size="sm" onClick={() => handleEditClick(dept)}>
+              <tr key={index}>
+                <td>{dept}</td>
+                <td>{departmentData[index]?.email || "N/A"}</td>
+                <td>
+                  <button className="edit-btn" onClick={() => handleEdit(index)}>
                     Edit
-                  </Button>
-                  <Button variant="danger" size="sm" className="ms-2" onClick={() => handleRemove(dept.id)}>
-                    Remove
-                  </Button>
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDelete(index)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
-        </Table>
+        </table>
       </div>
- 
-      <Button className="mt-3 mb-3 print_btn_DL" variant="primary" onClick={handlePrint}>
-        Print
-      </Button>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Mail ID</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Mail ID</Form.Label>
-              <Form.Control
-                type="email"
-                value={editedMail}
-                onChange={(e) => setEditedMail(e.target.value)}
+      {showForm && (
+        <div className="popup-overlay">
+          <div className="popup-form">
+            <h3>{editingIndex !== null ? "Edit Department" : "Add Department"}</h3>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Department Name"
+                required
               />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Auditor Email"
+                required
+              />
+              <div className="form-buttons">
+                <button type="button" className="close-btn" onClick={() => setShowForm(false)}>
+                  Close
+                </button>
+                <button type="submit" className="submit-btn">
+                  {editingIndex !== null ? "Update" : "Add"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
