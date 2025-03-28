@@ -31,14 +31,11 @@ const DepartmentList = () => {
   const [departmentData, setDepartmentData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "" });
 
+  // Load departments from localStorage on mount
   useEffect(() => {
-    const storedDepartments =
-      JSON.parse(localStorage.getItem("departments")) || [];
+    const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
     setDepartmentData(storedDepartments);
   }, []);
 
@@ -52,15 +49,17 @@ const DepartmentList = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let updatedDepartments;
+    if (!formData.name.trim() || !formData.email.trim()) return; // Prevent empty entries
+
+    let updatedDepartments = [...departmentData];
+
     if (editingIndex !== null) {
-      updatedDepartments = departmentData.map((dept, index) =>
-        index === editingIndex ? formData : dept
-      );
+      updatedDepartments[editingIndex] = formData; // Update existing department
       setEditingIndex(null);
     } else {
-      updatedDepartments = [...departmentData, formData];
+      updatedDepartments.push(formData); // Add new department
     }
+
     setDepartmentData(updatedDepartments);
     saveToLocalStorage(updatedDepartments);
     setShowForm(false);
@@ -80,13 +79,14 @@ const DepartmentList = () => {
   };
 
   const handlePrint = () => {
-    const tableContent = document
-      .querySelector(".department-table")
-      .cloneNode(true);
+    const tableContent = document.querySelector(".department-table");
+    if (!tableContent) return; // Prevent error if the table isn't found
 
-    // Remove the "Actions" column
-    tableContent.querySelectorAll("tr").forEach((row) => {
-      row.removeChild(row.lastElementChild);
+    const clonedTable = tableContent.cloneNode(true);
+    
+    // Remove "Actions" column
+    clonedTable.querySelectorAll("tr").forEach((row) => {
+      if (row.lastElementChild) row.removeChild(row.lastElementChild);
     });
 
     const printWindow = window.open("", "", "width=800,height=600");
@@ -95,26 +95,15 @@ const DepartmentList = () => {
         <head>
           <title>Department List</title>
           <style>
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              border: 1px solid #ddd;
-              padding: 12px;
-              text-align: left;
-            }
-            th {
-              background-color: #f4f4f4;
-            }
-            tbody tr:nth-child(even) {
-              background-color: #f9f9f9;
-            }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #f4f4f4; }
+            tbody tr:nth-child(even) { background-color: #f9f9f9; }
           </style>
         </head>
         <body>
           <h2>Department List</h2>
-          ${tableContent.outerHTML}
+          ${clonedTable.outerHTML}
         </body>
       </html>
     `);
@@ -125,60 +114,56 @@ const DepartmentList = () => {
   return (
     <div className="department-list-container">
       <h2>Department List</h2>
-      
+
       <div className="department-list-header">
         <button className="add-btn" onClick={() => setShowForm(true)}>
           Add Department
         </button>
-        
+
         <button className="print-btn" onClick={handlePrint}>
           Print Table
         </button>
       </div>
 
       <div className="department-table-wrapper">
-        <table className="department-table">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>Department Name</th>
-              <th>Auditor Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {departmentData.map((dept, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td> {/* Serial Number Column */}
-                <td>{dept.name}</td>
-                <td>{dept.email || "N/A"}</td>
-                <td>
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEdit(index)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(index)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        {departmentData.length === 0 ? (
+          <p>No departments available. Add one!</p>
+        ) : (
+          <table className="department-table">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Department Name</th>
+                <th>Auditor Email</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {departmentData.map((dept, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{dept.name}</td>
+                  <td>{dept.email || "N/A"}</td>
+                  <td>
+                    <button className="edit-btn" onClick={() => handleEdit(index)}>
+                      Edit
+                    </button>
+                    <button className="delete-btn" onClick={() => handleDelete(index)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {showForm && (
         <div className="popup-overlay">
           <div className="popup-form">
-            <h3>
-              {editingIndex !== null ? "Edit Department" : "Add Department"}
-            </h3>
+            <h3>{editingIndex !== null ? "Edit Department" : "Add Department"}</h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -197,11 +182,7 @@ const DepartmentList = () => {
                 required
               />
               <div className="form-buttons">
-                <button
-                  type="button"
-                  className="close-btn"
-                  onClick={() => setShowForm(false)}
-                >
+                <button type="button" className="close-btn" onClick={() => setShowForm(false)}>
                   Close
                 </button>
                 <button type="submit" className="submit-btn">

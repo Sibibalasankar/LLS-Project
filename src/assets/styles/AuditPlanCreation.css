@@ -1,71 +1,121 @@
 .audit-plan-container {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .department-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .department-item {
-    padding: 10px;
-    background-color: #f4f4f4;
-    margin: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .department-item:hover {
-    background-color: #ddd;
-  }
-  
-  .back-btn {
-    margin-top: 20px;
-    padding: 10px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-  }
-  
+  text-align: center;
+  padding: 20px;
+  max-width: 100%;
+  background: #f4f7fc;
+  min-height: 100vh;
+}
 
-  .audit-plan-container {
-    text-align: center;
-    padding: 20px;
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+/* Department Grid */
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Department Card */
+.department-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.department-card h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.department-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 12px 18px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.view-details-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.view-details-btn:hover {
+  background-color: #0056b3;
+}
+
+/* No Data Message */
+.no-data-msg {
+  font-size: 18px;
+  color: #555;
+  margin-top: 20px;
+  font-style: italic;
+}
+
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+
+/* Popup Form */
+.popup-form {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 24px;
   }
-  
-  .department-list {
-    list-style: none;
-    padding: 0;
+
+  .popup-form {
+    width: 95%;
+    padding: 15px;
   }
-  
-  .department-item {
+
+  select,
+  input {
+    font-size: 14px;
     padding: 10px;
-    background-color: #f4f4f4;
-    margin: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
   }
-  
-  .department-item:hover {
-    background-color: #ddd;
+
+  button {
+    font-size: 14px;
+    padding: 8px 12px;
   }
-  
-  .audit-plan-details {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-  }
-  
-  .back-btn {
-    margin-top: 20px;
-    padding: 10px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-  }
-      
+}

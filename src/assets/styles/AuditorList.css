@@ -161,3 +161,27 @@ input, select {
     cursor: pointer;
     margin-left: 10px; /* Add spacing */
 }
+
+@media print {
+    .auditor-list-header, .popup-overlay, .filter-container, .edit-btn, .delete-btn {
+      display: none !important;
+    }
+  
+    .auditor-table th:last-child, 
+    .auditor-table td:last-child {
+      display: none;
+    }
+  
+    body {
+      visibility: hidden;
+    }
+  
+    .auditor-table-wrapper {
+      visibility: visible;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
+  
