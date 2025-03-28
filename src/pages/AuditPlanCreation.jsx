@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "../assets/styles/AuditPlanCreation.css";
 import AuditPlanDetails from "./AuditPlanDetails";
+import { useNavigate } from "react-router-dom";  // ✅ Add this import
+
 
 const AuditPlanCreation = () => {
   const [departments, setDepartments] = useState([]);
@@ -11,6 +13,12 @@ const AuditPlanCreation = () => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
     setDepartments(storedDepartments);
   }, []);
+  const navigate = useNavigate();
+
+const handleDepartmentClick = (dept) => {
+  navigate("/audit-plan/details", { state: { department: dept } });
+};
+
 
   return (
     <div className="audit-plan-container">
@@ -37,6 +45,7 @@ const AuditPlanCreation = () => {
         // Show AuditPlanDetails inside the same page when a department is selected
         <AuditPlanDetails department={selectedDepartment} onClose={() => setSelectedDepartment(null)} />
       )}
+
     </div>
   );
 };

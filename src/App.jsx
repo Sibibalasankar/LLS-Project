@@ -28,7 +28,7 @@ function App() {
 
       {/* Audit Plan Routes (Inside Admin Only) */}
       <Route path="/audit-plan-creation" element={<AuditPlanCreation />} />
-      <Route path="/audit-plan/details" element={<AuditPlanDetails />} /> {/* Ensure path is consistent */}
+
 
       {/* User Routes */}
       <Route path="/user" element={<UserLogin />} />
