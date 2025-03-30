@@ -32,7 +32,9 @@ const AuditPlanDetails = ({ department, onClose }) => {
   useEffect(() => {
     if (department) {
       const auditorList = JSON.parse(localStorage.getItem("auditors")) || [];
-      const assignedAuditor = auditorList.find((aud) => aud.department === department.name);
+      const assignedAuditor = auditorList.find(
+        (aud) => aud.department === department.name
+      );
       if (assignedAuditor) {
         setAuditor(assignedAuditor.name);
         setFormData((prev) => ({ ...prev, auditor: assignedAuditor.name }));
@@ -41,7 +43,9 @@ const AuditPlanDetails = ({ department, onClose }) => {
       } else {
         setAuditor("");
         setIsAuditorAssigned(false);
-        setErrorMessage("No auditor assigned for this department. Please assign one before proceeding.");
+        setErrorMessage(
+          "No auditor assigned for this department. Please assign one before proceeding."
+        );
       }
     }
   }, [department]);
@@ -79,20 +83,37 @@ const AuditPlanDetails = ({ department, onClose }) => {
       return;
     }
 
+    if (
+      !window.confirm(
+        editIndex !== null
+          ? "Are you sure you want to update this audit plan?"
+          : "Are you sure you want to add this audit plan?"
+      )
+    ) {
+      return; // If user cancels, do nothing
+    }
+
     let updatedPlans;
     const formattedCycle = `${formData.auditCycle}/${currentYear}`;
 
     if (editIndex !== null) {
       updatedPlans = [...auditPlans];
-      updatedPlans[editIndex] = { ...formData, department: department.name, formattedCycle };
+      updatedPlans[editIndex] = {
+        ...formData,
+        department: department.name,
+        formattedCycle,
+      };
     } else {
-      updatedPlans = [...auditPlans, { ...formData, department: department.name, formattedCycle }];
+      updatedPlans = [
+        ...auditPlans,
+        { ...formData, department: department.name, formattedCycle },
+      ];
     }
 
     setAuditPlans(updatedPlans);
     localStorage.setItem("auditPlans", JSON.stringify(updatedPlans));
-    setShowForm(false);
     resetForm();
+    setShowForm(false);
   };
 
   const handleEdit = (index) => {
@@ -101,6 +122,47 @@ const AuditPlanDetails = ({ department, onClose }) => {
     setShowForm(true);
   };
 
+  const handlePrint = () => {
+    const printContent = document.getElementById("audit-plan-table");
+    if (!printContent) {
+      alert("Audit Plan Table not found!");
+      return;
+    }
+
+    // Clone the table to manipulate it without affecting the original
+    const clonedTable = printContent.cloneNode(true);
+
+    // Remove the last column (Action column) from the header and all rows
+    const headers = clonedTable.querySelectorAll("thead th");
+    if (headers.length) headers[headers.length - 1].remove(); // Remove "Action" column header
+
+    clonedTable.querySelectorAll("tbody tr").forEach((row) => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length) cells[cells.length - 1].remove(); // Remove "Action" column data
+    });
+
+    const printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Audit Plan</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid black; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h2>Audit Plan Details</h2>
+          ${clonedTable.outerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+  };
   const resetForm = () => {
     setFormData({
       auditCycle: "I",
@@ -110,21 +172,42 @@ const AuditPlanDetails = ({ department, onClose }) => {
       auditor: auditor,
       auditees: "",
     });
+    setNewProcess(""); // Ensure new process input is cleared
     setEditIndex(null);
   };
 
   return (
     <div className="audit-plan-container">
-      <button onClick={() => (onClose ? onClose() : navigate("/audit-plan-creation"))} className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors">
-        ← Back
-      </button>
       <h2>Audit Plan Details</h2>
+      <h5 className="iso_title mb-4">
+        INTERNAL AUDIT SCHEDULE - ISO 9001:2015
+      </h5>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
-      <button className="add-btn mb-3" onClick={() => setShowForm(true)} disabled={!isAuditorAssigned}>
-        Add Audit Plan
-      </button>
 
-      <table className="audit-table">
+      <div className="header-buttons">
+        <button
+          onClick={() =>
+            onClose ? onClose() : navigate("/audit-plan-creation")
+          }
+          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+        >
+          ← Back
+        </button>
+        <div className="two_btns">
+          <button
+            className="add-btn mb-3"
+            onClick={() => setShowForm(true)}
+            disabled={!isAuditorAssigned}
+          >
+            Add Audit Plan
+          </button>
+          <button className="print-btn mb-3" onClick={handlePrint}>
+            🖨️ Print
+          </button>
+        </div>
+      </div>
+
+      <table id="audit-plan-table" className="audit-table">
         <thead>
           <tr>
             <th>Audit Cycle No</th>
@@ -156,8 +239,26 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 <td>{plan.auditor}</td>
                 <td>{plan.auditees}</td>
                 <td>
-                  <button onClick={() => handleEdit(index)} className="edit-btn styled-btn">Edit</button>
-                  <button onClick={() => setAuditPlans(auditPlans.filter((_, i) => i !== index))} className="delete-btn styled-btn">Delete</button>
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="edit-btn styled-btn"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this audit plan?"
+                        )
+                      ) {
+                        setAuditPlans(auditPlans.filter((_, i) => i !== index));
+                      }
+                    }}
+                    className="delete-btn styled-btn"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -169,7 +270,12 @@ const AuditPlanDetails = ({ department, onClose }) => {
           <div className="popup-form">
             <h3>{editIndex !== null ? "Edit Audit Plan" : "Add Audit Plan"}</h3>
             <form onSubmit={handleSubmit}>
-              <select name="auditCycle" value={formData.auditCycle} onChange={handleChange} required>
+              <select
+                name="auditCycle"
+                value={formData.auditCycle}
+                onChange={handleChange}
+                required
+              >
                 <option value="I">I</option>
                 <option value="II">II</option>
                 <option value="III">III</option>
@@ -177,10 +283,25 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 <option value="V">V</option>
               </select>
 
-              <input type="text" name="department" value={department?.name || ""} readOnly />
-              <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+              <input
+                type="text"
+                name="department"
+                value={department?.name || ""}
+                readOnly
+              />
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
 
-              <select name="timeDuration" value={formData.timeDuration} onChange={handleChange}>
+              <select
+                name="timeDuration"
+                value={formData.timeDuration}
+                onChange={handleChange}
+              >
                 <option value="">Select Time Duration</option>
                 <option value="1 Month">1 Month</option>
                 <option value="3 Months">3 Months</option>
@@ -190,22 +311,57 @@ const AuditPlanDetails = ({ department, onClose }) => {
               </select>
 
               <div className="processes-container">
-                <input type="text" placeholder="Add Process" value={newProcess} onChange={(e) => setNewProcess(e.target.value)} />
-                <button type="button" className="add-process-btn" onClick={handleAddProcess}>+ Add</button>
+                <input
+                  type="text"
+                  placeholder="Add Process"
+                  value={newProcess}
+                  onChange={(e) => setNewProcess(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="add-process-btn"
+                  onClick={handleAddProcess}
+                >
+                  + Add
+                </button>
                 <ol>
                   {formData.processes.map((process, index) => (
                     <li key={index}>
-                      {process} <button type="button" onClick={() => handleRemoveProcess(index)}>❌</button>
+                      {process}{" "}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveProcess(index)}
+                      >
+                        ❌
+                      </button>
                     </li>
                   ))}
                 </ol>
               </div>
 
               <input type="text" name="auditor" value={auditor} readOnly />
-              <input type="text" name="auditees" placeholder="Auditee(s)" value={formData.auditees} onChange={handleChange} />
+              <input
+                type="text"
+                name="auditees"
+                placeholder="Auditee(s)"
+                value={formData.auditees}
+                onChange={handleChange}
+              />
               <div className="form-buttons">
-                <button type="button" className="close-btn" onClick={() => setShowForm(false)}>Close</button>
-                <button type="submit" className="submit-btn" disabled={!isAuditorAssigned}>Save</button>
+                <button
+                  type="button"
+                  className="close-btn"
+                  onClick={() => setShowForm(false)}
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={!isAuditorAssigned}
+                >
+                  Save
+                </button>
               </div>
             </form>
           </div>

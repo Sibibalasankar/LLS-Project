@@ -142,3 +142,31 @@
     color: white;
   }
   
+
+  .header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .print-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .print-btn:hover {
+    background-color: #45a049;
+  }
+  
+
+  .iso_title{
+    background-color: #FFC000;
+    padding: 10px;
+    border-top: 1px solid black; 
+    border-bottom: 1px solid black;
+  }
