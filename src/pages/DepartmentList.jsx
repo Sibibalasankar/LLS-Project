@@ -36,8 +36,21 @@ const DepartmentList = () => {
   // Load departments from localStorage on mount
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
-    setDepartmentData(storedDepartments);
+  
+    // Create a map of stored departments to retain assigned emails
+    const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept.email]));
+  
+    // Ensure all departments are listed, retaining assigned emails if available
+    const updatedDepartments = departments.map(name => ({
+      name,
+      email: storedDeptMap.get(name) || "", // Keep stored email if exists, else empty
+    }));
+  
+    setDepartmentData(updatedDepartments);
+    localStorage.setItem("departments", JSON.stringify(updatedDepartments)); // Update storage
   }, []);
+  
+  
 
   const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));
