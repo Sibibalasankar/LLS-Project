@@ -63,8 +63,10 @@ const AuditorList = () => {
         index === editingIndex ? formData : auditor
       );
       setEditingIndex(null);
+      alert("Auditor updated successfully!");
     } else {
       updatedAuditors = [...auditors, formData];
+      alert("Auditor added successfully!");
     }
     setAuditors(updatedAuditors);
     saveToLocalStorage(updatedAuditors);
@@ -80,9 +82,17 @@ const AuditorList = () => {
   };
 
   const handleDelete = (index) => {
-    const updatedAuditors = auditors.filter((_, i) => i !== index);
-    setAuditors(updatedAuditors);
-    saveToLocalStorage(updatedAuditors);
+    const auditorToDelete = auditors[index];
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete ${auditorToDelete.name} (Employee #: ${auditorToDelete.employeeNumber})?`
+    );
+    
+    if (isConfirmed) {
+      const updatedAuditors = auditors.filter((_, i) => i !== index);
+      setAuditors(updatedAuditors);
+      saveToLocalStorage(updatedAuditors);
+      alert("Auditor deleted successfully!");
+    }
   };
 
   const handlePrint = () => {
@@ -259,7 +269,12 @@ const AuditorList = () => {
                 <button
                   type="button"
                   className="close-btn"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+                    if (isConfirmed) {
+                      setShowForm(false);
+                    }
+                  }}
                 >
                   Close
                 </button>

@@ -50,8 +50,6 @@ const DepartmentList = () => {
     localStorage.setItem("departments", JSON.stringify(updatedDepartments)); // Update storage
   }, []);
   
-  
-
   const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));
   };
@@ -62,21 +60,28 @@ const DepartmentList = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) return; // Prevent empty entries
+    if (!formData.name.trim() || !formData.email.trim()) {
+      alert("Please fill in all fields");
+      return;
+    }
 
     let updatedDepartments = [...departmentData];
+    let message = "";
 
     if (editingIndex !== null) {
-      updatedDepartments[editingIndex] = formData; // Update existing department
+      updatedDepartments[editingIndex] = formData;
       setEditingIndex(null);
+      message = "Department updated successfully!";
     } else {
-      updatedDepartments.push(formData); // Add new department
+      updatedDepartments.push(formData);
+      message = "Department added successfully!";
     }
 
     setDepartmentData(updatedDepartments);
     saveToLocalStorage(updatedDepartments);
     setShowForm(false);
     setFormData({ name: "", email: "" });
+    alert(message);
   };
 
   const handleEdit = (index) => {
@@ -86,14 +91,22 @@ const DepartmentList = () => {
   };
 
   const handleDelete = (index) => {
-    const updatedDepartments = departmentData.filter((_, i) => i !== index);
-    setDepartmentData(updatedDepartments);
-    saveToLocalStorage(updatedDepartments);
+    const departmentToDelete = departmentData[index];
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditor Email: ${departmentToDelete.email || "N/A"}`
+    );
+    
+    if (isConfirmed) {
+      const updatedDepartments = departmentData.filter((_, i) => i !== index);
+      setDepartmentData(updatedDepartments);
+      saveToLocalStorage(updatedDepartments);
+      alert("Department deleted successfully!");
+    }
   };
 
   const handlePrint = () => {
     const tableContent = document.querySelector(".department-table");
-    if (!tableContent) return; // Prevent error if the table isn't found
+    if (!tableContent) return;
 
     const clonedTable = tableContent.cloneNode(true);
     
@@ -195,7 +208,16 @@ const DepartmentList = () => {
                 required
               />
               <div className="form-buttons">
-                <button type="button" className="close-btn" onClick={() => setShowForm(false)}>
+                <button 
+                  type="button" 
+                  className="close-btn" 
+                  onClick={() => {
+                    const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+                    if (isConfirmed) {
+                      setShowForm(false);
+                    }
+                  }}
+                >
                   Close
                 </button>
                 <button type="submit" className="submit-btn">
