@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 
 // Import user-related pages
-import AuditObservation from "../pages/AuditObservation";
+import AuditObservation from "./AuditObservation";
 import AuditNCCloser from "../pages/AuditNCCloser";
 import AuditNCApproval from "../pages/AuditNCApproval";
 import AuditPlanSheet from "./AuditPlanSheet";
