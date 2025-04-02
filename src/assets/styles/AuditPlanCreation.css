@@ -1,121 +1,55 @@
-.audit-plan-container {
-  text-align: center;
-  padding: 20px;
-  max-width: 100%;
-  background: #f4f7fc;
-  min-height: 100vh;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #007bff;
-}
-
-/* Department Grid */
-.department-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
-}
-
-/* Department Card */
 .department-card {
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
-}
-
-.department-card h3 {
-  font-size: 20px;
-  color: #333;
-  margin-bottom: 15px;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .department-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Buttons */
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  padding: 12px 18px;
-  transition: all 0.3s ease;
+.department-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 18px;
   font-weight: bold;
+  color: #2c3e50;
 }
 
 .view-details-btn {
-  background-color: #007bff;
+  background-color: #3498db;
   color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background-color 0.3s;
 }
 
 .view-details-btn:hover {
-  background-color: #0056b3;
-}
-
-/* No Data Message */
-.no-data-msg {
-  font-size: 18px;
-  color: #555;
-  margin-top: 20px;
-  font-style: italic;
-}
-
-/* Popup Overlay */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
-}
-
-/* Popup Form */
-.popup-form {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 24px;
-  }
-
-  .popup-form {
-    width: 95%;
-    padding: 15px;
-  }
-
-  select,
-  input {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  button {
-    font-size: 14px;
-    padding: 8px 12px;
-  }
+  background-color: #2980b9;
 }

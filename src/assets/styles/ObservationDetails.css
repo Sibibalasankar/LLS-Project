@@ -1,0 +1,33 @@
+.back-btn {
+    background-color: #007BFF;
+    color: #fff;
+  }
+  
+  .go-to-btn {
+    background-color: #28A745;
+    color: #fff;
+  }
+  
+  .delete-btn {
+    background-color: #DC3545;
+    color: #fff;
+  }
+  
+  .add-observation-btn {
+    background-color: #FFC107;
+    color: #000;
+  }
+  
+  .button {
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .button:hover {
+    opacity: 0.9;
+  }
+  

@@ -270,3 +270,27 @@
   margin-bottom: 30px;
   color: #6c757d;
 }
+.view-btn {
+  width: 100%;
+  margin-top: 10px;
+  background-color: #007bff; /* Primary blue */
+  color: white; /* Ensure text is readable */
+  border: none;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.view-btn:disabled {
+  background-color: #ccc;
+  color: #666; /* Make disabled text readable */
+  cursor: not-allowed;
+}
+
