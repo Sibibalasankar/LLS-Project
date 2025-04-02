@@ -7,6 +7,9 @@ import UserLogin from "./pages/User_login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuditPlanCreation from "./pages/AuditPlanCreation";
 import AuditPlanDetails from "./pages/AuditPlanDetails";
+import AuditObservation from "./pages/AuditObservation";
+import ObservationDetails from "./pages/Observationdetails";
+
 
 function App() {
   return (
@@ -25,7 +28,8 @@ function App() {
           </ProtectedRoute>
         }
       />
-
+<Route path="/audit-observation" element={<AuditObservation />} />
+<Route path="/observation-details/:departmentName" element={<ObservationDetails />} />
       {/* Audit Plan Routes (Inside Admin Only) */}
       <Route path="/audit-plan-creation" element={<AuditPlanCreation />} />
 

@@ -1,330 +1,272 @@
-/* AuditObservation.css - Combined Styles */
-
-/* Existing Styles */
+/* Main Container */
 .audit-observation-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .page-title {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #2c3e50;
-  }
-  
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+}
+
+/* Department Cards Grid */
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.department-card {
+  transition: all 0.3s ease;
+}
+
+.department-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.department-card h3 {
+  margin-top: 0;
+  color: #3498db;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Department Statistics */
+.department-stats {
+  margin: 15px 0;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.stat-label {
+  color: #666;
+}
+
+.stat-value {
+  font-weight: 500;
+}
+
+.view-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Observation Detail View */
+.observation-detail-view {
+  margin-top: 30px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.back-btn {
+  min-width: 150px;
+}
+
+/* Observation List */
+.observation-list {
+  margin-bottom: 30px;
+}
+
+.observation-list h4 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.observation-item {
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+}
+
+.observation-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.observation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.observation-desc {
+  color: #555;
+  margin-top: 10px;
+}
+
+.no-observations-msg {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+/* Severity Badges */
+.severity-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-left: 10px;
+}
+
+.severity-badge.low { background: #d4edda; color: #155724; }
+.severity-badge.medium { background: #fff3cd; color: #856404; }
+.severity-badge.high { background: #f8d7da; color: #721c24; }
+.severity-badge.critical { background: #dc3545; color: white; }
+
+/* Add Observation Form */
+.add-observation-form {
+  margin-top: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+/* No Data Message */
+.no-data-msg {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
   .department-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: 1fr;
   }
   
-  .department-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    transition: transform 0.2s;
-  }
-  
-  .department-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  }
-  
-  .department-card h3 {
-    margin-top: 0;
-    color: #3498db;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-  }
-  
-  .dept-description {
-    color: #666;
-    font-size: 0.9em;
-    margin-bottom: 15px;
-  }
-  
-  .view-observations-btn {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s;
-  }
-  
-  .view-observations-btn:hover {
-    background-color: #2980b9;
-  }
-  
-  .no-data-msg {
-    text-align: center;
-    color: #7f8c8d;
-    padding: 40px;
-    background: #f9f9f9;
-    border-radius: 8px;
-  }
-  
-  .card-animation {
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .card-animation:hover {
-    transform: translateY(-2px);
-  }
-  
-  /* New Styles for Observation Form */
-  .audit-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .header-actions {
-    display: flex;
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
-  }
-  
-  .observation-form {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #2c3e50;
-  }
-  
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: inherit;
-  }
-  
-  .form-group textarea {
-    min-height: 80px;
-    resize: vertical;
-  }
-  
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .observations-table {
-    overflow-x: auto;
-    margin-top: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  
-  .observations-table table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .observations-table th,
-  .observations-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .observations-table th {
-    background-color: #3498db;
-    color: white;
-    font-weight: 500;
-  }
-  
-  .observations-table tr:hover {
-    background-color: #f8f9fa;
-  }
-  
-  .edit-btn, .delete-btn {
-    padding: 6px 12px;
-    margin-right: 5px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-    transition: all 0.2s;
-  }
-  
-  .edit-btn {
-    background-color: #3498db;
-    color: white;
-  }
-  
-  .edit-btn:hover {
-    background-color: #2980b9;
-  }
-  
-  .delete-btn {
-    background-color: #e74c3c;
-    color: white;
-  }
-  
-  .delete-btn:hover {
-    background-color: #c0392b;
-  }
-  
-  .back-btn, .add-btn, .cancel-btn, .submit-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
   }
   
   .back-btn {
-    background-color: #6c757d;
-    color: white;
+    width: 100%;
   }
-  
-  .back-btn:hover {
-    background-color: #5a6268;
-  }
-  
-  .add-btn {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .add-btn:hover {
-    background-color: #218838;
-  }
-  
-  .cancel-btn {
-    background-color: #6c757d;
-    color: white;
-  }
-  
-  .cancel-btn:hover {
-    background-color: #5a6268;
-  }
-  
-  .submit-btn {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .submit-btn:hover {
-    background-color: #0069d9;
-  }
-  
-  .no-observations {
-    text-align: center;
-    padding: 30px;
-    color: #6c757d;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-    
-    .header-actions {
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .observations-table th,
-    .observations-table td {
-      padding: 8px 10px;
-      font-size: 0.9em;
-    }
-  }
-  /* Add these styles to your existing CSS */
-.view-btn {
-    background-color: #17a2b8;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-    transition: all 0.2s;
-    margin-right: 5px;
-  }
-  
-  .view-btn:hover {
-    background-color: #138496;
-  }
-  
-  /* Adjust the actions column to fit all buttons */
-  .observations-table td:last-child {
-    white-space: nowrap;
-  }
-  
-  /* Style for result indicators */
-  .result-0+ {
-    color: #28a745;
-    font-weight: 500;
-  }
-  
-  .result-NC {
-    color: #dc3545;
-    font-weight: 500;
-  }
-  
-  .result-OFI {
-    color: #ffc107;
-    font-weight: 500;
-  }
+}
+/* Add to AuditObservation.css */
 
-  /* Add to your existing CSS */
-.download-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 0 5px;
-    font-size: 14px;
-  }
-  
-  .download-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
+/* Observation List Header */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-new-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.add-new-btn:hover {
+  background-color: #218838;
+}
+
+/* Observation Actions */
+.observation-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.edit-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #138496;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.submit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #0069d9;
+}
+
+/* No Observations Message */
+.no-observations-msg {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 30px;
+  color: #6c757d;
+}
