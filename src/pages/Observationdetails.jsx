@@ -1,53 +1,87 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/card";
 import { Button } from "../components/button";
+import Observations from "./Observations";
 import "../assets/styles/ObservationDetails.css";
 
 const ObservationDetails = ({ departmentName, onClose }) => {
-  const storageKey = `observations_${departmentName}`;
   const [observations, setObservations] = useState([]);
+  const [viewObservationId, setViewObservationId] = useState(null);
 
-  // Load observations from localStorage on component mount
+  // Load observations from localStorage when component mounts
   useEffect(() => {
-    const storedObservations = localStorage.getItem(storageKey);
-    if (storedObservations) {
-      setObservations(JSON.parse(storedObservations));
-    }
-  }, [departmentName]); // Ensure it updates if the department changes
+    const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
+    setObservations(storedObservations);
+  }, [departmentName]);
 
-  // Save observations to localStorage when they change
+  // Save observations to localStorage whenever they change
   useEffect(() => {
-    if (observations.length > 0) { // Prevent empty overwrites
-      localStorage.setItem(storageKey, JSON.stringify(observations));
-    }
-  }, [observations]);
+    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(observations));
+  }, [observations, departmentName]);
 
   const handleAddObservation = () => {
+    const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
+  
+    // Ensure sequential numbering
     const newObservation = {
       id: Date.now(),
-      number: observations.length + 1,
+      number: storedObservations.length + 1, // Keeps numbers sequential
+      department: departmentName,
     };
-    const updatedObservations = [...observations, newObservation];
+  
+    const updatedObservations = [...storedObservations, newObservation];
     setObservations(updatedObservations);
-    localStorage.setItem(storageKey, JSON.stringify(updatedObservations)); // Save immediately
+  
+    // Save updated observations to localStorage
+    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
+  
+    // Remove navigation to Observations page
+    // setViewObservationId(newObservation.id);
   };
+  
 
   const handleDeleteObservation = (id) => {
-    const updatedObservations = observations.filter((obs) => obs.id !== id);
-    setObservations(updatedObservations);
-    localStorage.setItem(storageKey, JSON.stringify(updatedObservations)); // Save immediately
+    const observationToDelete = observations.find(obs => obs.id === id);
+
+    if (!observationToDelete) return;
+
+    if (window.confirm(`Are you sure you want to delete Observation ${observationToDelete.number}?`)) {
+      const updatedObservations = observations.filter(obs => obs.id !== id);
+      
+      // Reassign sequential numbers
+      const reNumberedObservations = updatedObservations.map((obs, index) => ({
+        ...obs,
+        number: index + 1,
+      }));
+
+      setObservations(reNumberedObservations);
+      alert(`Observation ${observationToDelete.number} deleted.`);
+    }
   };
+
+  const handleGoToObservation = (id) => {
+    const observation = observations.find(obs => obs.id === id);
+    if (observation && window.confirm(`Open Observation ${observation.number}?`)) {
+      setViewObservationId(id);
+    }
+  };
+
+  const handleBackToDepartments = () => {
+    if (window.confirm("Return to departments list?")) {
+      onClose();
+    }
+  };
+
+  // If an observation is selected, navigate to Observations component
+  if (viewObservationId !== null) {
+    return <Observations observationId={viewObservationId} onBack={() => setViewObservationId(null)} />;
+  }
 
   return (
     <div className="observation-details">
       <div className="detail-header">
         <h3>Observations for {departmentName}</h3>
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="back-btn"
-          style={{ backgroundColor: "#007BFF", color: "#fff" }}
-        >
+        <Button variant="outline" onClick={handleBackToDepartments} className="back-btn" style={{ backgroundColor: "#007BFF", color: "#fff" }}>
           Back to Departments
         </Button>
       </div>
@@ -61,7 +95,7 @@ const ObservationDetails = ({ departmentName, onClose }) => {
                   <tr>
                     <th style={{ width: "10%" }}>S. No</th>
                     <th style={{ width: "30%" }}>Observation</th>
-                    <th style={{ width: "40%" }}>Go to Observation</th>
+                    <th style={{ width: "40%" }}>Actions</th>
                     <th style={{ width: "20%" }}>Delete</th>
                   </tr>
                 </thead>
@@ -71,16 +105,17 @@ const ObservationDetails = ({ departmentName, onClose }) => {
                       <td>{index + 1}</td>
                       <td>Observation {obs.number}</td>
                       <td>
-                        <Button variant="outline" className="observation_btn">
+                        <Button 
+                          variant="outline"
+                          className="observation_btn"
+                          onClick={() => handleGoToObservation(obs.id)}
+                          style={{ backgroundColor: "#28A745", color: "#fff" }}
+                        >
                           Go to Observation
                         </Button>
                       </td>
                       <td>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteObservation(obs.id)}
-                          className="delete-btn"
-                        >
+                        <Button variant="destructive" onClick={() => handleDeleteObservation(obs.id)} className="delete-btn">
                           Delete
                         </Button>
                       </td>
@@ -88,20 +123,14 @@ const ObservationDetails = ({ departmentName, onClose }) => {
                   ))}
                 </tbody>
               </table>
-              {observations.length === 0 && (
-                <p className="no-observations-msg">No observations added yet</p>
-              )}
+              {observations.length === 0 && <p className="no-observations-msg">No observations added yet</p>}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Button
-        onClick={handleAddObservation}
-        className="add-observation-btn mt-4"
-        style={{ backgroundColor: "#FFC107", color: "#000" }}
-      >
-        Add Observation
+      <Button onClick={handleAddObservation} className="add-observation-btn mt-4" style={{ backgroundColor: "#FFC107", color: "#000" }}>
+        Add 
       </Button>
     </div>
   );
