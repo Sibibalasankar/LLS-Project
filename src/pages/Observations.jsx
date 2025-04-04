@@ -3,9 +3,10 @@ import "../assets/styles/Observation.css";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
 
-const Observations = ({ observationId, onBack }) => {
+const Observations = ({ observationId: propObservationId, onBack }) => {
   const [observations, setObservations] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [observationId, setObservationId] = useState(null);
   const [currentObservation, setCurrentObservation] = useState({
     id: "",
     slNo: "",
@@ -14,8 +15,12 @@ const Observations = ({ observationId, onBack }) => {
     findings: "",
     isoClause: "",
     result: "",
+    riskLevel: "Medium",
     auditCycleNo: "I",
     auditDate: new Date().toISOString().split("T")[0],
+    dueDate: "",
+    correctiveAction: "",
+    status: "Open",
     auditorSignature: "",
     auditorDesignation: "",
     auditeeSignature: "",
@@ -23,7 +28,31 @@ const Observations = ({ observationId, onBack }) => {
     department: "Quality Management System",
   });
 
-  // Load observations for the current observationId
+  // ISO clauses options
+  const isoClauses = [
+    "4.1", "4.2", "4.3", "4.4", 
+    "5.1", "5.2", "5.3", 
+    "6.1", "6.2", 
+    "7.1", "7.2", "7.3", "7.4", "7.5",
+    "8.1", "8.2", "8.3", "8.4", "8.5", "8.6", "8.7",
+    "9.1", "9.2", "9.3",
+    "10.1", "10.2"
+  ];
+
+  // Initialize observationId from props or localStorage
+  useEffect(() => {
+    if (propObservationId) {
+      localStorage.setItem("currentObservationId", propObservationId);
+      setObservationId(propObservationId);
+    } else {
+      const storedId = localStorage.getItem("currentObservationId");
+      if (storedId) {
+        setObservationId(storedId);
+      }
+    }
+  }, [propObservationId]);
+
+  // Load observations from localStorage when observationId is set
   useEffect(() => {
     if (observationId) {
       const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
@@ -31,9 +60,9 @@ const Observations = ({ observationId, onBack }) => {
     }
   }, [observationId]);
 
-  // Update storage only when observations change
+  // Save observations to localStorage whenever they change
   useEffect(() => {
-    if (observationId && observations.length > 0) {
+    if (observationId) {
       const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
       allObservations[observationId] = observations;
       localStorage.setItem("auditObservations", JSON.stringify(allObservations));
@@ -47,6 +76,14 @@ const Observations = ({ observationId, onBack }) => {
     setCurrentObservation((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleResultChange = (e) => {
+    const { value, checked } = e.target;
+    setCurrentObservation(prev => ({
+      ...prev,
+      result: checked ? value : ""
+    }));
+  };
+
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
 
   const handleCreate = () => {
@@ -58,8 +95,12 @@ const Observations = ({ observationId, onBack }) => {
       findings: "",
       isoClause: "",
       result: "",
+      riskLevel: "Medium",
       auditCycleNo: "I",
       auditDate: new Date().toISOString().split("T")[0],
+      dueDate: "",
+      correctiveAction: "",
+      status: "Open",
       auditorSignature: "",
       auditorDesignation: "",
       auditeeSignature: "",
@@ -137,26 +178,226 @@ const Observations = ({ observationId, onBack }) => {
 
       {showForm && (
         <form onSubmit={handleSubmit} className="observation-form">
-          <label>
-            Process / Activity:
-            <input type="text" name="processActivity" value={currentObservation.processActivity} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Potential Uncertainties / Causes:
-            <input type="text" name="potentialCauses" value={currentObservation.potentialCauses} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Findings:
-            <input type="text" name="findings" value={currentObservation.findings} onChange={handleInputChange} required />
-          </label>
-          <label>
-            ISO 9001 Clause:
-            <input type="text" name="isoClause" value={currentObservation.isoClause} onChange={handleInputChange} />
-          </label>
-          <label>
-            Result:
-            <input type="text" name="result" value={currentObservation.result} onChange={handleInputChange} required />
-          </label>
+          <div className="form-row">
+            <div className="form-group">
+              <label>
+                SL No:
+                <input 
+                  type="number" 
+                  name="slNo" 
+                  value={currentObservation.slNo} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </label>
+            </div>
+            <div className="form-group">
+              <label>
+                Department:
+                <input 
+                  type="text" 
+                  name="department" 
+                  value={currentObservation.department} 
+                  onChange={handleInputChange} 
+                  readOnly
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              Process / Activity:
+              <textarea 
+                name="processActivity" 
+                value={currentObservation.processActivity} 
+                onChange={handleInputChange} 
+                required 
+                rows={3}
+              />
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label>
+              Potential Uncertainties / Causes:
+              <textarea 
+                name="potentialCauses" 
+                value={currentObservation.potentialCauses} 
+                onChange={handleInputChange} 
+                 
+                rows={3}
+              />
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label>
+              Findings:
+              <textarea 
+                name="findings" 
+                value={currentObservation.findings} 
+                onChange={handleInputChange} 
+                required 
+                rows={4}
+              />
+            </label>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>
+                ISO 9001 Clause:
+                <select 
+                  name="isoClause" 
+                  value={currentObservation.isoClause} 
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Clause</option>
+                  {isoClauses.map(clause => (
+                    <option key={clause} value={clause}>{clause}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="form-group">
+              <label>
+                Audit Cycle No:
+                <input 
+                  type="text" 
+                  name="auditCycleNo" 
+                  value={currentObservation.auditCycleNo} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Result:</label>
+            <div className="checkbox-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  name="result"
+                  value="0+"
+                  checked={currentObservation.result === "0+"}
+                  onChange={handleResultChange}
+                />
+                <span>0+ (Observation Positive)</span>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  name="result"
+                  value="NC"
+                  checked={currentObservation.result === "NC"}
+                  onChange={handleResultChange}
+                />
+                <span>NC (Non-Conformity)</span>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  name="result"
+                  value="OFI"
+                  checked={currentObservation.result === "OFI"}
+                  onChange={handleResultChange}
+                />
+                <span>OFI (Opportunity For Improvement)</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>
+                Audit Date:
+                <input 
+                  type="date" 
+                  name="auditDate" 
+                  value={currentObservation.auditDate} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </label>
+            </div>
+            <div className="form-group">
+              <label>
+                Due Date:
+                <input 
+                  type="date" 
+                  name="dueDate" 
+                  value={currentObservation.dueDate} 
+                  onChange={handleInputChange} 
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              Corrective Action:
+              <textarea 
+                name="correctiveAction" 
+                value={currentObservation.correctiveAction} 
+                onChange={handleInputChange} 
+                rows={3}
+              />
+            </label>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>
+                Auditor Signature:
+                <input 
+                  type="text" 
+                  name="auditorSignature" 
+                  value={currentObservation.auditorSignature} 
+                  onChange={handleInputChange} 
+                />
+              </label>
+            </div>
+            <div className="form-group">
+              <label>
+                Auditor Designation:
+                <input 
+                  type="text" 
+                  name="auditorDesignation" 
+                  value={currentObservation.auditorDesignation} 
+                  onChange={handleInputChange} 
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>
+                Auditee Signature:
+                <input 
+                  type="text" 
+                  name="auditeeSignature" 
+                  value={currentObservation.auditeeSignature} 
+                  onChange={handleInputChange} 
+                />
+              </label>
+            </div>
+            <div className="form-group">
+              <label>
+                Auditee Designation:
+                <input 
+                  type="text" 
+                  name="auditeeDesignation" 
+                  value={currentObservation.auditeeDesignation} 
+                  onChange={handleInputChange} 
+                />
+              </label>
+            </div>
+          </div>
+
           <div className="form-buttons">
             <button type="submit" className="save-btn">Save Observation</button>
             <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
