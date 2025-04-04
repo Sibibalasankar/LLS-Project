@@ -9,7 +9,7 @@ import AuditPlanCreation from "./pages/AuditPlanCreation";
 import AuditPlanDetails from "./pages/AuditPlanDetails";
 import AuditObservation from "./pages/AuditObservation";
 import ObservationDetails from "./pages/Observationdetails";
-
+import AuditReport from "./pages/ObservationSheet"; // 👈 Add this
 
 function App() {
   return (
@@ -28,11 +28,9 @@ function App() {
           </ProtectedRoute>
         }
       />
-<Route path="/audit-observation" element={<AuditObservation />} />
-<Route path="/observation-details/:departmentName" element={<ObservationDetails />} />
-      {/* Audit Plan Routes (Inside Admin Only) */}
+      <Route path="/audit-observation" element={<AuditObservation />} />
+      <Route path="/observation-details/:departmentName" element={<ObservationDetails />} />
       <Route path="/audit-plan-creation" element={<AuditPlanCreation />} />
-
 
       {/* User Routes */}
       <Route path="/user" element={<UserLogin />} />
@@ -45,10 +43,11 @@ function App() {
         }
       />
 
-      {/* Handle "/dashboard" Route */}
-      <Route path="/dashboard" element={<Navigate to="/login" replace />} />
+      {/* Add the Audit Report Route */}
+      <Route path="/audit-report" element={<AuditReport />} />
 
-      {/* Catch-All Route (404) */}
+      {/* Redirect & Catch All */}
+      <Route path="/dashboard" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

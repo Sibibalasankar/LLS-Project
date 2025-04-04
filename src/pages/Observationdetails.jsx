@@ -66,7 +66,13 @@ const ObservationDetails = ({ departmentName, onClose }) => {
   };
 
   if (viewObservationId !== null) {
-    return <Observations observationId={viewObservationId} onBack={() => setViewObservationId(null)} />;
+    return (
+      <Observations 
+        observationId={viewObservationId} 
+        departmentName={departmentName}  // Add this line
+        onBack={() => setViewObservationId(null)} 
+      />
+    );
   }
 
   return (

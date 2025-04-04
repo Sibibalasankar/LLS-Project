@@ -321,3 +321,94 @@
     width: 100%;
   }
 }
+/* Header info row */
+.audit-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.audit-info-item {
+  font-size: 16px;
+}
+
+/* Footer styles */
+.audit-footer {
+  margin-top: 30px;
+  padding: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.result-legend {
+  margin-bottom: 20px;
+}
+
+.result-legend p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.signature-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.signature-row {
+  display: flex;
+  gap: 50px;
+}
+
+.signature-item {
+  min-width: 200px;
+}
+
+.signature-item p {
+  margin: 5px 0;
+  border-bottom: 1px solid #000;
+  padding-bottom: 20px;
+}
+
+.document-info {
+  text-align: right;
+  font-size: 12px;
+  color: #555;
+}
+
+.document-info p {
+  margin: 3px 0;
+}
+
+.open-sheet-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.open-sheet-btn:hover {
+  background-color: #45a049;
+}
+.signatures-summary {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 2px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 16px;
+}
+
+.signature-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.signature-info div {
+  width: 48%;
+}
