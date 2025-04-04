@@ -163,25 +163,31 @@ input, select {
 }
 
 @media print {
+    /* Hide unnecessary elements */
     .auditor-list-header, .popup-overlay, .filter-container, .edit-btn, .delete-btn {
-      display: none !important;
+        display: none !important;
     }
-  
+
+    /* Hide Actions column */
     .auditor-table th:last-child, 
     .auditor-table td:last-child {
-      display: none;
+        display: none;
     }
-  
-    body {
-      visibility: hidden;
+
+    /* Ensure everything except the table is hidden */
+    * {
+        visibility: hidden;
     }
-  
+
+    /* Make the table visible and take up the full page */
+    .auditor-table-wrapper, .auditor-table-wrapper * {
+        visibility: visible;
+    }
+
     .auditor-table-wrapper {
-      visibility: visible;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
     }
-  }
-  
+}

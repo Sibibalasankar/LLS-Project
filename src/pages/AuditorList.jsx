@@ -143,7 +143,7 @@ const AuditorList = () => {
         <table className="auditor-table">
           <thead>
             <tr>
-              <th>#</th>
+              <th>S.no</th>
               <th>Name</th>
               <th>Employee Number</th>
               <th>Certified Date</th>

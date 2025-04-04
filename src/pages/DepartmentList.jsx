@@ -37,18 +37,25 @@ const DepartmentList = () => {
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
   
-    // Create a map of stored departments to retain assigned emails
-    const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept.email]));
+    // Create a map of stored departments
+    const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept]));
   
-    // Ensure all departments are listed, retaining assigned emails if available
-    const updatedDepartments = departments.map(name => ({
-      name,
-      email: storedDeptMap.get(name) || "", // Keep stored email if exists, else empty
-    }));
+    // Merge default departments with stored ones
+    const updatedDepartments = departments.map(name => 
+      storedDeptMap.get(name) || { name, email: "" }
+    );
+  
+    // Ensure any newly added departments are preserved
+    storedDepartments.forEach(dept => {
+      if (!departments.includes(dept.name)) {
+        updatedDepartments.push(dept);
+      }
+    });
   
     setDepartmentData(updatedDepartments);
-    localStorage.setItem("departments", JSON.stringify(updatedDepartments)); // Update storage
+    localStorage.setItem("departments", JSON.stringify(updatedDepartments));
   }, []);
+  
   
   const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));

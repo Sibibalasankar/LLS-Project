@@ -89,8 +89,8 @@ const ObservationSheet = () => {
               <td>{observation.potentialCauses || ""}</td>
               <td>{observation.findings || ""}</td>
               <td>{observation.isoClause || ""}</td>
-              <td>{observation.result || ""}</td>
-            </tr>
+              <td>{Array.isArray(observation.result) ? observation.result.join(", ") : observation.result}</td>
+              </tr>
           ))
         ) : (
           <tr>
@@ -129,13 +129,13 @@ const ObservationSheet = () => {
                 </tr>
                 <tr>
                   <td className="signature-label-cell">
-                    <div>Auditor Name & Designation:</div>
+                    <div className="signature-label">Auditor Name & Designation:</div>
                   </td>
                   <td className="signature-value-cell">
                     <div>{auditorInfo.name} & {auditorInfo.designation}</div>
                   </td>
                   <td className="signature-label-cell">
-                    <div>Auditee Name / Designation:</div>
+                    <div className="signature-label">Auditee Name / Designation:</div>
                   </td>
                   <td className="signature-value-cell">
                     <div>{auditeeInfo.name} & {auditeeInfo.designation}</div>
