@@ -9,7 +9,8 @@ import AuditPlanCreation from "./pages/AuditPlanCreation";
 import AuditPlanDetails from "./pages/AuditPlanDetails";
 import AuditObservation from "./pages/AuditObservation";
 import ObservationDetails from "./pages/Observationdetails";
-import AuditReport from "./pages/ObservationSheet"; // 👈 Add this
+import AuditReport from "./pages/ObservationSheet"; 
+import ActionReport from "./pages/ActionReport";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
       <Route path="/audit-observation" element={<AuditObservation />} />
       <Route path="/observation-details/:departmentName" element={<ObservationDetails />} />
       <Route path="/audit-plan-creation" element={<AuditPlanCreation />} />
+      <Route path="/action-report" element={<ActionReport />} />
 
       {/* User Routes */}
       <Route path="/user" element={<UserLogin />} />

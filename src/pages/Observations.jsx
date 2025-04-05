@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../assets/styles/Observation.css";
-import ReactDOM from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
 
@@ -31,10 +31,15 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [actionObservation, setActionObservation] = useState(null); // Stores the observation for action form
   const [showActionForm, setShowActionForm] = useState(false); // Controls modal visibility
 
-  const handleOpenActionForm = (observation) => {
-    setActionObservation(observation);
-    setShowActionForm(true);
-  };
+  
+
+  // Replace the handleOpenActionForm function with:
+const navigate = useNavigate();
+
+const handleOpenActionForm = (observation) => {
+  const url = `/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
+  window.open(url, "_blank");
+};
 
   const handleCloseActionForm = () => {
     setShowActionForm(false);

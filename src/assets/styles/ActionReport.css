@@ -1,0 +1,299 @@
+/* ====================== */
+/* BASE STYLES */
+/* ====================== */
+.action-report-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+/* ====================== */
+/* DOCUMENT STRUCTURE */
+/* ====================== */
+.document-format {
+    background-color: white;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.document-title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-left: 1px solid #333;
+    color: #2c3e50;
+    margin-bottom: 0;
+    padding: 15px;
+}
+
+/* ====================== */
+/* HEADER SECTION */
+/* ====================== */
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.header-field {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 10px;
+}
+
+.header-field strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.header-field input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+/* ====================== */
+/* FORM SECTIONS */
+/* ====================== */
+.document-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0 0 15px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #2c3e50;
+    color: #2c3e50;
+}
+
+.field-group {
+    margin-bottom: 20px;
+}
+
+.field-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.field-group textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    background-color: #fafafa;
+}
+
+/* ====================== */
+/* LAYOUTS */
+/* ====================== */
+.two-column-fields {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.column {
+    flex: 1;
+}
+
+/* ====================== */
+/* SPECIFIC COMPONENTS */
+/* ====================== */
+/* Root Causes */
+.root-cause-list {
+    margin: 15px 0 0 20px;
+}
+
+.root-cause-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.root-cause-item label {
+    width: 50px;
+    font-weight: bold;
+    color: #444;
+}
+
+.root-cause-item input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+/* Tables */
+.document-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.document-table th {
+    background-color: #2c3e50;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: normal;
+}
+
+.document-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    background-color: white;
+}
+
+.document-table input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+/* Signature Lines */
+.signature-line {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #2c3e50;
+}
+
+.signature-field {
+    flex: 1;
+    max-width: 45%;
+}
+
+.signature-field input {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 1px solid #666;
+    background-color: transparent;
+}
+
+/* ====================== */
+/* BUTTONS */
+/* ====================== */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.action-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.save-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.add-row-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 8px 15px;
+    margin: 10px 0;
+    font-size: 0.9rem;
+}
+
+/* ====================== */
+/* SAVED DATA VIEW */
+/* ====================== */
+.saved-data-view {
+    background-color: white;
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.saved-data-view .document-title {
+    border-bottom-color: #2c3e50;
+}
+
+.saved-data-view .field-value {
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #fafafa;
+    border-left: 3px solid #3498db;
+}
+
+.saved-data-view .document-table th {
+    background-color: #34495e;
+}
+
+.saved-data-view .document-table td {
+    background-color: #f9f9f9;
+}
+
+.saved-data-view .edit-btn {
+    background-color: #f39c12;
+}
+
+.saved-data-view .back-btn {
+    background-color: #7f8c8d;
+}
+
+/* ====================== */
+/* UTILITY CLASSES */
+/* ====================== */
+.no-print {
+    @media print {
+        display: none;
+    }
+}
+
+.page-break {
+    page-break-after: always;
+}
+.img_logo{
+    width: 50px;
+    padding: 5px 5px;
+}
+.head_title_logo{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border: 1px solid black;
+}
