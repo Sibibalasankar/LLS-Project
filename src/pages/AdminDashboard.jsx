@@ -40,104 +40,98 @@ const Dashboard = () => {
       <div className="dashboard-main">
         {/* Sidebar Navigation */}
         <nav className="dashboard-sidebar">
-  <div className="sidebar-menu">
-    <button
-      className={`menu-btn ${activeComponent === "auditor-list" ? "active" : ""}`}
-      onClick={() => setActiveComponent("auditor-list")}
-    >
-      Auditor List
-    </button>
-    
-    <button
-      className={`menu-btn ${activeComponent === "department-list" ? "active" : ""}`}
-      onClick={() => setActiveComponent("department-list")}
-    >
-      Department List
-    </button>
+          <div className="sidebar-menu">
+            <button
+              className={`menu-btn ${activeComponent === "auditor-list" ? "active" : ""}`}
+              onClick={() => setActiveComponent("auditor-list")}
+            >
+              Auditor List
+            </button>
+            <button
+              className={`menu-btn ${activeComponent === "department-list" ? "active" : ""}`}
+              onClick={() => setActiveComponent("department-list")}
+            >
+              Department List
+            </button>
 
-    {/* Audit Plan Section */}
-    <div className="menu-section">
-      <button
-        className={`menu-btn ${showAuditPlan ? "active" : ""}`}
-        onClick={() => setShowAuditPlan(!showAuditPlan)}
-      >
-        Audit Plan {showAuditPlan ? '▼' : '▶'}
-      </button>
-      {showAuditPlan && (
-        <div className="submenu">
-          <button
-            className={`submenu-btn ${activeComponent === "audit-plan-creation" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-plan-creation")}
-          >
-            Audit Plan Creation
-          </button>
-          <button
-            className={`submenu-btn ${activeComponent === "audit-plan-sheet" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-plan-sheet")}
-          >
-            Audit Plan Sheet
-          </button>
-          <button
-            className={`submenu-btn ${activeComponent === "audit-intimation-mail" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-intimation-mail")}
-          >
-            Audit Intimation Mail
-          </button>
-        </div>
-      )}
-    </div>
+            {/* Audit Plan Section */}
+            <div className="menu-section">
+              <button
+                className={`menu-btn ${showAuditPlan ? "active" : ""}`}
+                onClick={() => setShowAuditPlan(!showAuditPlan)}
+              >
+                Audit Plan {showAuditPlan ? '▼' : '▶'}
+              </button>
+              {showAuditPlan && (
+                <div className="submenu">
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-plan-creation" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-plan-creation")}
+                  >
+                    Audit Plan Creation
+                  </button>
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-plan-sheet" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-plan-sheet")}
+                  >
+                    Audit Plan Sheet
+                  </button>
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-intimation-mail" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-intimation-mail")}
+                  >
+                    Audit Intimation Mail
+                  </button>
+                </div>
+              )}
+            </div>
 
-    {/* Audit Check List Section */}
-    <div className="menu-section">
-      <button
-        className={`menu-btn ${showAuditCheckList ? "active" : ""}`}
-        onClick={() => setShowAuditCheckList(!showAuditCheckList)}
-      >
-        Audit Check List {showAuditCheckList ? '▼' : '▶'}
-      </button>
-      {showAuditCheckList && (
-        <div className="submenu">
-          <button
-            className={`submenu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-observation")}
-          >
-            Audit Observation
-          </button>
-          <button
-            className={`submenu-btn ${activeComponent === "audit-nc-closer" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-nc-closer")}
-          >
-            Audit NC Closer
-          </button>
-          <button
-            className={`submenu-btn ${activeComponent === "audit-nc-approval" ? "active" : ""}`}
-            onClick={() => setActiveComponent("audit-nc-approval")}
-          >
-            Audit NC Approval
-          </button>
-        </div>
-      )}
-    </div>
+            {/* Audit Check List Section */}
+            <div className="menu-section">
+              <button
+                className={`menu-btn ${showAuditCheckList ? "active" : ""}`}
+                onClick={() => setShowAuditCheckList(!showAuditCheckList)}
+              >
+                Audit Check List {showAuditCheckList ? '▼' : '▶'}
+              </button>
+              {showAuditCheckList && (
+                <div className="submenu">
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-observation")}
+                  >
+                    Audit Observation
+                  </button>
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-nc-closer" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-nc-closer")}
+                  >
+                    Audit NC Closer
+                  </button>
+                  <button
+                    className={`submenu-btn ${activeComponent === "audit-nc-approval" ? "active" : ""}`}
+                    onClick={() => setActiveComponent("audit-nc-approval")}
+                  >
+                    Audit NC Approval
+                  </button>
+                </div>
+              )}
+            </div>
 
-    <div className="menu-section">
-      <button
-        className={`menu-btn ${activeComponent === "audit-summary" ? "active" : ""}`}
-        onClick={() => setActiveComponent("audit-summary")}
-      >
-        Audit Summary Report
-      </button>
-    </div>
-
-    <div className="menu-section">
-      <button
-        className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
-        onClick={() => setActiveComponent("iso-manual")}
-      >
-        ISO 9001-2015 Manual
-      </button>
-    </div>
-  </div>
-</nav>
+            <button
+              className={`menu-btn ${activeComponent === "audit-summary" ? "active" : ""}`}
+              onClick={() => setActiveComponent("audit-summary")}
+            >
+              Audit Summary Report
+            </button>
+            <button
+              className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
+              onClick={() => setActiveComponent("iso-manual")}
+            >
+              ISO 9001-2015 Manual
+            </button>
+          </div>
+        </nav>
 
         {/* Main Content Display */}
         <main className="dashboard-content">
