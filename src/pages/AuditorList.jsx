@@ -107,7 +107,7 @@ const AuditorList = () => {
           Add Auditor
         </button>
         <button className="print-btn" onClick={handlePrint}>
-          Print
+        🖨️ Print
         </button>
       </div>
 

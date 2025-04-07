@@ -151,10 +151,20 @@ const AuditPlanDetails = ({ department, onClose }) => {
             table { width: 100%; border-collapse: collapse; }
             th, td { border: 1px solid black; padding: 8px; text-align: left; }
             th { background-color: #f2f2f2; }
+            h5{
+               background-color: #FFC000;
+               padding: 10px;
+               border-top: 1px solid black; 
+               border-bottom: 1px solid black;
+               text-align: center;
+             }
           </style>
         </head>
         <body>
           <h2>Audit Plan Details</h2>
+          <h5 className="iso_title mb-4">
+        INTERNAL AUDIT SCHEDULE - ISO 9001:2015
+      </h5>
           ${clonedTable.outerHTML}
         </body>
       </html>
@@ -178,7 +188,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
 
   return (
     <div className="audit-plan-container">
-      <h2>Audit Plan Details</h2>
+      <center className="mb-4"> <h2>Audit Plan Details</h2></center>
       <h5 className="iso_title mb-4">
         INTERNAL AUDIT SCHEDULE - ISO 9001:2015
       </h5>

@@ -13,6 +13,7 @@ import AuditNCCloser from "./AuditNCCloser";
 import AuditNCApproval from "./AuditNCApproval";
 import AuditSummary from "./AuditSummary";
 import ISOManual from "./ISOManual";
+import companyLogo from "../assets/images/lls_logo.png";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -21,70 +22,125 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container-fluid main_body">
-      <div className="top_bar_nav">
-        <h2 className="title_company">LLS Audit Management System</h2>
-        <button className="logout_btn" onClick={() => navigate("/login")}>
-          Log out
-        </button>
-      </div>
-
-      <div className="row main_child">
-        {/* Sidebar */}
-        <div className="side_bar col-3">
-          <button className="main_btn" onClick={() => setActiveComponent("auditor-list")}>
-            Auditor List
-          </button>
-          <button className="main_btn" onClick={() => setActiveComponent("department-list")}>
-            Department List
-          </button>
-
-          {/* Audit Plan Section */}
-          <button onClick={() => setShowAuditPlan(!showAuditPlan)} className="main_btn">
-            Audit Plan
-          </button>
-          {showAuditPlan && (
-            <div className="plan_div">
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-plan-creation")}>
-                Audit Plan Creation
-              </button>
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-plan-sheet")}>
-                Audit Plan Sheet
-              </button>
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-intimation-mail")}>
-                Audit Plan Intimation Mail
-              </button>
-            </div>
-          )}
-
-          {/* Audit Check List Section */}
-          <button onClick={() => setShowAuditCheckList(!showAuditCheckList)} className="main_btn">
-            Audit Check List
-          </button>
-          {showAuditCheckList && (
-            <div className="plan_div">
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-observation")}>
-                Audit Observation
-              </button>
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-nc-closer")}>
-                Audit NC Closer
-              </button>
-              <button className="sub_btn" onClick={() => setActiveComponent("audit-nc-approval")}>
-                Audit NC Approval
-              </button>
-            </div>
-          )}
-
-          <button className="main_btn" onClick={() => setActiveComponent("audit-summary")}>
-            Audit Summary Report
-          </button>
-          <button className="main_btn" onClick={() => setActiveComponent("iso-manual")}>
-            ISO 9001-2015 Manual
+    <div className="dashboard-container">
+      {/* Top Navigation Bar */}
+      <header className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <img src={companyLogo} alt="Company Logo" className="header-logo" />
+            <h1 className="header-title">LLS Audit Management System</h1>
+          </div>
+          <button className="logout-btn" onClick={() => navigate("/login")}>
+            Logout
           </button>
         </div>
+      </header>
 
-        {/* Content Display */}
-        <div className="child_body col-9">
+      {/* Main Content Area */}
+      <div className="dashboard-main">
+        {/* Sidebar Navigation */}
+        <nav className="dashboard-sidebar">
+  <div className="sidebar-menu">
+    <button
+      className={`menu-btn ${activeComponent === "auditor-list" ? "active" : ""}`}
+      onClick={() => setActiveComponent("auditor-list")}
+    >
+      Auditor List
+    </button>
+    
+    <button
+      className={`menu-btn ${activeComponent === "department-list" ? "active" : ""}`}
+      onClick={() => setActiveComponent("department-list")}
+    >
+      Department List
+    </button>
+
+    {/* Audit Plan Section */}
+    <div className="menu-section">
+      <button
+        className={`menu-btn ${showAuditPlan ? "active" : ""}`}
+        onClick={() => setShowAuditPlan(!showAuditPlan)}
+      >
+        Audit Plan {showAuditPlan ? '▼' : '▶'}
+      </button>
+      {showAuditPlan && (
+        <div className="submenu">
+          <button
+            className={`submenu-btn ${activeComponent === "audit-plan-creation" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-plan-creation")}
+          >
+            Audit Plan Creation
+          </button>
+          <button
+            className={`submenu-btn ${activeComponent === "audit-plan-sheet" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-plan-sheet")}
+          >
+            Audit Plan Sheet
+          </button>
+          <button
+            className={`submenu-btn ${activeComponent === "audit-intimation-mail" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-intimation-mail")}
+          >
+            Audit Intimation Mail
+          </button>
+        </div>
+      )}
+    </div>
+
+    {/* Audit Check List Section */}
+    <div className="menu-section">
+      <button
+        className={`menu-btn ${showAuditCheckList ? "active" : ""}`}
+        onClick={() => setShowAuditCheckList(!showAuditCheckList)}
+      >
+        Audit Check List {showAuditCheckList ? '▼' : '▶'}
+      </button>
+      {showAuditCheckList && (
+        <div className="submenu">
+          <button
+            className={`submenu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-observation")}
+          >
+            Audit Observation
+          </button>
+          <button
+            className={`submenu-btn ${activeComponent === "audit-nc-closer" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-nc-closer")}
+          >
+            Audit NC Closer
+          </button>
+          <button
+            className={`submenu-btn ${activeComponent === "audit-nc-approval" ? "active" : ""}`}
+            onClick={() => setActiveComponent("audit-nc-approval")}
+          >
+            Audit NC Approval
+          </button>
+        </div>
+      )}
+    </div>
+
+    <div className="menu-section">
+      <button
+        className={`menu-btn ${activeComponent === "audit-summary" ? "active" : ""}`}
+        onClick={() => setActiveComponent("audit-summary")}
+      >
+        Audit Summary Report
+      </button>
+    </div>
+
+    <div className="menu-section">
+      <button
+        className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
+        onClick={() => setActiveComponent("iso-manual")}
+      >
+        ISO 9001-2015 Manual
+      </button>
+    </div>
+  </div>
+</nav>
+
+        {/* Main Content Display */}
+        <main className="dashboard-content">
           {activeComponent === "auditor-list" && <AuditorList />}
           {activeComponent === "department-list" && <DepartmentList />}
           {activeComponent === "audit-plan-creation" && <AuditPlanCreation />}
@@ -95,9 +151,14 @@ const Dashboard = () => {
           {activeComponent === "audit-nc-approval" && <AuditNCApproval />}
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
-          
-          {!activeComponent && <p>Welcome to the Audit Management System. Select an option from the sidebar.</p>}
-        </div>
+
+          {!activeComponent && (
+            <div className="welcome-message">
+              <h2>Welcome to the Audit Management System</h2>
+              <p>Select an option from the sidebar to get started</p>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );

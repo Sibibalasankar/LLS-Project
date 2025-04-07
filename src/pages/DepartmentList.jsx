@@ -36,27 +36,27 @@ const DepartmentList = () => {
   // Load departments from localStorage on mount
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
-  
+
     // Create a map of stored departments
     const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept]));
-  
+
     // Merge default departments with stored ones
-    const updatedDepartments = departments.map(name => 
+    const updatedDepartments = departments.map(name =>
       storedDeptMap.get(name) || { name, email: "" }
     );
-  
+
     // Ensure any newly added departments are preserved
     storedDepartments.forEach(dept => {
       if (!departments.includes(dept.name)) {
         updatedDepartments.push(dept);
       }
     });
-  
+
     setDepartmentData(updatedDepartments);
     localStorage.setItem("departments", JSON.stringify(updatedDepartments));
   }, []);
-  
-  
+
+
   const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));
   };
@@ -102,7 +102,7 @@ const DepartmentList = () => {
     const isConfirmed = window.confirm(
       `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditor Email: ${departmentToDelete.email || "N/A"}`
     );
-    
+
     if (isConfirmed) {
       const updatedDepartments = departmentData.filter((_, i) => i !== index);
       setDepartmentData(updatedDepartments);
@@ -116,7 +116,7 @@ const DepartmentList = () => {
     if (!tableContent) return;
 
     const clonedTable = tableContent.cloneNode(true);
-    
+
     // Remove "Actions" column
     clonedTable.querySelectorAll("tr").forEach((row) => {
       if (row.lastElementChild) row.removeChild(row.lastElementChild);
@@ -154,7 +154,7 @@ const DepartmentList = () => {
         </button>
 
         <button className="print-btn" onClick={handlePrint}>
-          Print Table
+          🖨️ Print
         </button>
       </div>
 
@@ -215,9 +215,9 @@ const DepartmentList = () => {
                 required
               />
               <div className="form-buttons">
-                <button 
-                  type="button" 
-                  className="close-btn" 
+                <button
+                  type="button"
+                  className="close-btn"
                   onClick={() => {
                     const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
                     if (isConfirmed) {
