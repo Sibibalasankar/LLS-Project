@@ -235,3 +235,14 @@
     padding: 1rem;
   }
 }
+.welcome-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.datetime-info {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  color: #555;
+}

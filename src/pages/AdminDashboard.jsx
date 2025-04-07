@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 
@@ -20,6 +20,31 @@ const Dashboard = () => {
   const [showAuditPlan, setShowAuditPlan] = useState(false);
   const [showAuditCheckList, setShowAuditCheckList] = useState(false);
   const navigate = useNavigate();
+  const WelcomeMessage = () => {
+    const [currentTime, setCurrentTime] = useState(new Date());
+  
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+  
+      return () => clearInterval(intervalId); // Cleanup
+    }, []);
+  
+    const formattedDate = currentTime.toLocaleDateString();
+    const formattedTime = currentTime.toLocaleTimeString();
+  
+    return (
+      <div className="welcome-message">
+        <h2>Welcome to the Audit Management System</h2>
+        <p>Select an option from the sidebar to get started</p>
+        <p className="datetime-info">
+          📅 {formattedDate} | ⏰ {formattedTime}
+        </p>
+      </div>
+    );
+  };
+  
 
   return (
     <div className="dashboard-container">
@@ -147,11 +172,9 @@ const Dashboard = () => {
           {activeComponent === "iso-manual" && <ISOManual />}
 
           {!activeComponent && (
-            <div className="welcome-message">
-              <h2>Welcome to the Audit Management System</h2>
-              <p>Select an option from the sidebar to get started</p>
-            </div>
-          )}
+  <WelcomeMessage />
+)}
+
         </main>
       </div>
     </div>
