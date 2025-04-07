@@ -268,7 +268,7 @@ const AuditorList = () => {
               <div className="form-buttons">
                 <button
                   type="button"
-                  className="close-btn"
+                  className="close-btns"
                   onClick={() => {
                     const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
                     if (isConfirmed) {
@@ -278,7 +278,7 @@ const AuditorList = () => {
                 >
                   Close
                 </button>
-                <button type="submit" className="submit-btn">
+                <button type="submit" className="submit-btns">
                   {editingIndex !== null ? "Update" : "Add"}
                 </button>
               </div>

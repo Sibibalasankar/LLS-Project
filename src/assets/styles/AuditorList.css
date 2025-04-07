@@ -95,7 +95,7 @@ input, select {
     justify-content: space-between;
 }
 
-.close-btn, .submit-btn {
+.close-btns, .submit-btns {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -103,12 +103,12 @@ input, select {
     width: 48%;
 }
 
-.close-btn {
+.close-btns {
     background-color: red;
     color: white;
 }
 
-.submit-btn {
+.submit-btns {
     background-color: #28a745;
     color: white;
 }
