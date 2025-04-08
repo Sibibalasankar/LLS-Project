@@ -85,7 +85,7 @@ const Dashboard = () => {
                 className={`menu-btn ${showAuditPlan ? "active" : ""}`}
                 onClick={() => setShowAuditPlan(!showAuditPlan)}
               >
-                Audit Plan {showAuditPlan ? '▼' : '▶'}
+                Audit Plan {showAuditPlan ? '🔽' : '▶'}
               </button>
               {showAuditPlan && (
                 <div className="submenu">
@@ -117,7 +117,7 @@ const Dashboard = () => {
                 className={`menu-btn ${showAuditCheckList ? "active" : ""}`}
                 onClick={() => setShowAuditCheckList(!showAuditCheckList)}
               >
-                Audit Check List {showAuditCheckList ? '▼' : '▶'}
+                Audit Check List {showAuditCheckList ? '🔽' : '▶'}
               </button>
               {showAuditCheckList && (
                 <div className="submenu">
