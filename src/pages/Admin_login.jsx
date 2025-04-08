@@ -12,7 +12,7 @@ const Admin_login = () => {
 
   // Hardcoded Admin Credentials
   const ADMIN_USERNAME = "admin";
-  const ADMIN_PASSWORD = "admin123";
+  const ADMIN_PASSWORD = "admin@123";
 
   // Handle Form Submission
   const handleSubmit = (event) => {

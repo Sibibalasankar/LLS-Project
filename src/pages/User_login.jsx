@@ -12,7 +12,7 @@ const User_login = () => {
 
   // Hardcoded User Credentials
   const USER_USERNAME = "user";
-  const USER_PASSWORD = "user123";
+  const USER_PASSWORD = "user@123";
 
   // Handle Form Submission
   const handleSubmit = (event) => {
