@@ -2,14 +2,8 @@ import { useState, useEffect } from "react";
 import "../assets/styles/AuditorList.css";
 
 const designations = [
-  "Auditor",
-  "Senior Auditor",
-  "Lead Auditor",
-  "Quality Inspector",
-  "Project Manager",
-  "Operations Manager",
+  "Cheif Engineer",
   "Supervisor",
-  "Technician",
   "Engineer",
 ];
 
@@ -22,6 +16,7 @@ const AuditorList = () => {
     name: "",
     employeeNumber: "",
     certifiedDate: "",
+    certifiedOnName: "", // <-- New field
     mailID: "",
     designation: "",
     department: "",
@@ -86,7 +81,7 @@ const AuditorList = () => {
     const isConfirmed = window.confirm(
       `Are you sure you want to delete ${auditorToDelete.name} (Employee #: ${auditorToDelete.employeeNumber})?`
     );
-    
+
     if (isConfirmed) {
       const updatedAuditors = auditors.filter((_, i) => i !== index);
       setAuditors(updatedAuditors);
@@ -107,7 +102,7 @@ const AuditorList = () => {
           Add Auditor
         </button>
         <button className="print-btn" onClick={handlePrint}>
-        🖨️ Print
+          🖨️ Print
         </button>
       </div>
 
@@ -147,6 +142,7 @@ const AuditorList = () => {
               <th>Name</th>
               <th>Employee Number</th>
               <th>Certified Date</th>
+              <th>Certified On (Name)</th>
               <th>Mail ID</th>
               <th>Department</th>
               <th>Designation</th>
@@ -162,6 +158,7 @@ const AuditorList = () => {
                   <td>{auditor.name}</td>
                   <td>{auditor.employeeNumber}</td>
                   <td>{auditor.certifiedDate}</td>
+                  <td>{auditor.certifiedOnName}</td>
                   <td>{auditor.mailID}</td>
                   <td>{auditor.department}</td>
                   <td>{auditor.designation}</td>
@@ -224,6 +221,15 @@ const AuditorList = () => {
                 onChange={handleChange}
                 required
               />
+              <input
+                type="text"
+                name="certifiedOnName"
+                value={formData.certifiedOnName}
+                onChange={handleChange}
+                placeholder="Certified On (Name)"
+                required
+              />
+
               <input
                 type="email"
                 name="mailID"

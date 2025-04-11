@@ -100,7 +100,7 @@ const DepartmentList = () => {
   const handleDelete = (index) => {
     const departmentToDelete = departmentData[index];
     const isConfirmed = window.confirm(
-      `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditor Email: ${departmentToDelete.email || "N/A"}`
+      `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditee Email: ${departmentToDelete.email || "N/A"}`
     );
 
     if (isConfirmed) {
@@ -167,7 +167,7 @@ const DepartmentList = () => {
               <tr>
                 <th>S.No</th>
                 <th>Department Name</th>
-                <th>Auditor Email</th>
+                <th>Auditee Email</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -211,7 +211,7 @@ const DepartmentList = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Auditor Email"
+                placeholder="Auditee Email"
                 required
               />
               <div className="form-buttons">

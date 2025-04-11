@@ -30,4 +30,8 @@
   .button:hover {
     opacity: 0.9;
   }
-  
+  .detail-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }

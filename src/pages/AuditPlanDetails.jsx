@@ -329,7 +329,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 />
                 <button
                   type="button"
-                  className="add-process-btn"
+                  className="edit-btn"
                   onClick={handleAddProcess}
                 >
                   + Add
@@ -360,14 +360,14 @@ const AuditPlanDetails = ({ department, onClose }) => {
               <div className="form-buttons">
                 <button
                   type="button"
-                  className="close-btn"
+                  className="close-btns"
                   onClick={() => setShowForm(false)}
                 >
                   Close
                 </button>
                 <button
                   type="submit"
-                  className="submit-btn"
+                  className="submit-btns"
                   disabled={!isAuditorAssigned}
                 >
                   Save

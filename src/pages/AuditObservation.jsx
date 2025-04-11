@@ -6,7 +6,7 @@ import "../assets/styles/AuditObservation.css";
 
 const AuditObservation = () => {
   const [departments, setDepartments] = useState([]);
-  const [observationsCount, setObservationsCount] = useState({}); // Store count per department
+  const [observationsCount, setObservationsCount] = useState({});
   const [auditPlans, setAuditPlans] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
 
@@ -15,16 +15,22 @@ const AuditObservation = () => {
       const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
       const storedPlans = JSON.parse(localStorage.getItem('auditPlans')) || [];
 
+      const updatedCounts = {};
+      storedDepartments.forEach(dept => {
+        const hasPlan = storedPlans.some(plan => plan.department === dept.name);
+
+        // If no audit plan exists for this department, delete its observations
+        if (!hasPlan) {
+          localStorage.removeItem(`observations_${dept.name}`);
+        }
+
+        const remainingObservations = JSON.parse(localStorage.getItem(`observations_${dept.name}`)) || [];
+        updatedCounts[dept.name] = remainingObservations.length;
+      });
+
       setDepartments(storedDepartments);
       setAuditPlans(storedPlans);
-
-      // Load observation counts
-      const counts = {};
-      storedDepartments.forEach(dept => {
-        const storedObservations = JSON.parse(localStorage.getItem(`observations_${dept.name}`)) || [];
-        counts[dept.name] = storedObservations.length;
-      });
-      setObservationsCount(counts);
+      setObservationsCount(updatedCounts);
     };
 
     loadData();
@@ -47,7 +53,7 @@ const AuditObservation = () => {
         <ObservationDetails
           departmentName={selectedDepartment}
           onClose={() => setSelectedDepartment(null)}
-          onObservationUpdate={handleObservationUpdate} // Pass update function
+          onObservationUpdate={handleObservationUpdate}
         />
       ) : (
         <div className="department-grid">
@@ -57,24 +63,34 @@ const AuditObservation = () => {
 
             return (
               <Card key={dept.name} className="department-card">
-                <CardContent>
-                  <h3>{dept.name}</h3>
-                  <div className="department-stats">
-                    <div className="stat-item">
-                      <span className="stat-label">Audit Plans:</span>
-                      <span className="stat-value">{plansCount}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">Observations:</span>
-                      <span className="stat-value">{obsCount}</span> {/* Updated Count */}
+                <CardContent className="card-content">
+                  <div className="card-body">
+                    <h3 className="department-title">{dept.name}</h3>
+                    <div className="department-stats">
+                      <div className="stat-item">
+                        <span className="stat-label">Audit Plans:</span>
+                        <span className="stat-value">{plansCount}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Observations:</span>
+                        <span className="stat-value">{obsCount}</span>
+                      </div>
                     </div>
                   </div>
-                  <Button 
-                    onClick={() => setSelectedDepartment(dept.name)}
-                    className={`view-btn ${plansCount === 0 ? 'disabled' : ''}`} 
+                  <Button
+                    onClick={() => {
+                      if (plansCount > 0) {
+                        setSelectedDepartment(dept.name);
+                      }
+                    }}
+                    className={`view-btn ${plansCount === 0 ? 'disabled' : ''}`}
                     disabled={plansCount === 0}
                   >
-                    {plansCount > 0 ? (obsCount > 0 ? 'View Observations' : 'Add Observation') : 'No Audit Plan'}
+                    {plansCount > 0
+                      ? obsCount > 0
+                        ? 'View Observations'
+                        : 'Add Observation'
+                      : 'No Audit Plan'}
                   </Button>
                 </CardContent>
               </Card>

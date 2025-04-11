@@ -8,7 +8,6 @@ const ObservationDetails = ({ departmentName, onClose }) => {
   const [observations, setObservations] = useState([]);
   const [viewObservationId, setViewObservationId] = useState(null);
 
-  // Load observations on mount
   useEffect(() => {
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
     setObservations(storedObservations);
@@ -24,52 +23,35 @@ const ObservationDetails = ({ departmentName, onClose }) => {
     };
 
     const updated = [...stored, newObservation];
-
-    // Save to localStorage immediately
     localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updated));
-
-    // Update state
     setObservations(updated);
   };
 
   const handleDeleteObservation = (id) => {
-    const observationToDelete = observations.find(obs => obs.id === id);
-    if (!observationToDelete) return;
+    const updatedObservations = observations
+      .filter(obs => obs.id !== id)
+      .map((obs, index) => ({
+        ...obs,
+        number: index + 1,
+      }));
 
-    if (window.confirm(`Are you sure you want to delete Observation ${observationToDelete.number}?`)) {
-      const updatedObservations = observations
-        .filter(obs => obs.id !== id)
-        .map((obs, index) => ({
-          ...obs,
-          number: index + 1,
-        }));
-
-      // Save to localStorage immediately
-      localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
-
-      setObservations(updatedObservations);
-      alert(`Observation ${observationToDelete.number} deleted.`);
-    }
+    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
+    setObservations(updatedObservations);
   };
 
   const handleGoToObservation = (id) => {
-    const observation = observations.find(obs => obs.id === id);
-    if (observation && window.confirm(`Open Observation ${observation.number}?`)) {
-      setViewObservationId(id);
-    }
+    setViewObservationId(id);
   };
 
   const handleBackToDepartments = () => {
-    if (window.confirm("Return to departments list?")) {
-      onClose();
-    }
+    onClose();
   };
 
   if (viewObservationId !== null) {
     return (
       <Observations 
         observationId={viewObservationId} 
-        departmentName={departmentName}  // Add this line
+        departmentName={departmentName}
         onBack={() => setViewObservationId(null)} 
       />
     );
@@ -82,7 +64,7 @@ const ObservationDetails = ({ departmentName, onClose }) => {
         <Button
           variant="outline"
           onClick={handleBackToDepartments}
-          className="back-btn"
+          className="back-btn mb-3"
           style={{ backgroundColor: "#007BFF", color: "#fff" }}
         >
           Back to Departments

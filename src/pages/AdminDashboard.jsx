@@ -20,6 +20,14 @@ const Dashboard = () => {
   const [showAuditPlan, setShowAuditPlan] = useState(false);
   const [showAuditCheckList, setShowAuditCheckList] = useState(false);
   const navigate = useNavigate();
+
+  // Function to reset to welcome view
+  const resetToWelcome = () => {
+    setActiveComponent(null);
+    setShowAuditPlan(false);
+    setShowAuditCheckList(false);
+  };
+
   const WelcomeMessage = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
   
@@ -53,7 +61,13 @@ const Dashboard = () => {
         <div className="header-content">
           <div className="header-left">
             <img src={companyLogo} alt="Company Logo" className="header-logo" />
-            <h1 className="header-title">LLS Audit Management System</h1>
+            <h1 
+              className="header-title" 
+              onClick={resetToWelcome}
+              style={{ cursor: "pointer" }}
+            >
+              LLS Audit Management System
+            </h1>
           </div>
           <button className="logout-btn" onClick={() => navigate("/login")}>
             Logout
@@ -171,10 +185,7 @@ const Dashboard = () => {
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
 
-          {!activeComponent && (
-  <WelcomeMessage />
-)}
-
+          {!activeComponent && <WelcomeMessage />}
         </main>
       </div>
     </div>
