@@ -627,7 +627,7 @@
   table {
     page-break-inside: avoid;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 1px;
   }
 
   @page {
@@ -639,8 +639,8 @@
 /* Screen-specific styles */
 @media screen {
   .print-page {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     border: 1px dashed #ccc;
-    padding: 20px;
+    padding: 5px;
   }
 }
