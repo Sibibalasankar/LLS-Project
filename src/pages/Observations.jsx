@@ -10,6 +10,12 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [observationId, setObservationId] = useState(null);
   const [auditorInfo, setAuditorInfo] = useState({ name: "", designation: "" });
   const [auditeeInfo, setAuditeeInfo] = useState({ name: "", designation: "" });
+
+  // Get current and next year for audit cycle format
+  const currentYear = new Date().getFullYear();
+  const nextYear = currentYear + 1;
+  const yearFormat = `${currentYear}-${nextYear}`;
+
   const [currentObservation, setCurrentObservation] = useState({
     id: "",
     slNo: "",
@@ -18,7 +24,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     findings: "",
     isoClause: "",
     result: [],
-    auditCycleNo: "I",
+    auditCycleNo: `I/${yearFormat}`,
     auditDate: new Date().toISOString().split("T")[0],
     auditorSignature: "",
     auditorDesignation: "",
@@ -28,24 +34,20 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   });
 
   const auditCycleOptions = ["I", "II", "III", "IV", "V"];
-  const [actionObservation, setActionObservation] = useState(null); // Stores the observation for action form
-  const [showActionForm, setShowActionForm] = useState(false); // Controls modal visibility
+  const [actionObservation, setActionObservation] = useState(null);
+  const [showActionForm, setShowActionForm] = useState(false);
 
-  
+  const navigate = useNavigate();
 
-  // Replace the handleOpenActionForm function with:
-const navigate = useNavigate();
-
-const handleOpenActionForm = (observation) => {
-  const url = `/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
-  window.open(url, "_blank");
-};
+  const handleOpenActionForm = (observation) => {
+    const url = `/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
+    window.open(url, "_blank");
+  };
 
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);
   };
-
 
   // Initialize observationId from props or localStorage
   useEffect(() => {
@@ -130,7 +132,6 @@ const handleOpenActionForm = (observation) => {
     });
   };
 
-
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
 
   const handleCreate = () => {
@@ -142,7 +143,7 @@ const handleOpenActionForm = (observation) => {
       findings: "",
       isoClause: "",
       result: "",
-      auditCycleNo: "I",
+      auditCycleNo: `I/${yearFormat}`,
       auditDate: new Date().toISOString().split("T")[0],
       auditorSignature: auditorInfo.name || "",
       auditorDesignation: auditorInfo.designation || "",
@@ -202,7 +203,6 @@ const handleOpenActionForm = (observation) => {
     }
   };
 
-
   return (
     <div className="observations-container">
       <div className="header-with-logo">
@@ -216,11 +216,12 @@ const handleOpenActionForm = (observation) => {
           <strong>Dept.:</strong> {currentObservation.department}
         </div>
         <div className="audit-info-item">
-          <strong>Audit Cycle no.:</strong> {currentObservation.auditCycleNo}
+          <strong>Audit Cycle no.:</strong> {observations.length > 0 ? currentObservation.auditCycleNo : "-"}
         </div>
         <div className="audit-info-item">
-          <strong>Audit Date:</strong> {currentObservation.auditDate}
+          <strong>Audit Date:</strong> {observations.length > 0 ? currentObservation.auditDate : "-"}
         </div>
+
       </div>
 
       <div className="observations-table-container p-3">
@@ -251,52 +252,49 @@ const handleOpenActionForm = (observation) => {
                     <button className="delete-btn" onClick={() => handleDelete(obs.id)}>Delete</button>
                     {Array.isArray(obs.result) && obs.result.includes("NC") && (
                       <button
-                      className="action-form-btn"
-                      onClick={() => handleOpenActionForm(obs)}
-                    >
-                      Action
-                    </button>
-                    
+                        className="action-form-btn"
+                        onClick={() => handleOpenActionForm(obs)}
+                      >
+                        Action
+                      </button>
                     )}
                   </td>
-
                 </tr>
               ))
             ) : (
               <tr className="empty-table-message">
-                <td colSpan="7" >No observations found for this audit. Create a new one.</td>
+                <td colSpan="7">No observations found for this audit. Create a new one.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
       {showActionForm && actionObservation && (
-            <div className="action-form-overlay">
-              <div className="action-form-modal">
-                <h3>Action Plan for Observation #{actionObservation.slNo}</h3>
-                <form>
-                  <div className="form-group">
-                    <label>Corrective Action:</label>
-                    <textarea rows={4} placeholder="Enter corrective action..." />
-                  </div>
-                  <div className="form-group">
-                    <label>Responsible Person:</label>
-                    <input type="text" placeholder="Enter name..." />
-                  </div>
-                  <div className="form-group">
-                    <label>Target Completion Date:</label>
-                    <input type="date" />
-                  </div>
-
-                  <div className="form-buttons">
-                    <button type="submit" className="save-btn">Save Action</button>
-                    <button type="button" className="cancel-btn" onClick={handleCloseActionForm}>Cancel</button>
-                  </div>
-                </form>
+        <div className="action-form-overlay">
+          <div className="action-form-modal">
+            <h3>Action Plan for Observation #{actionObservation.slNo}</h3>
+            <form>
+              <div className="form-group">
+                <label>Corrective Action:</label>
+                <textarea rows={4} placeholder="Enter corrective action..." />
               </div>
-            </div>
-          )}
+              <div className="form-group">
+                <label>Responsible Person:</label>
+                <input type="text" placeholder="Enter name..." />
+              </div>
+              <div className="form-group">
+                <label>Target Completion Date:</label>
+                <input type="date" />
+              </div>
 
+              <div className="form-buttons">
+                <button type="submit" className="save-btn">Save Action</button>
+                <button type="button" className="cancel-btn" onClick={handleCloseActionForm}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="observation-form">
@@ -306,12 +304,18 @@ const handleOpenActionForm = (observation) => {
                 Audit Cycle No:
                 <select
                   name="auditCycleNo"
-                  value={currentObservation.auditCycleNo}
-                  onChange={handleInputChange}
+                  value={currentObservation.auditCycleNo.split('/')[0]}
+                  onChange={(e) => {
+                    const cyclePrefix = e.target.value;
+                    setCurrentObservation(prev => ({
+                      ...prev,
+                      auditCycleNo: `${cyclePrefix}/${yearFormat}`
+                    }));
+                  }}
                   required
                 >
                   {auditCycleOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                    <option key={option} value={option}>{option}/{yearFormat}</option>
                   ))}
                 </select>
               </label>
@@ -427,9 +431,7 @@ const handleOpenActionForm = (observation) => {
                 <span>OFI (Opportunity For Improvement)</span>
               </label>
             </div>
-
           </div>
-          
 
           {/* Only show auditor/auditee fields if this is the first observation */}
           {observations.length === 0 && (
@@ -493,15 +495,15 @@ const handleOpenActionForm = (observation) => {
       )}
       <div className="signatures-summary">
         <div className="signature-info">
-          <div>
-            <strong>Auditor:</strong> {auditorInfo.name} ({auditorInfo.designation})
-          </div>
-          <div>
-            <strong>Auditee:</strong> {auditeeInfo.name} ({auditeeInfo.designation})
-          </div>
+        <div className="audit-info-item">
+  <strong>Auditor:</strong> {auditorInfo.name ? `${auditorInfo.name} (${auditorInfo.designation})` : "-"}
+</div>
+<div className="audit-info-item">
+  <strong>Auditee:</strong> {auditeeInfo.name ? `${auditeeInfo.name} (${auditeeInfo.designation})` : "-"}
+</div>
+
         </div>
       </div>
-
 
       <div className="button-group">
         <Button onClick={onBack} className="button back-btn">Back to Dashboard</Button>
@@ -514,9 +516,7 @@ const handleOpenActionForm = (observation) => {
         >
           Open Record
         </Button>
-
       </div>
-
     </div>
   );
 };

@@ -221,3 +221,50 @@
   font-weight: bold;
   font-size: 20px;
 }
+/* Print-specific styles */
+/* Print-specific styles */
+@media print {
+  body * {
+    visibility: hidden; /* Hide everything by default */
+  }
+  .observation-table, .observation-table * {
+    visibility: visible; /* Make the observation table and its children visible */
+  }
+
+  .observation-table {
+    position: relative;
+    width: 100%;
+    table-layout: fixed; /* Ensure the table's layout is fixed to prevent overflow */
+    page-break-inside: avoid; /* Avoid page breaks inside the table */
+    word-wrap: break-word; /* Break long words to prevent overflow */
+  }
+
+  .observation-table th, .observation-table td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+
+  /* Do not specify the orientation explicitly to allow print dialog options */
+  @page {
+    margin: 10mm; /* Adjust margins */
+  }
+
+  /* Adjust the print button to be hidden */
+  .print-button {
+    display: none;
+  }
+
+  /* Adjust margins and prevent content from spilling out */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Adjust the content container to prevent any overflow */
+  .observation-table {
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+  }
+}

@@ -31,7 +31,7 @@ const DepartmentList = () => {
   const [departmentData, setDepartmentData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", dept: "" });
 
   // Load departments from localStorage on mount
   useEffect(() => {
