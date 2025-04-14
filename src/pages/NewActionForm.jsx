@@ -8,9 +8,8 @@ const NewActionForm = () => {
     const navigate = useNavigate();
     const { observation } = location.state || {};
 
-    // Form states matching the document structure
-    const [formData, setFormData] = useState({
-        // First Form (Non-conformity Report)
+    // Initialize form data from observation if available
+    const initialFormData = {
         dept: observation?.department || "",
         ncsNumber: "",
         auditDate: new Date().toISOString().split('T')[0],
@@ -26,8 +25,6 @@ const NewActionForm = () => {
         activities: [{ slNo: "", activity: "", target: "", status: "" }],
         auditorSignature: "",
         auditeeSignature: "",
-
-        // Second Form (Corrective Action Report)
         rootCauses: ["", "", "", "", ""],
         correctiveActions: [{
             slNo: "",
@@ -42,11 +39,14 @@ const NewActionForm = () => {
         closingStatus: "",
         verifiedBy: "OMS Coordinator",
         approvedBy: "Head-QA"
-    });
+    };
 
-    const [savedData, setSavedData] = useState(null);
-    const [showForms, setShowForms] = useState(false); // Changed to false initially
-    const [showAddButton, setShowAddButton] = useState(true); // New state for Add button
+    const [formData, setFormData] = useState(initialFormData);
+    const [savedReports, setSavedReports] = useState([]);
+    const [showForms, setShowForms] = useState(false);
+    const [showAddButton, setShowAddButton] = useState(true);
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [viewingReport, setViewingReport] = useState(null);
 
     // Handlers for all fields
     const handleChange = (e) => {
@@ -93,23 +93,58 @@ const NewActionForm = () => {
     };
 
     const handleAddNew = () => {
+        setFormData(initialFormData);
+        setEditingIndex(null);
+        setViewingReport(null);
         setShowForms(true);
         setShowAddButton(false);
     };
 
     const handleSave = () => {
-        setSavedData(formData);
+        const newReport = {
+            ...formData,
+            id: Date.now(),
+            savedDate: new Date().toLocaleString()
+        };
+
+        if (editingIndex !== null) {
+            const updatedReports = [...savedReports];
+            updatedReports[editingIndex] = newReport;
+            setSavedReports(updatedReports);
+        } else {
+            setSavedReports([...savedReports, newReport]);
+        }
+
         setShowForms(false);
         setShowAddButton(true);
     };
 
-    const handleEdit = () => {
+    const handleEdit = (index) => {
+        setFormData(savedReports[index]);
+        setEditingIndex(index);
+        setViewingReport(null);
         setShowForms(true);
         setShowAddButton(false);
     };
 
     const handleCancel = () => {
         setShowForms(false);
+        setShowAddButton(true);
+    };
+
+    const handleDelete = (index) => {
+        const updatedReports = savedReports.filter((_, i) => i !== index);
+        setSavedReports(updatedReports);
+    };
+
+    const handleViewReport = (report) => {
+        setViewingReport(report);
+        setShowForms(false);
+        setShowAddButton(false);
+    };
+
+    const handleBackToList = () => {
+        setViewingReport(null);
         setShowAddButton(true);
     };
 
@@ -370,204 +405,239 @@ const NewActionForm = () => {
                     </div>
 
                     <div className="form-buttons">
-                        <button type="button" className="save-btn" onClick={handleSave}>Save Reports</button>
+                        <button type="button" className="save-btn" onClick={handleSave}>
+                            {editingIndex !== null ? 'Update Report' : 'Save Reports'}
+                        </button>
                         <button type="button" className="cancel-btn" onClick={handleCancel}>Cancel</button>
                     </div>
                 </>
-            ) : savedData ? (
-                <>
-                    {/* Display Saved Data in Document Format */}
-                    <div className="document-format">
-                        {/* Non-conformity Report Display */}
-                        <div className='head_title_logo'>
-                            <img src={companyLogo} alt="" className='img_logo'/>
-                            <h1 className="document-title">Internal Audit Non Conformity and Corrective Action Report</h1>
-                        </div>
-                        <table className="document-header-table">
-                            <tbody>
-                                <tr>
-                                    <td width="33%"><strong>DEPT</strong>: {savedData.dept}</td>
-                                    <td width="33%"><strong>NCS. NO.</strong>: {savedData.ncsNumber}</td>
-                                    <td width="33%"><strong>AUDIT DATE</strong>: {savedData.auditDate}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>PROCESS</strong>: {savedData.process}</td>
-                                    <td><strong>AUDITOR/DEPT.</strong>: {savedData.auditor}</td>
-                                    <td><strong>AUDITEE</strong>: {savedData.auditee}</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan={3}>
-                                        <p><strong>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information):</strong></p>
-                                        <p>{savedData.requirement}</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className='tbl_data' colSpan={2}>
-                                        <p><strong>NONCONFORMITY STATEMENT</strong></p>
-                                        <p>{savedData.nonConformityStatement}</p>
-                                    </td>
-                                    <td className='tbl_data'>
-                                        <p><strong>OBJECTIVE EVIDENCE</strong></p>
-                                        <p>{savedData.objectiveEvidence}</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>ISO 9001-2018: OVIS CLASS NO. & DISCIPLINE</strong></p>
-                                        <p>{savedData.isoClass}</p>
-                                    </td>
-                                    <td colSpan={2}></td>
-                                </tr>
-                                <tr>
-                                    <td className='tbl_data2'>DATE: {savedData.auditDate}</td>
-                                    <td colSpan={2}>SIGNATURE OF AUDITOR: {savedData.auditorSignature}</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan={3} className="document-section-title">
-                                        <p>TO BE FILLED BY AUDITEE</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="document-field">
-                                        <p><strong>POTENTIAL RISK</strong></p>
-                                        <p>{savedData.potentialRisk}</p>
-                                    </td>
-                                    <td colSpan={2}>
-                                        <p><strong>CORRECTION</strong></p>
-                                        <table className="document-table">
-                                            <thead>
-                                                <tr>
-                                                    <th width="10%">SLno.</th>
-                                                    <th width="40%">Activity</th>
-                                                    <th width="25%">Target</th>
-                                                    <th width="25%">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {savedData.activities.map((activity, index) => (
-                                                    <tr key={index}>
-                                                        <td>{activity.slNo}</td>
-                                                        <td>{activity.activity}</td>
-                                                        <td>{activity.target}</td>
-                                                        <td>{activity.status}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>DATE: {savedData.auditDate}</td>
-                                    <td colSpan={2}>SIGNATURE OF AUDITEE: {savedData.auditeeSignature}</td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colSpan={3}>
-                                        <div className="document-footer">
-                                            9.T.O LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-
-                        <h1 className="document-title">Internal Audit Non-Conformity and Corrective Action Report</h1>
-
-                        <table className="document-header-table">
-                            <tbody>
-                                <tr>
-                                    <td className="document-section-title">TO BE FILLED BY AUDITEE</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>ROOT CAUSE(S)</strong></p>
-                                        {savedData.rootCauses.map((cause, index) => (
-                                            cause && <p key={index}>Why {index + 1}: {cause}</p>
-                                        ))}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>CORRECTIVE ACTION</strong></p>
-                                        <table className="document-table">
-                                            <thead>
-                                                <tr>
-                                                    <th width="10%">SL no.</th>
-                                                    <th width="25%">Activity</th>
-                                                    <th width="15%">Resp.</th>
-                                                    <th width="25%">Changes to be made in FMEA/ROAR/OMS Doc. Info.</th>
-                                                    <th width="15%">Target/Resp.</th>
-                                                    <th width="10%">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {savedData.correctiveActions.map((action, index) => (
-                                                    <tr key={index}>
-                                                        <td>{action.slNo}</td>
-                                                        <td>{action.activity}</td>
-                                                        <td>{action.responsible}</td>
-                                                        <td>{action.changes}</td>
-                                                        <td>{action.target}</td>
-                                                        <td>{action.status}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        DATE: {savedData.auditDate}<br />
-                                        SIGNATURE OF AUDITEE: {savedData.auditeeSignature}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="document-section-title">
-                                        <p>TO BE FILLED BY AUDITOR</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>FOLLOW-UP AUDIT OBSERVATION</strong></p>
-                                        <p>{savedData.followUpObservation}</p>
-                                        <p><strong>OBJECTIVE EVIDENCE</strong></p>
-                                        <p>{savedData.followUpEvidence}</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>DATE: {savedData.auditDate}</p>
-                                        <p>SIGNATURE OF AUDITOR: {savedData.auditorSignature}</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p><strong>NCS. CLOSING STATUS</strong></p>
-                                        <p>{savedData.closingStatus === "Closed"
-                                            ? "a) Closed / Mixed Re-Action"
-                                            : "b) Amid similar nonconformity exist, could potentially occur at:"}</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Date : {savedData.closingDate}<br />
-                                        Verified by: {savedData.verifiedBy}<br />
-                                        Approved by: {savedData.approvedBy}<br />
-                                        LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div className="form-buttons">
-                            <button type="button" className="edit-btn" onClick={handleEdit}>Edit</button>
-                            <button type="button" className="back-btn" onClick={() => navigate(-1)}>Back to Observations</button>
-                            <button type="button" className="add-btn" onClick={handleAddNew}>Add New Report</button>
-                        </div>
+            ) : viewingReport ? (
+                // View Mode - Display single report
+                <div className="document-format">
+                    <div className='head_title_logo'>
+                        <img src={companyLogo} alt="" className='img_logo' />
+                        <h1 className="document-title">Internal Audit Non Conformity and Corrective Action Report</h1>
                     </div>
-                </>
-            ) : null}
+                    <table className="document-header-table">
+                        <tbody>
+                            <tr>
+                                <td width="33%"><strong>DEPT</strong>: {viewingReport.dept}</td>
+                                <td width="33%"><strong>NCS. NO.</strong>: {viewingReport.ncsNumber}</td>
+                                <td width="33%"><strong>AUDIT DATE</strong>: {viewingReport.auditDate}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROCESS</strong>: {viewingReport.process}</td>
+                                <td><strong>AUDITOR/DEPT.</strong>: {viewingReport.auditor}</td>
+                                <td><strong>AUDITEE</strong>: {viewingReport.auditee}</td>
+                            </tr>
+                            <tr>
+                                <td colSpan={3}>
+                                    <p><strong>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information):</strong></p>
+                                    <p>{viewingReport.requirement}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className='tbl_data' colSpan={2}>
+                                    <p><strong>NONCONFORMITY STATEMENT</strong></p>
+                                    <p>{viewingReport.nonConformityStatement}</p>
+                                </td>
+                                <td className='tbl_data'>
+                                    <p><strong>OBJECTIVE EVIDENCE</strong></p>
+                                    <p>{viewingReport.objectiveEvidence}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>ISO 9001-2018: OVIS CLASS NO. & DISCIPLINE</strong></p>
+                                    <p>{viewingReport.isoClass}</p>
+                                </td>
+                                <td colSpan={2}></td>
+                            </tr>
+                            <tr>
+                                <td className='tbl_data2'>DATE: {viewingReport.auditDate}</td>
+                                <td colSpan={2}>SIGNATURE OF AUDITOR: {viewingReport.auditorSignature}</td>
+                            </tr>
+                            <tr>
+                                <td colSpan={3} className="document-section-title">
+                                    <p>TO BE FILLED BY AUDITEE</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="document-field">
+                                    <p><strong>POTENTIAL RISK</strong></p>
+                                    <p>{viewingReport.potentialRisk}</p>
+                                </td>
+                                <td colSpan={2}>
+                                    <p><strong>CORRECTION</strong></p>
+                                    <table className="document-table">
+                                        <thead>
+                                            <tr>
+                                                <th width="10%">SLno.</th>
+                                                <th width="40%">Activity</th>
+                                                <th width="25%">Target</th>
+                                                <th width="25%">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {viewingReport.activities.map((activity, index) => (
+                                                <tr key={index}>
+                                                    <td>{activity.slNo}</td>
+                                                    <td>{activity.activity}</td>
+                                                    <td>{activity.target}</td>
+                                                    <td>{activity.status}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>DATE: {viewingReport.auditDate}</td>
+                                <td colSpan={2}>SIGNATURE OF AUDITEE: {viewingReport.auditeeSignature}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colSpan={3}>
+                                    <div className="document-footer">
+                                        9.T.O LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <h1 className="document-title">Internal Audit Non-Conformity and Corrective Action Report</h1>
+
+                    <table className="document-header-table">
+                        <tbody>
+                            <tr>
+                                <td className="document-section-title">TO BE FILLED BY AUDITEE</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>ROOT CAUSE(S)</strong></p>
+                                    {viewingReport.rootCauses.map((cause, index) => (
+                                        cause && <p key={index}>Why {index + 1}: {cause}</p>
+                                    ))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>CORRECTIVE ACTION</strong></p>
+                                    <table className="document-table">
+                                        <thead>
+                                            <tr>
+                                                <th width="10%">SL no.</th>
+                                                <th width="25%">Activity</th>
+                                                <th width="15%">Resp.</th>
+                                                <th width="25%">Changes to be made in FMEA/ROAR/OMS Doc. Info.</th>
+                                                <th width="15%">Target/Resp.</th>
+                                                <th width="10%">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {viewingReport.correctiveActions.map((action, index) => (
+                                                <tr key={index}>
+                                                    <td>{action.slNo}</td>
+                                                    <td>{action.activity}</td>
+                                                    <td>{action.responsible}</td>
+                                                    <td>{action.changes}</td>
+                                                    <td>{action.target}</td>
+                                                    <td>{action.status}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DATE: {viewingReport.auditDate}<br />
+                                    SIGNATURE OF AUDITEE: {viewingReport.auditeeSignature}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="document-section-title">
+                                    <p>TO BE FILLED BY AUDITOR</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>FOLLOW-UP AUDIT OBSERVATION</strong></p>
+                                    <p>{viewingReport.followUpObservation}</p>
+                                    <p><strong>OBJECTIVE EVIDENCE</strong></p>
+                                    <p>{viewingReport.followUpEvidence}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>DATE: {viewingReport.auditDate}</p>
+                                    <p>SIGNATURE OF AUDITOR: {viewingReport.auditorSignature}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>NCS. CLOSING STATUS</strong></p>
+                                    <p>{viewingReport.closingStatus === "Closed"
+                                        ? "a) Closed / Mixed Re-Action"
+                                        : "b) Amid similar nonconformity exist, could potentially occur at:"}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Verified by: {viewingReport.verifiedBy}<br />
+                                    Approved by: {viewingReport.approvedBy}<br />
+                                    LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div className="form-buttons">
+                        <button type="button" className="edit-btn" onClick={() => {
+                            const index = savedReports.findIndex(r => r.id === viewingReport.id);
+                            handleEdit(index);
+                        }}>Edit</button>
+                        <button type="button" className="back-btn" onClick={handleBackToList}>Back to Reports</button>
+                    </div>
+                </div>
+            ) : (
+                // List Mode - Display saved reports
+                <div className="saved-reports-container">
+                    <h2>Saved Action Reports</h2>
+                    {savedReports.length > 0 ? (
+                        <table className="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>NCS Number</th>
+                                    <th>Department</th>
+                                    <th>Audit Date</th>
+                                    <th>Saved Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {savedReports.map((report, index) => (
+                                    <tr key={report.id}>
+                                        <td>{report.ncsNumber}</td>
+                                        <td>{report.dept}</td>
+                                        <td>{report.auditDate}</td>
+                                        <td>{report.savedDate}</td>
+                                        <td>
+                                            <button onClick={() => handleViewReport(report)}>View</button>
+                                            <button onClick={() => handleEdit(index)}>Edit</button>
+                                            <button onClick={() => handleDelete(index)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>No reports saved yet.</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
