@@ -21,17 +21,17 @@ const IsoManual = () => {
             backgroundColor: '#f5f5f5',
             padding: '20px'
         }}>
-            <h1 style={{ marginBottom: '20px', color: '#333' }}>PDF Manual Viewer</h1>
+            <h3 style={{ marginBottom: '10px', color: '#333' }}>PDF Manual Viewer</h3>
             
             <div style={{ 
-                width: '90%', 
-                height: '80vh',
-                border: '1px solid #ddd',
+                width: '100%', 
+                height: '100vh',
+                border: '2px solid #ddd',
                 borderRadius: '8px',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                 overflow: 'hidden',
                 position: 'relative',
-                backgroundColor: 'white'
+                backgroundColor: 'gray'
             }}>
                 {isLoading && (
                     <div style={{

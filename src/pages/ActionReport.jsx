@@ -529,7 +529,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
             /* Print-specific styles */
             @page {
               size: A4;
-              margin: 15mm;
+              margin: 1mm;
             }
             body {
               margin: 0;
