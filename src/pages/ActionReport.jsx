@@ -513,25 +513,140 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
 
 const ReportViewer = ({ report, onEdit, onBack }) => {
   const handlePrint = () => {
-    window.print();
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+  
+    // Get the HTML content to print
+    const printContent = document.querySelector('.tabls_data').innerHTML;
+  
+    // Write the print document
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Report Print</title>
+          <style>
+            /* Print-specific styles */
+            @page {
+              size: A4;
+              margin: 15mm;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+              font-size: 12pt;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            /* Adjust font sizes for printing */
+            .document-title {
+              font-size: 16px !important; /* Smaller title font size for print */
+            }
+            .document-header-table {
+              font-size: 12px !important; /* Smaller header font size */
+            }
+            .document-table th, .document-table td {
+              font-size: 11px !important; /* Adjust table content font size */
+            }
+            .root-cause-table td {
+              font-size: 10px !important; /* Root cause table smaller font */
+            }
+            .signature_line p {
+              font-size: 10px !important; /* Signature section font size */
+            }
+            .print-page {
+              width: 210mm;
+              min-height: 297mm;
+              page-break-after: always;
+              margin: 0 auto;
+              padding: 15mm;
+              box-sizing: border-box;
+            }
+            .print-page:last-child {
+              page-break-after: auto;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              page-break-inside: avoid;
+            }
+            th, td {
+              border: 1px solid #000;
+              padding: 5px;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .document-footer {
+              font-size: 10px !important;
+              text-align: center;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent}
+          <script>
+            // Trigger print after content loads
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 200);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
+  
   return (
     <div className="document-format">
       <div className="tabls_data">
-      <div className="print-page page-1">
+        <div className="print-page page-1">
 
           <table className="document-header-table">
             <tbody>
               <tr>
                 <td colSpan={3}>
-                  <div className='head_title_logo'>
-                    <img src={companyLogo} alt="Company Logo" className='img_logo' />
-                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "19px", borderRight: "1px solid black", borderLeft: "1px solid black", padding: "10px 15px" }}>Internal Audit Non Conformity and Corrective Action Report</h1>
-                    <div style={{ fontSize: "15px", textAlign: "center", padding: "10px" }}>
-                      Audit cycle No: <br /><p>{report.auditCycleNo}</p>
+                  <div
+                    className="head_title_logo"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px',
+                      border: '1px solid black', // one clean border around all
+                    }}
+                  >
+                    <img
+                      src={companyLogo}
+                      alt="Company Logo"
+                      className="img_logo"
+                      style={{ height: '60px', objectFit: 'contain' }}
+                    />
+
+                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "19px", borderRight: "1px solid black", borderLeft: "1px solid black", padding: "10px 30px" }}>
+
+                      Internal Audit Non Conformity and Corrective Action Report
+                    </h1>
+
+                    <div
+                      style={{
+                        fontSize: '15px',
+                        textAlign: 'right',
+                        minWidth: '120px',
+                        lineHeight: '1.2',
+                      }}
+                    >
+                      <strong>Audit cycle No:</strong><br />
+                      <span>{report.auditCycleNo}</span>
                     </div>
                   </div>
                 </td>
+
               </tr>
               <tr>
                 <td width="33%"><strong>DEPT</strong>: {report.dptname}</td>
@@ -632,133 +747,161 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
         </div>
 
 
-      <div className="print-page page-2">
+        <div className="print-page page-2">
 
-        <table className="document-header-table mt-3">
+          <table className="document-header-table mt-3">
 
-          <tbody>
-            <tr>
-              <td colSpan={3}>
-                <div className='head_title_logo'>
-                  <img src={companyLogo} alt="Company Logo" className='img_logo' />
-                  <h1 className="document-title" style={{ textAlign: "center", fontSize: "19px", borderRight: "1px solid black", borderLeft: "1px solid black", padding: "10px 15px" }}>Internal Audit Non Conformity and Corrective Action Report</h1>
-                  <div style={{ fontSize: "15px", textAlign: "center", padding: "10px" }}>
-                    Audit cycle No: <br /><p>{report.auditCycleNo}</p>
+            <tbody>
+              <tr>
+                <td colSpan={3}>
+                  <div
+                    className="head_title_logo"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px',
+                      border: '1px solid black', // one clean border around all
+                    }}
+                  >
+                    <img
+                      src={companyLogo}
+                      alt="Company Logo"
+                      className="img_logo"
+                      style={{ height: '60px', objectFit: 'contain' }}
+                    />
+
+                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "19px", borderRight: "1px solid black", borderLeft: "1px solid black", padding: "10px 30px" }}>
+
+                      Internal Audit Non Conformity and Corrective Action Report
+                    </h1>
+
+                    <div
+                      style={{
+                        fontSize: '15px',
+                        textAlign: 'right',
+                        minWidth: '120px',
+                        lineHeight: '1.2',
+                      }}
+                    >
+                      <strong>Audit cycle No:</strong><br />
+                      <span>{report.auditCycleNo}</span>
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="document-section-title">TO BE FILLED BY AUDITEE</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="root-cause-section">
-                  <p className="section-header"><strong>ROOT CAUSE(S)</strong></p>
-                  <hr className="divider" />
-                  <table className="root-cause-table">
+                </td>
+
+              </tr>
+              <tr>
+                <td className="document-section-title">TO BE FILLED BY AUDITEE</td>
+              </tr>
+              <tr>
+                <td>
+                  <div className="root-cause-section">
+                    <p className="section-header"><strong>ROOT CAUSE(S)</strong></p>
+                    <hr className="divider" />
+                    <table className="root-cause-table">
+                      <tbody>
+                        {[0, 1, 2, 3, 4].map((index) => (
+                          <tr key={index} className="root-cause-row">
+                            <td className="root-cause-label">Why {index + 1}</td>
+                            <td className="root-cause-value">
+                              {report.rootCauses[index] || ""}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p className='text_cen'><strong>CORRECTIVE ACTION</strong></p><hr />
+                  <table className="document-table">
+                    <thead>
+                      <tr>
+                        <th width="10%">SL no.</th>
+                        <th width="25%">Activity</th>
+                        <th width="15%">Resp.</th>
+                        <th width="25%">Changes to be made in FMEA/ROAR/OMS Doc. Info.</th>
+                        <th width="15%">Target/Resp.</th>
+                        <th width="10%">Status</th>
+                      </tr>
+                    </thead>
                     <tbody>
-                      {[0, 1, 2, 3, 4].map((index) => (
-                        <tr key={index} className="root-cause-row">
-                          <td className="root-cause-label">Why {index + 1}</td>
-                          <td className="root-cause-value">
-                            {report.rootCauses[index] || ""}
-                          </td>
+                      {report.correctiveActions.map((action, index) => (
+                        <tr key={index}>
+                          <td>{action.slNo}</td>
+                          <td>{action.activity}</td>
+                          <td>{action.responsible}</td>
+                          <td>{action.changes}</td>
+                          <td>{action.target}</td>
+                          <td>{action.status}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p className='text_cen'><strong>CORRECTIVE ACTION</strong></p><hr />
-                <table className="document-table">
-                  <thead>
-                    <tr>
-                      <th width="10%">SL no.</th>
-                      <th width="25%">Activity</th>
-                      <th width="15%">Resp.</th>
-                      <th width="25%">Changes to be made in FMEA/ROAR/OMS Doc. Info.</th>
-                      <th width="15%">Target/Resp.</th>
-                      <th width="10%">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.correctiveActions.map((action, index) => (
-                      <tr key={index}>
-                        <td>{action.slNo}</td>
-                        <td>{action.activity}</td>
-                        <td>{action.responsible}</td>
-                        <td>{action.changes}</td>
-                        <td>{action.target}</td>
-                        <td>{action.status}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div className='signature_line mb-0'>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div className='signature_line mb-0'>
+                    <p>DATE: {report.auditDate}</p>
+                    <p>SIGNATURE OF AUDITEE: {report.auditeeSignature}</p>
+                  </div>
+
+                </td>
+              </tr>
+              <tr>
+                <td className="document-section-title ">
+                  <p >TO BE FILLED BY AUDITOR</p>
+                </td>
+              </tr>
+              <tr>
+                <td><div className='follow_split'>
+                  <div className='follow_split_left'>
+                    <p><strong>FOLLOW-UP AUDIT OBSERVATION</strong></p>
+                    <p>{report.followUpObservation}</p></div><div className='follow_split_right'>
+                    <p><strong>OBJECTIVE EVIDENCE</strong></p>
+                    <p>{report.followUpEvidence}</p></div></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div className='signature_line mb-0'>
+                    <p>DATE: {report.auditDate}</p>
+                    <p>SIGNATURE OF AUDITOR: </p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p><strong>NCS. CLOSING STATUS</strong></p>
+
+                  "a) Closed / Mixed Re-Action":<br />
+                  "b) Amid similar nonconformity exist, could potentially occur at:"
+                </td>
+              </tr>
+              <tr>
+                <td><div className="end_content">
                   <p>DATE: {report.auditDate}</p>
-                  <p>SIGNATURE OF AUDITEE: {report.auditeeSignature}</p>
+                  <p>
+                    Verified by: {report.verifiedBy}<br /></p>
+                  <p>
+                    Approved by: {report.approvedBy}<br /></p>
                 </div>
 
-              </td>
-            </tr>
-            <tr>
-              <td className="document-section-title ">
-                <p >TO BE FILLED BY AUDITOR</p>
-              </td>
-            </tr>
-            <tr>
-              <td><div className='follow_split'>
-                <div className='follow_split_left'>
-                  <p><strong>FOLLOW-UP AUDIT OBSERVATION</strong></p>
-                  <p>{report.followUpObservation}</p></div><div className='follow_split_right'>
-                  <p><strong>OBJECTIVE EVIDENCE</strong></p>
-                  <p>{report.followUpEvidence}</p></div></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div className='signature_line mb-0'>
-                  <p>DATE: {report.auditDate}</p>
-                  <p>SIGNATURE OF AUDITOR: </p>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p><strong>NCS. CLOSING STATUS</strong></p>
-
-                "a) Closed / Mixed Re-Action":<br />
-                "b) Amid similar nonconformity exist, could potentially occur at:"
-              </td>
-            </tr>
-            <tr>
-              <td><div className="end_content">
-                <p>DATE: {report.auditDate}</p>
-                <p>
-                  Verified by: {report.verifiedBy}<br /></p>
-                <p>
-                  Approved by: {report.approvedBy}<br /></p>
-              </div>
-
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p className='document-footer '>
-                  LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p className='document-footer '>
+                    LLS3/TQ3A/QA/6/5/0/8/04-00-03-2022
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div className="form-buttons no-print">
