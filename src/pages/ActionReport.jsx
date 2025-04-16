@@ -513,24 +513,16 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
 
 const ReportViewer = ({ report, onEdit, onBack }) => {
   const handlePrint = () => {
-    // Create a new window for printing
     const printWindow = window.open('', '_blank');
-  
-    // Get the HTML content to print
     const printContent = document.querySelector('.tabls_data').innerHTML;
-  
-    // Write the print document
+
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
           <title>Report Print</title>
           <style>
-            /* Print-specific styles */
-            @page {
-              size: A4;
-              margin: 1mm;
-            }
+            /* Base styles */
             body {
               margin: 0;
               padding: 0;
@@ -538,23 +530,16 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               font-size: 12pt;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              color: #333;
+              background-color: white !important;
             }
-            /* Adjust font sizes for printing */
-            .document-title {
-              font-size: 16px !important; /* Smaller title font size for print */
+            
+            /* Page layout */
+            @page {
+              size: A4;
+              margin: 1mm;
             }
-            .document-header-table {
-              font-size: 12px !important; /* Smaller header font size */
-            }
-            .document-table th, .document-table td {
-              font-size: 11px !important; /* Adjust table content font size */
-            }
-            .root-cause-table td {
-              font-size: 10px !important; /* Root cause table smaller font */
-            }
-            .signature_line p {
-              font-size: 10px !important; /* Signature section font size */
-            }
+            
             .print-page {
               width: 210mm;
               min-height: 297mm;
@@ -562,33 +547,269 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               margin: 0 auto;
               padding: 15mm;
               box-sizing: border-box;
+              background: white;
             }
+            
             .print-page:last-child {
               page-break-after: auto;
             }
+            
+            /* Tables */
             table {
               width: 100%;
               border-collapse: collapse;
               page-break-inside: avoid;
             }
+            
             th, td {
-              border: 1px solid #000;
+              border: 1px solid #000 !important;
+              padding: 8px 12px;
+              text-align: left;
+              vertical-align: top;
+              word-wrap: break-word;
+            }
+            
+            th {
+              background-color: #2c3e50 !important;
+              color: white !important;
+              font-weight: normal;
+            }
+            
+            td {
+              background-color: white !important;
+            }
+            
+            /* Document header */
+            .head_title_logo {
+              display: flex;
+              justify-content: space-evenly;
+              align-items: center;
+              padding: 5px;
+              border: 1px solid black;
+              font-weight: bold;
+            }
+            
+            .img_logo {
+              width: 50px;
               padding: 5px;
             }
+            
+            .document-title {
+              text-align: center;
+              font-size: 19px !important;
+              border-right: 1px solid black;
+              border-left: 1px solid black;
+              padding: 10px 30px;
+              color: #2c3e50;
+              margin-bottom: 5px;
+            }
+            
+            /* Document sections */
+            .document-section-title {
+              text-align: center;
+              font-weight: bold;
+              font-size: 13px;
+            }
+            
+            .document-section-title p {
+              margin-bottom: 0px;
+              margin-top: 0px;
+            }
+            
+            /* Signature lines */
+            .signature_line {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 0px;
+              font-size: 12px;
+            }
+            
+            .signature_line p {
+              margin-top: 40px;
+              margin-bottom: 0px;
+              font-weight: bold;
+            }
+            
+            /* ISO line */
+            .iso_line {
+              font-size: 12px;
+              margin-bottom: 0px;
+              padding: 0px;
+            }
+            
+            /* Text center */
+            .text_cen {
+              text-align: center;
+            }
+            
+            /* Follow up split */
+            .follow_split {
+              display: flex;
+              justify-content: space-around;
+            }
+            
+            .follow_split_left, .follow_split_right {
+              width: 100%;
+              text-align: center;
+              text-decoration: underline;
+              padding: 5px;
+            }
+            
+            .follow_split_left {
+              border-right: 1px solid black;
+              border-collapse: collapse;
+            }
+            
+            strong {
+              text-decoration: underline;
+            }
+            
+            /* End content */
+            .end_content {
+              display: flex;
+              justify-content: space-between;
+              font-size: 15px;
+            }
+            
+            .end_content p {
+              margin-bottom: 0;
+              font-weight: bold;
+              font-size: 10px;
+            }
+            
+            /* Document footer */
+            .document-footer {
+              text-align: end;
+              font-size: 12px;
+              margin-bottom: 0px;
+            }
+            
+            .document-footer p {
+              margin-bottom: 0px;
+            }
+            
+            /* Root cause section */
+            .root-cause-section {
+              width: 100%;
+            }
+            
+            .section-header {
+              font-weight: bold;
+              margin-bottom: 8px;
+              text-align: left;
+            }
+            
+            .divider {
+              border: none;
+              border-top: 1px solid #000;
+              margin: 5px 0 10px 0;
+            }
+            
+            .root-cause-table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            
+            .root-cause-row {
+              border-bottom: 1px solid #eee;
+            }
+            
+            .root-cause-row:last-child {
+              border-bottom: none;
+            }
+            
+            .root-cause-label {
+              padding: 6px 0;
+              width: 15%;
+              font-weight: 500;
+              vertical-align: top;
+            }
+            
+            .root-cause-value {
+              padding: 6px 0 6px 10px;
+              width: 85%;
+            }
+            
+            /* Column width adjustments */
+            .document-table th:nth-child(1),
+            .document-table td:nth-child(1) {
+              width: 10%;
+              text-align: center;
+            }
+            
+            .document-table th:nth-child(2),
+            .document-table td:nth-child(2) {
+              width: 25%;
+            }
+            
+            .document-table th:nth-child(3),
+            .document-table td:nth-child(3) {
+              width: 15%;
+            }
+            
+            .document-table th:nth-child(4),
+            .document-table td:nth-child(4) {
+              width: 25%;
+            }
+            
+            .document-table th:nth-child(5),
+            .document-table td:nth-child(5) {
+              width: 15%;
+              text-align: center;
+            }
+            
+            .document-table th:nth-child(6),
+            .document-table td:nth-child(6) {
+              width: 10%;
+              text-align: center;
+            }
+            
+            /* Utility classes */
             .no-print {
               display: none !important;
             }
-            .document-footer {
-              font-size: 10px !important;
-              text-align: center;
-              margin-top: 20px;
+            
+            .mb-0 {
+              margin-bottom: 0 !important;
+            }
+            
+            /* Print-specific adjustments */
+            @media print {
+              body {
+                margin: 0;
+                padding: 0;
+              }
+              
+              .print-page {
+                padding: 15mm;
+              }
+              
+              .document-title {
+                font-size: 16px !important;
+              }
+              
+              .document-header-table {
+                font-size: 12px !important;
+              }
+              
+              .document-table th, 
+              .document-table td {
+                font-size: 11px !important;
+              }
+              
+              .root-cause-table td {
+                font-size: 10px !important;
+              }
+              
+              .signature_line p {
+                page-break-inside: avoid;
+              }
             }
           </style>
         </head>
         <body>
           ${printContent}
           <script>
-            // Trigger print after content loads
             window.onload = function() {
               setTimeout(function() {
                 window.print();
@@ -601,7 +822,71 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
     `);
     printWindow.document.close();
   };
-  
+  const handleDownloadPDF = async (report) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.innerHTML = document.querySelector('.tabls_data').innerHTML;
+    document.body.appendChild(tempDiv);
+
+    const loadScript = (src) => new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+
+    try {
+      await Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+      ]);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Process each page
+      const pages = tempDiv.querySelectorAll('.print-page');
+
+      for (let i = 0; i < pages.length; i++) {
+        const canvas = await html2canvas(pages[i], {
+          scale: 2,
+          logging: false,
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+          backgroundColor: '#FFFFFF',
+          ignoreElements: (element) => element.classList.contains('no-print')
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = pdf.internal.pageSize.getWidth() - 20;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      }
+
+      // Generate dynamic filename
+      const departmentName = report.dptname.replace(/[^a-zA-Z0-9]/g, '_');
+      const auditCycle = report.auditCycleNo.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `Action_Report_${departmentName}_${auditCycle}_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      document.body.removeChild(tempDiv);
+    }
+  }
+
+
   return (
     <div className="document-format">
       <div className="tabls_data">
@@ -907,7 +1192,25 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
       <div className="form-buttons no-print">
         <button type="button" className="submit-btns" style={{ width: "100px" }} onClick={onEdit}>Edit</button>
         <button type="button" className="delete-btn" onClick={onBack}>Back to Reports</button>
-        <button type="button" className="print-btn" onClick={handlePrint}>Print</button>
+        <div className="action-buttons">
+          <button
+            className="print-btns"
+            onClick={handlePrint}
+            title="Print Report"
+          >
+            <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+            Print Report
+          </button>
+
+          <button
+            className="download-pdf-btn"
+            onClick={() => handleDownloadPDF(report)}
+            title="Download PDF Report"
+          >
+            <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+            Download PDF
+          </button>
+        </div>
       </div>
     </div>
   );
