@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import "../assets/styles/Admin_login.css";
 
 const Admin_login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,14 +18,9 @@ const Admin_login = () => {
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setError("");
-      login("admin-token", "admin"); // ✅ Store admin token & role
 
-      // Save role in localStorage for persistence
-      localStorage.setItem("role", "admin");
-
+      // Directly navigate to the admin dashboard without storing any tokens
       alert("Login Successful!");
-
-      // ✅ Redirect to admin dashboard
       navigate("/admin-dashboard", { replace: true });
     } else {
       setError("Invalid username or password!");
@@ -42,7 +35,9 @@ const Admin_login = () => {
         </div>
 
         <form className="form_elements" onSubmit={handleSubmit}>
-          <label htmlFor="admin-username" style={{color:"white"}}>Username</label>
+          <label htmlFor="admin-username" style={{ color: "white" }}>
+            Username
+          </label>
           <input
             type="text"
             id="admin-username"
@@ -50,7 +45,9 @@ const Admin_login = () => {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <label htmlFor="admin-password" style={{color:"white"}}>Password</label>
+          <label htmlFor="admin-password" style={{ color: "white" }}>
+            Password
+          </label>
           <input
             type="password"
             id="admin-password"
@@ -59,7 +56,9 @@ const Admin_login = () => {
             required
           />
           {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-          <button type="submit" className="user_login_btn">Submit</button>
+          <button type="submit" className="user_login_btn">
+            Submit
+          </button>
 
           {/* Back Button */}
           <div className="back_button" onClick={() => navigate("/login")}>

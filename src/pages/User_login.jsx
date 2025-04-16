@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import "../assets/styles/Admin_login.css";
 
 const User_login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [stage, setStage] = useState("login");
   const [username, setUsername] = useState("");
@@ -35,28 +33,25 @@ const User_login = () => {
   // Check for request status updates
   useEffect(() => {
     if (!isRequestSubmitted || !currentRequestId) return;
-  
+
     let isMounted = true; // Track mounted state
-  
+
     const checkRequestStatus = () => {
       if (!isMounted) return; // Don't proceed if unmounted
-  
+
       const requests = JSON.parse(localStorage.getItem("accessRequests") || "[]");
       const currentRequest = requests.find(req => req.timestamp === currentRequestId);
-  
+
       if (!currentRequest) return;
-  
+
       if (currentRequest.status === "approved") {
         // Save data to localStorage
         localStorage.setItem("userPermissions", JSON.stringify(currentRequest.permissions));
         localStorage.setItem("userDepartment", currentRequest.department);
-        
-        // Update auth state
-        login("authToken", "user");
-        
+
         // Clear interval immediately
         clearInterval(interval);
-        
+
         if (isMounted) {
           setIsRequestSubmitted(false);
           setCurrentRequestId(null);
@@ -72,14 +67,14 @@ const User_login = () => {
         }
       }
     };
-  
+
     const interval = setInterval(checkRequestStatus, 3000);
-  
+
     return () => {
       isMounted = false; // Mark as unmounted
       clearInterval(interval); // Cleanup interval
     };
-  }, [isRequestSubmitted, currentRequestId, navigate, login]);
+  }, [isRequestSubmitted, currentRequestId, navigate]);
 
   const USER_USERNAME = "user";
   const USER_PASSWORD = "user@123";
@@ -88,8 +83,6 @@ const User_login = () => {
     e.preventDefault();
     if (username === USER_USERNAME && password === USER_PASSWORD) {
       setError("");
-      login("user-token", "user");
-      localStorage.setItem("role", "user");
       setStage("form");
     } else {
       setError("Invalid username or password!");
@@ -106,7 +99,7 @@ const User_login = () => {
       alert("Please select a department");
       return;
     }
-  
+
     const newRequest = {
       username: username,
       department: selectedDept,
@@ -117,10 +110,11 @@ const User_login = () => {
       status: "pending",
       read: false
     };
-  
+
     const existingRequests = JSON.parse(localStorage.getItem("accessRequests") || "[]");
     localStorage.setItem("accessRequests", JSON.stringify([...existingRequests, newRequest]));
-  
+    localStorage.setItem("currentUser", username);
+
     setIsRequestSubmitted(true);
     setCurrentRequestId(newRequest.timestamp);
     alert("Your request has been submitted. Waiting for admin approval...");

@@ -1,10 +1,10 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import AdminLogin from "./pages/Admin_login";
 import UserLogin from "./pages/User_login";
-import ProtectedRoute from "./components/ProtectedRoute";
+
 import AuditPlanCreation from "./pages/AuditPlanCreation";
 import AuditPlanDetails from "./pages/AuditPlanDetails";
 import AuditObservation from "./pages/AuditObservation";
@@ -24,36 +24,17 @@ function App() {
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/audit-report" element={<AuditReport />} />
 
-      {/* Admin Protected Routes */}
-      <Route
-        path="/admin-dashboard"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="notifications" replace />} />
-        <Route path="notifications" element={<NotificationsPage />} />
-        <Route path="audit-plan-creation" element={<AuditPlanCreation />} />
-        <Route path="audit-observation" element={<AuditObservation />} />
-        <Route path="observation-details/:departmentName" element={<ObservationDetails />} />
-        <Route path="action-report" element={<ActionReport />} />
-      </Route>
+      {/* Admin Routes */}
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin-dashboard/notifications" element={<NotificationsPage />} />
+      <Route path="/admin-dashboard/audit-plan-creation" element={<AuditPlanCreation />} />
+      <Route path="/admin-dashboard/audit-observation" element={<AuditObservation />} />
+      <Route path="/admin-dashboard/observation-details/:departmentName" element={<ObservationDetails />} />
+      <Route path="/admin-dashboard/action-report" element={<ActionReport />} />
 
-      {/* User Protected Routes */}
-      <Route
-        path="/user-dashboard"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="notifications" replace />} />
-        <Route path="notifications" element={<NotificationsPage />} />
-        {/* Add other user-specific routes here */}
-      </Route>
+      {/* User Routes */}
+      <Route path="/user-dashboard" element={<UserDashboard />} />
+      <Route path="/user-dashboard/notifications" element={<NotificationsPage />} />
 
       {/* Redirects */}
       <Route path="/admin" element={<Navigate to="/admin-login" replace />} />
@@ -63,5 +44,6 @@ function App() {
     </Routes>
   );
 }
+
 
 export default App;

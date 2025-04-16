@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import companyLogo from "../assets/images/lls_logo.png";
 import "../assets/styles/ActionReport.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 // Constants for initial state and action types
 const INITIAL_FORM_DATA = {
