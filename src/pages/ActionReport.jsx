@@ -1056,25 +1056,12 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                       style={{ height: '60px', objectFit: 'contain' }}
                     />
 
-                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "19px", borderRight: "1px solid black", borderLeft: "1px solid black", padding: "10px 30px" }}>
+                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "20px", borderLeft: "1px solid black", padding: "10px 30px" ,marginRight:"180px"}}>
 
                       Internal Audit Non Conformity and Corrective Action Report
                     </h1>
-
-                    <div
-                      style={{
-                        fontSize: '15px',
-                        textAlign: 'right',
-                        minWidth: '120px',
-                        lineHeight: '1.2',
-                      }}
-                    >
-                      <strong>Audit cycle No:</strong><br />
-                      <span>{report.auditCycleNo}</span>
-                    </div>
                   </div>
                 </td>
-
               </tr>
               <tr>
                 <td className="document-section-title">TO BE FILLED BY AUDITEE</td>

@@ -66,12 +66,7 @@ const UserDashboard = () => {
             >
               Audit Plan Sheet
             </button>
-            <button
-              className={`menu-btn ${activeComponent === "audit-intimation-mail" ? "active" : ""}`}
-              onClick={() => setActiveComponent("audit-intimation-mail")}
-            >
-              Audit Intimation Mail
-            </button>
+           
             <button
               className={`menu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
               onClick={() => setActiveComponent("audit-observation")}

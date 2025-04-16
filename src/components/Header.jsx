@@ -8,7 +8,7 @@ const Header = () => {
         <div className="child_bar">
           <div className="Logo" ></div>
           <div className="Title">
-            <h2 className="main_title">Lakshmi Life Science Limited</h2>
+            <h2 className="main_title">Lakshmi Life Sciences PVT. LTD.</h2>
           </div>
         </div>
       </div>
