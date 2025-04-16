@@ -42,7 +42,7 @@ const Admin_login = () => {
         </div>
 
         <form className="form_elements" onSubmit={handleSubmit}>
-          <label htmlFor="admin-username">Username</label>
+          <label htmlFor="admin-username" style={{color:"white"}}>Username</label>
           <input
             type="text"
             id="admin-username"
@@ -50,7 +50,7 @@ const Admin_login = () => {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <label htmlFor="admin-password">Password</label>
+          <label htmlFor="admin-password" style={{color:"white"}}>Password</label>
           <input
             type="password"
             id="admin-password"

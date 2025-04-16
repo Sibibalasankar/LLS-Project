@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../assets/styles/Admin_login.css";
@@ -7,21 +7,79 @@ const User_login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [stage, setStage] = useState("login"); // login → form → dashboard
+  const [stage, setStage] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isRequestSubmitted, setIsRequestSubmitted] = useState(false);
+  const [currentRequestId, setCurrentRequestId] = useState(null);
 
   // Form states
   const [selectedDept, setSelectedDept] = useState("");
   const [checkboxes, setCheckboxes] = useState({
-    option1: false,
-    option2: false,
-    option3: false,
-    option4: false,
+    auditPlanSheet: false,
+    auditObservation: false,
+    auditNCCloser: false,
+    auditNCApproval: false,
+    isoManual: false,
   });
 
-  const departments = ["HR", "Finance", "IT", "Production"];
+  // Load departments from localStorage
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
+    setDepartments(storedDepartments.map(dept => dept.name));
+  }, []);
+
+  // Check for request status updates
+  useEffect(() => {
+    if (!isRequestSubmitted || !currentRequestId) return;
+  
+    let isMounted = true; // Track mounted state
+  
+    const checkRequestStatus = () => {
+      if (!isMounted) return; // Don't proceed if unmounted
+  
+      const requests = JSON.parse(localStorage.getItem("accessRequests") || "[]");
+      const currentRequest = requests.find(req => req.timestamp === currentRequestId);
+  
+      if (!currentRequest) return;
+  
+      if (currentRequest.status === "approved") {
+        // Save data to localStorage
+        localStorage.setItem("userPermissions", JSON.stringify(currentRequest.permissions));
+        localStorage.setItem("userDepartment", currentRequest.department);
+        
+        // Update auth state
+        login("authToken", "user");
+        
+        // Clear interval immediately
+        clearInterval(interval);
+        
+        if (isMounted) {
+          setIsRequestSubmitted(false);
+          setCurrentRequestId(null);
+          navigate("/user-dashboard", { replace: true });
+        }
+      } 
+      else if (currentRequest.status === "rejected") {
+        clearInterval(interval);
+        if (isMounted) {
+          setIsRequestSubmitted(false);
+          setCurrentRequestId(null);
+          alert("Request rejected by admin");
+        }
+      }
+    };
+  
+    const interval = setInterval(checkRequestStatus, 3000);
+  
+    return () => {
+      isMounted = false; // Mark as unmounted
+      clearInterval(interval); // Cleanup interval
+    };
+  }, [isRequestSubmitted, currentRequestId, navigate, login]);
 
   const USER_USERNAME = "user";
   const USER_PASSWORD = "user@123";
@@ -32,7 +90,7 @@ const User_login = () => {
       setError("");
       login("user-token", "user");
       localStorage.setItem("role", "user");
-      setStage("form"); // 👈 Go to form stage
+      setStage("form");
     } else {
       setError("Invalid username or password!");
     }
@@ -44,9 +102,28 @@ const User_login = () => {
   };
 
   const handleRequest = () => {
-    // You can handle storing form data here
-    alert("Request submitted successfully!");
-    navigate("/user-dashboard", { replace: true });
+    if (!selectedDept) {
+      alert("Please select a department");
+      return;
+    }
+  
+    const newRequest = {
+      username: username,
+      department: selectedDept,
+      permissions: Object.entries(checkboxes)
+        .filter(([_, value]) => value)
+        .map(([key]) => key),
+      timestamp: new Date().toISOString(),
+      status: "pending",
+      read: false
+    };
+  
+    const existingRequests = JSON.parse(localStorage.getItem("accessRequests") || "[]");
+    localStorage.setItem("accessRequests", JSON.stringify([...existingRequests, newRequest]));
+  
+    setIsRequestSubmitted(true);
+    setCurrentRequestId(newRequest.timestamp);
+    alert("Your request has been submitted. Waiting for admin approval...");
   };
 
   return (
@@ -58,7 +135,7 @@ const User_login = () => {
               <p className="login_subtitle">User Login</p>
             </div>
             <form className="form_elements" onSubmit={handleLogin}>
-              <label htmlFor="user-username">Username</label>
+              <label htmlFor="user-username" style={{ color: "white" }}>Username</label>
               <input
                 type="text"
                 id="user-username"
@@ -66,7 +143,7 @@ const User_login = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-              <label htmlFor="user-password">Password</label>
+              <label htmlFor="user-password" style={{ color: "white" }}>Password</label>
               <input
                 type="password"
                 id="user-password"
@@ -84,49 +161,60 @@ const User_login = () => {
           </>
         )}
 
-{stage === "form" && (
-  <div className="form_elements">
-    <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Request Access</h3>
+        {stage === "form" && (
+          <div className="form_div">
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Request Access</h3>
 
-    <label htmlFor="department">Select Department:</label>
-    <select
-      id="department"
-      value={selectedDept}
-      onChange={(e) => setSelectedDept(e.target.value)}
-      required
-      className="styled-select"
-    >
-      <option value="">-- Select Department --</option>
-      {departments.map((dept, index) => (
-        <option key={index} value={dept}>
-          {dept}
-        </option>
-      ))}
-    </select>
+            <label htmlFor="department" style={{color:'white'}}>Select Department:</label>
+            <select
+              id="department"
+              value={selectedDept}
+              onChange={(e) => setSelectedDept(e.target.value)}
+              required
+              className="styled-select"
+              disabled={isRequestSubmitted}
+            >
+              <option value="">-- Select Department --</option>
+              {departments.map((dept, index) => (
+                <option key={index} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
 
-    <div className="checkbox-group">
-      {["option1", "option2", "option3", "option4"].map((opt, idx) => (
-        <label key={idx} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <input
-            type="checkbox"
-            name={opt}
-            checked={checkboxes[opt]}
-            onChange={handleCheckboxChange}
-          />
-          {`Option ${idx + 1}`}
-        </label>
-      ))}
-    </div>
+            <div className="checkbox-group">
+              {Object.entries(checkboxes).map(([key, value]) => (
+                <label key={key}>
+                  <input
+                    type="checkbox"
+                    name={key}
+                    checked={value}
+                    onChange={handleCheckboxChange}
+                    disabled={isRequestSubmitted}
+                  />
+                  {key.split(/(?=[A-Z])/).join(" ")}
+                </label>
+              ))}
+            </div>
 
-    <div className="modal-buttons">
-      <button className="user_login_btn" onClick={handleRequest}>Request</button>
-      <button className="back_button" onClick={() => setStage("login")}>
-        <i className="bi bi-arrow-left"></i> Back
-      </button>
-    </div>
-  </div>
-)}
-
+            <div className="modal-buttons">
+              <button 
+                className="user_login_btn" 
+                onClick={handleRequest}
+                disabled={isRequestSubmitted}
+              >
+                {isRequestSubmitted ? "Waiting for admin response..." : "Request"}
+              </button>
+              <button 
+                className="back_button" 
+                onClick={() => navigate("/user-login")}
+                disabled={isRequestSubmitted}
+              >
+                <i className="bi bi-arrow-left"></i> Back
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

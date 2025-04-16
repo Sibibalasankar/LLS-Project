@@ -85,3 +85,22 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+.department-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-label {
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+}

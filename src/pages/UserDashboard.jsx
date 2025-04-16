@@ -38,6 +38,35 @@ const UserDashboard = () => {
       </div>
     );
   };
+  useEffect(() => {
+    const checkAccess = () => {
+      const requests = JSON.parse(localStorage.getItem("accessRequests") || "[]");
+      const currentUser = localStorage.getItem("currentUser");
+  
+      if (!currentUser) {
+        alert("No user found in session.");
+        navigate("/user-login");
+        return;
+      }
+  
+      const approved = requests.some(req => 
+        req.username === currentUser && req.status === "approved"
+      );
+  
+      if (!approved) {
+        // prevent double alerts
+        if (!window.hasAlerted) {
+          alert("You don't have approved access yet");
+          window.hasAlerted = true;
+        }
+        navigate("/user-login");
+      }
+    };
+  
+    checkAccess();
+    const interval = setInterval(checkAccess, 5000);
+    return () => clearInterval(interval);
+  }, [navigate]);
   
 
   return (

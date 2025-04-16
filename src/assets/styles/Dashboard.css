@@ -12,6 +12,7 @@
   min-height: 100vh;
   background-color: #f5f5f5;
   width: 100%;
+  position: relative;
 }
 
 /* Header Styles */
@@ -19,9 +20,12 @@
   background-color: #2e3191;
   color: white;
   padding: 0.8rem 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   width: 100%;
   border-bottom: 2px solid rgb(150, 146, 146);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .header-content {
@@ -53,6 +57,35 @@
   font-weight: 600;
 }
 
+/* Header Right Styles */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notification-icon-container {
+  position: relative;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.notification-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4757;
+  border-radius: 50%;
+  border: 2px solid #2e3191;
+}
+
 .logout-btn {
   background-color: transparent;
   color: white;
@@ -77,9 +110,10 @@
   width: 100%;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
-/* Sidebar Styles *//* Sidebar Styles */
+/* Sidebar Styles */
 .dashboard-sidebar {
   width: 250px;
   background-color: #2e3191;
@@ -87,6 +121,10 @@
   min-height: calc(100vh - 60px);
   flex-shrink: 0;
   padding: 1rem 0;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
 }
 
 .sidebar-menu {
@@ -166,10 +204,10 @@
   border-radius: 50%;
 }
 
-/* Add separation between main buttons */
 .menu-btn:not(:last-child) {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 /* Content Area Styles */
 .dashboard-content {
   flex: 1;
@@ -190,15 +228,35 @@
   margin-bottom: 1rem;
 }
 
+.datetime-info {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  color: #555;
+}
+
+/* Notification Panel Styles */
+.notification-panel {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: 350px;
+  height: calc(100vh - 60px);
+  background: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
-  .dashboard-main {
-    flex-direction: column;
-  }
-  
   .dashboard-sidebar {
     width: 100%;
     min-height: auto;
+    position: relative;
+    top: auto;
+    height: auto;
   }
   
   .header-title {
@@ -207,6 +265,11 @@
   
   .header-logo {
     height: 35px;
+  }
+
+  .notification-panel {
+    width: 100%;
+    height: calc(100vh - 60px);
   }
 }
 
@@ -222,8 +285,8 @@
   }
   
   .logout-btn {
-    width: 100%;
-    margin-top: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
   }
   
   .menu-btn {
@@ -234,15 +297,4 @@
   .dashboard-content {
     padding: 1rem;
   }
-}
-.welcome-message {
-  text-align: center;
-  padding: 2rem;
-}
-
-.datetime-info {
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin-top: 1rem;
-  color: #555;
 }

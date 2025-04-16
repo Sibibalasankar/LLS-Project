@@ -14,34 +14,40 @@ import AuditNCApproval from "./AuditNCApproval";
 import AuditSummary from "./AuditSummary";
 import ISOManual from "./ISOManual";
 import companyLogo from "../assets/images/lls_logo.png";
+import NotificationsPage from "./NotificationsPage";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [showAuditPlan, setShowAuditPlan] = useState(false);
   const [showAuditCheckList, setShowAuditCheckList] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]); // Add notifications state
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const navigate = useNavigate();
+  
 
   // Function to reset to welcome view
   const resetToWelcome = () => {
     setActiveComponent(null);
     setShowAuditPlan(false);
     setShowAuditCheckList(false);
+    setShowNotifications(false);
   };
 
   const WelcomeMessage = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
-  
+
     useEffect(() => {
       const intervalId = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
-  
-      return () => clearInterval(intervalId); // Cleanup
+
+      return () => clearInterval(intervalId);
     }, []);
-  
+
     const formattedDate = currentTime.toLocaleDateString();
     const formattedTime = currentTime.toLocaleTimeString();
-  
+
     return (
       <div className="welcome-message">
         <h2>Welcome to the Audit Management System</h2>
@@ -52,7 +58,30 @@ const Dashboard = () => {
       </div>
     );
   };
-  
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+    if (hasUnreadNotifications && !showNotifications) {
+      setHasUnreadNotifications(false);
+    }
+  };
+
+  // Simulate receiving a new notification
+  useEffect(() => {
+    const notificationInterval = setInterval(() => {
+      const newNotification = {
+        message: "New notification received!",
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        newNotification,
+      ]);
+      setHasUnreadNotifications(true);
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(notificationInterval);
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -61,17 +90,26 @@ const Dashboard = () => {
         <div className="header-content">
           <div className="header-left">
             <img src={companyLogo} alt="Company Logo" className="header-logo" />
-            <h1 
-              className="header-title" 
+            <h1
+              className="header-title"
               onClick={resetToWelcome}
               style={{ cursor: "pointer" }}
             >
               LLS Audit Management System
             </h1>
           </div>
-          <button className="logout-btn" onClick={() => navigate("/login")}>
-            Logout
-          </button>
+          <div className="header-right">
+            <div className="notification-icon-container" onClick={toggleNotifications}>
+              <i className="bi bi-bell notification-icon"></i>
+              {hasUnreadNotifications && <span className="notification-badge"></span>}
+            </div>
+            <button className="logout-btn" onClick={() => {
+              if (window.confirm("Are you sure you want to logout?")) navigate("/login");
+            }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
@@ -185,8 +223,19 @@ const Dashboard = () => {
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
 
-          {!activeComponent && <WelcomeMessage />}
+          {!activeComponent && !showNotifications && <WelcomeMessage />}
         </main>
+
+        {/* Notification Panel */}
+        {showNotifications && (
+          <div className="notification-panel">
+            <NotificationsPage
+              notifications={notifications} // Pass notifications to NotificationsPage
+              onClose={() => setShowNotifications(false)}
+              onNewNotification={() => setHasUnreadNotifications(true)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

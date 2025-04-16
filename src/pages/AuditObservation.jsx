@@ -7,6 +7,7 @@ import "../assets/styles/AuditObservation.css";
 const AuditObservation = () => {
   const [departments, setDepartments] = useState([]);
   const [observationsCount, setObservationsCount] = useState({});
+  const [ncCount, setNcCount] = useState({}); // New state for NC counts
   const [auditPlans, setAuditPlans] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
 
@@ -14,8 +15,11 @@ const AuditObservation = () => {
     const loadData = () => {
       const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
       const storedPlans = JSON.parse(localStorage.getItem('auditPlans')) || [];
+      const savedReports = JSON.parse(localStorage.getItem('savedReports')) || [];
 
       const updatedCounts = {};
+      const updatedNcCounts = {};
+
       storedDepartments.forEach(dept => {
         const hasPlan = storedPlans.some(plan => plan.department === dept.name);
 
@@ -24,13 +28,21 @@ const AuditObservation = () => {
           localStorage.removeItem(`observations_${dept.name}`);
         }
 
-        const remainingObservations = JSON.parse(localStorage.getItem(`observations_${dept.name}`)) || [];
-        updatedCounts[dept.name] = remainingObservations.length;
+        // Count observations for this department
+        const deptObservations = JSON.parse(localStorage.getItem(`observations_${dept.name}`)) || [];
+        updatedCounts[dept.name] = deptObservations.length;
+
+        // Count NCs for this department
+        const deptNcCount = savedReports.filter(report =>
+          report.dptname === dept.name
+        ).length;
+        updatedNcCounts[dept.name] = deptNcCount;
       });
 
       setDepartments(storedDepartments);
       setAuditPlans(storedPlans);
       setObservationsCount(updatedCounts);
+      setNcCount(updatedNcCounts);
     };
 
     loadData();
@@ -60,6 +72,7 @@ const AuditObservation = () => {
           {departments.map((dept) => {
             const plansCount = auditPlans.filter(plan => plan.department === dept.name).length;
             const obsCount = observationsCount[dept.name] || 0;
+            const deptNcCount = ncCount[dept.name] || 0; // Get NC count for this department
 
             return (
               <Card key={dept.name} className="department-card">
@@ -74,6 +87,10 @@ const AuditObservation = () => {
                       <div className="stat-item">
                         <span className="stat-label">Observations:</span>
                         <span className="stat-value">{obsCount}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">NC Count:</span>
+                        <span className="stat-value">{deptNcCount}</span>
                       </div>
                     </div>
                   </div>

@@ -4,7 +4,7 @@ import { Button } from "../components/button";
 import Observations from "./Observations";
 import "../assets/styles/ObservationDetails.css";
 
-const ObservationDetails = ({ departmentName, onClose }) => {
+const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) => {
   const [observations, setObservations] = useState([]);
   const [viewObservationId, setViewObservationId] = useState(null);
 
@@ -25,6 +25,8 @@ const ObservationDetails = ({ departmentName, onClose }) => {
     const updated = [...stored, newObservation];
     localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updated));
     setObservations(updated);
+    // Notify parent component about the count update
+    onObservationUpdate(departmentName, updated.length);
   };
 
   const handleDeleteObservation = (id) => {
@@ -37,6 +39,8 @@ const ObservationDetails = ({ departmentName, onClose }) => {
 
     localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
     setObservations(updatedObservations);
+    // Notify parent component about the count update
+    onObservationUpdate(departmentName, updatedObservations.length);
   };
 
   const handleGoToObservation = (id) => {
