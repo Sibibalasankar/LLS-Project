@@ -1228,8 +1228,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
 
   const filteredReports = reports.filter(report => {
     return (
-      (filters.dptname === "" ||
-        report.dptname === filters.dptname) &&
+      (filters.dptname === "" || report.dptname === filters.dptname) &&
       (filters.auditCycleNo === "" ||
         report.auditCycleNo?.toLowerCase().includes(filters.auditCycleNo.toLowerCase())) &&
       (filters.savedDate === "" ||
@@ -1287,6 +1286,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         </div>
       </div>
 
+      {/* Render filtered reports */}
       {filteredReports.length > 0 ? (
         <table className="reports-table">
           <thead>
@@ -1324,6 +1324,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     </div>
   );
 };
+
 // Main component
 const NewActionForm = () => {
   const [formData, dispatch] = useReducer(formReducer, INITIAL_FORM_DATA);

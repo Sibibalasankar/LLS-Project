@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 import AuditObservation from "./AuditObservation";
@@ -8,12 +8,13 @@ import AuditPlanSheet from "./AuditPlanSheet";
 import AuditIntimationMail from "./AuditIntimationMail";
 import ISOManual from "../pages/ISOManual";
 import companyLogo from "../assets/images/lls_logo.png";
+import UserAuditNcCloser from "../pages/UserAuditNcCloser";
 
 const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [accessApproved, setAccessApproved] = useState(true);
   const [userPermissions, setUserPermissions] = useState([]);
-  const [userDepartment, setUserDepartment] = useState(""); // 👈 added this
+  const [userDepartment, setUserDepartment] = useState(""); 
   const navigate = useNavigate();
 
   const WelcomeMessage = () => {
@@ -92,7 +93,6 @@ const UserDashboard = () => {
             <img src={companyLogo} alt="Company Logo" className="header-logo" />
             <div>
               <h1 className="header-title">LLS Audit Management System</h1>
-              {/* Display Department name */}
               {userDepartment && (
                 <p className="department-info" style={{ fontSize: "14px", color: "#ccc" }}>
                   Department: {userDepartment}
@@ -155,7 +155,7 @@ const UserDashboard = () => {
         <main className="dashboard-content">
           {activeComponent === "audit-plan-sheet" && <AuditPlanSheet />}
           {activeComponent === "audit-observation" && <AuditObservation />}
-          {activeComponent === "audit-nc-closer" && <AuditNCCloser />}
+          {activeComponent === "audit-nc-closer" && <UserAuditNcCloser />}
           {activeComponent === "audit-nc-approval" && <AuditNCApproval />}
           {activeComponent === "iso-manual" && <ISOManual />}
           {!activeComponent && <WelcomeMessage />}
