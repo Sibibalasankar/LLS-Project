@@ -1,94 +1,55 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "../assets/styles/DepartmentList.css";
-
-const departments = [
-  "Quality Management System",
-  "Marketing - Industrial Automation",
-  "Marketing - Textile Automation",
-  "Marketing - Trading",
-  "Project Management",
-  "Design - Industrial Automation",
-  "Design - Textile Automation",
-  "Design - Controls",
-  "Planning and Engineering Innovation",
-  "Supply Chain Management",
-  "Machining Division (MD)",
-  "Sheet Metal Division (SMD)",
-  "Powder Coating",
-  "Product Assembly",
-  "Project Assembly",
-  "Quality - Inward",
-  "Quality - SMD",
-  "Quality - Machining Division",
-  "Quality - Assembly",
-  "Stores",
-  "Customer Service Department",
-  "Human Resources",
-  "Total Plant Maintenance",
-];
 
 const DepartmentList = () => {
   const [departmentData, setDepartmentData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ Department: "", email: "" });
 
-  // Load departments from localStorage on mount
   useEffect(() => {
-    const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
-
-    // Create a map of stored departments
-    const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept]));
-
-    // Merge default departments with stored ones
-    const updatedDepartments = departments.map(name =>
-      storedDeptMap.get(name) || { name, email: "" }
-    );
-
-    // Ensure any newly added departments are preserved
-    storedDepartments.forEach(dept => {
-      if (!departments.includes(dept.name)) {
-        updatedDepartments.push(dept);
-      }
-    });
-
-    setDepartmentData(updatedDepartments);
-    localStorage.setItem("departments", JSON.stringify(updatedDepartments));
+    fetchDepartment();
   }, []);
 
-
-  const saveToLocalStorage = (departments) => {
-    localStorage.setItem("departments", JSON.stringify(departments));
+  const fetchDepartment = async () => {
+    try {
+      const res = await axios.get("http://localhost:3001/api/departments");
+      setDepartmentData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch departments:", err);
+    }
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
+    if (!formData.Department.trim() || !formData.email.trim()) {
       alert("Please fill in all fields");
       return;
     }
 
-    let updatedDepartments = [...departmentData];
-    let message = "";
+    try {
+      if (editingIndex !== null) {
+        const dept = departmentData[editingIndex];
+        await axios.put(`http://localhost:3001/api/departments/${dept.id}`, formData);
+        alert("Department updated successfully!");
+      } else {
+        await axios.post("http://localhost:3001/api/departments", formData);
+        alert("Department added successfully!");
+      }
 
-    if (editingIndex !== null) {
-      updatedDepartments[editingIndex] = formData;
+      fetchDepartment();
+      setShowForm(false);
       setEditingIndex(null);
-      message = "Department updated successfully!";
-    } else {
-      updatedDepartments.push(formData);
-      message = "Department added successfully!";
+      setFormData({ Department: "", email: "" });
+    } catch (err) {
+      alert("Error saving department");
+      console.error(err);
     }
-
-    setDepartmentData(updatedDepartments);
-    saveToLocalStorage(updatedDepartments);
-    setShowForm(false);
-    setFormData({ name: "", email: "" });
-    alert(message);
   };
 
   const handleEdit = (index) => {
@@ -97,17 +58,20 @@ const DepartmentList = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (index) => {
-    const departmentToDelete = departmentData[index];
+  const handleDelete = async (index) => {
+    const dept = departmentData[index];
     const isConfirmed = window.confirm(
-      `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditee Email: ${departmentToDelete.email || "N/A"}`
+      `Are you sure you want to delete ${dept.Department}?\n\nAuditee Email: ${dept.email || "N/A"}`
     );
 
     if (isConfirmed) {
-      const updatedDepartments = departmentData.filter((_, i) => i !== index);
-      setDepartmentData(updatedDepartments);
-      saveToLocalStorage(updatedDepartments);
-      alert("Department deleted successfully!");
+      try {
+        await axios.delete(`http://localhost:3001/api/departments/${dept.id}`);
+        fetchDepartment();
+        alert("Department deleted successfully!");
+      } catch (err) {
+        alert("Failed to delete department");
+      }
     }
   };
 
@@ -116,8 +80,6 @@ const DepartmentList = () => {
     if (!tableContent) return;
 
     const clonedTable = tableContent.cloneNode(true);
-
-    // Remove "Actions" column
     clonedTable.querySelectorAll("tr").forEach((row) => {
       if (row.lastElementChild) row.removeChild(row.lastElementChild);
     });
@@ -149,13 +111,8 @@ const DepartmentList = () => {
       <h2>Department List</h2>
 
       <div className="department-list-header">
-        <button className="add-btn" onClick={() => setShowForm(true)}>
-          Add Department
-        </button>
-
-        <button className="print-btn" onClick={handlePrint}>
-          🖨️ Print
-        </button>
+        <button className="add-btn" onClick={() => setShowForm(true)}>Add Department</button>
+        <button className="print-btn" onClick={handlePrint}>🖨️ Print</button>
       </div>
 
       <div className="department-table-wrapper">
@@ -171,20 +128,15 @@ const DepartmentList = () => {
                 <th>Actions</th>
               </tr>
             </thead>
-
             <tbody>
               {departmentData.map((dept, index) => (
-                <tr key={index}>
+                <tr key={dept.id}>
                   <td>{index + 1}</td>
-                  <td>{dept.name}</td>
+                  <td>{dept.Department}</td>
                   <td>{dept.email || "N/A"}</td>
                   <td>
-                    <button className="edit-btn" onClick={() => handleEdit(index)}>
-                      Edit
-                    </button>
-                    <button className="delete-btn" onClick={() => handleDelete(index)}>
-                      Delete
-                    </button>
+                    <button className="edit-btn" onClick={() => handleEdit(index)}>Edit</button>
+                    <button className="delete-btn" onClick={() => handleDelete(index)}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -200,8 +152,8 @@ const DepartmentList = () => {
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="Department"
+                value={formData.Department}
                 onChange={handleChange}
                 placeholder="Department Name"
                 required
@@ -219,9 +171,11 @@ const DepartmentList = () => {
                   type="button"
                   className="close-btns"
                   onClick={() => {
-                    const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+                    const isConfirmed = window.confirm("Are you sure you want to cancel? Unsaved changes will be lost.");
                     if (isConfirmed) {
                       setShowForm(false);
+                      setFormData({ Department: "", email: "" });
+                      setEditingIndex(null);
                     }
                   }}
                 >

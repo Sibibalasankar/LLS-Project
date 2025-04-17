@@ -10,27 +10,33 @@ const Admin_login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Hardcoded Admin Credentials
-  const ADMIN_USERNAME = "admin";
-  const ADMIN_PASSWORD = "admin@123";
-
-  // Handle Form Submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setError("");
-      login("admin-token", "admin"); // ✅ Store admin token & role
+    try {
+      const response = await fetch("http://localhost:3001/api/admin-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-      // Save role in localStorage for persistence
-      localStorage.setItem("role", "admin");
+      const data = await response.json();
 
-      alert("Login Successful!");
-
-      // ✅ Redirect to admin dashboard
-      navigate("/admin-dashboard", { replace: true });
-    } else {
-      setError("Invalid username or password!");
+      if (response.ok) {
+        // ✅ Login success
+        login("admin-token", "admin"); // store in context
+        localStorage.setItem("role", "admin");
+        alert("Login Successful!");
+        navigate("/admin-dashboard", { replace: true });
+      } else {
+        // ❌ Show error from server
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Server error. Please try again later.");
     }
   };
 

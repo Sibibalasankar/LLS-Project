@@ -32,6 +32,7 @@
     "lucide-react": "^0.485.0",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.0",
+    "nodemon": "^3.1.9",
     "pdfjs-dist": "^3.11.174",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
