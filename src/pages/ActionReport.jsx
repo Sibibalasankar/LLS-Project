@@ -1215,6 +1215,9 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   // State to hold departments from localStorage
   const [departments, setDepartments] = useState([]);
 
+  localStorage.setItem("reports", JSON.stringify(reports));
+
+
   // Load departments from localStorage on component mount
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
@@ -1225,6 +1228,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
+  
 
   const filteredReports = reports.filter(report => {
     return (
