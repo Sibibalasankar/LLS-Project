@@ -100,8 +100,8 @@
   z-index: 1000;
 }
 
-.modal-content {
-  background: white;
+.modal-contents {
+  background: rgb(255, 255, 255);
   padding: 20px;
   border-radius: 5px;
   max-width: 500px;

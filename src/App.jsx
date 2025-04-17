@@ -10,7 +10,8 @@ import AuditObservation from "./pages/AuditObservation";
 import ObservationDetails from "./pages/Observationdetails";
 import AuditReport from "./pages/ObservationSheet";
 import ActionReport from "./pages/ActionReport";
-import NotificationsPage from "./pages/NotificationsPage";
+import NotificationsPage from "./pages/NotificationsPage";  
+import ReportDetailsPage from "./pages/ActionReport";
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
       <Route path="/admin-dashboard/audit-observation" element={<AuditObservation />} />
       <Route path="/admin-dashboard/observation-details/:departmentName" element={<ObservationDetails />} />
       <Route path="/admin-dashboard/action-report" element={<ActionReport />} />
+      <Route path="/view-report/:id" element={<ReportDetailsPage />} />
+
 
       {/* User Routes */}
       <Route path="/user-dashboard" element={<UserDashboard />} />

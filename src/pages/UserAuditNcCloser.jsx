@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import "../assets/styles/UserAuditNcCloser.css"
+import "../assets/styles/UserAuditNcCloser.css";
+import { useNavigate } from "react-router-dom";
 
-const ReportAndAuditNCCloser = () => {
+
+const ReportAndAuditNCCloser = ({ onView }) => {
+  const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [filters, setFilters] = useState({
     dptname: "",
@@ -16,16 +19,17 @@ const ReportAndAuditNCCloser = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [reportToClear, setReportToClear] = useState(null);
 
+
   // Memoized data loading function
   const loadData = useCallback(() => {
     try {
       const storedData = JSON.parse(localStorage.getItem("reports") || "[]");
       const storedDepts = JSON.parse(localStorage.getItem("departments") || "[]");
-      
-      const sortedReports = [...storedData].sort((a, b) => 
+
+      const sortedReports = [...storedData].sort((a, b) =>
         new Date(b.auditDate) - new Date(a.auditDate)
       );
-      
+
       setReports(sortedReports);
       setDepartments(storedDepts);
       setLastUpdated(new Date().toLocaleTimeString());
@@ -55,7 +59,7 @@ const ReportAndAuditNCCloser = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileSelect = (report, file) => {
@@ -64,33 +68,49 @@ const ReportAndAuditNCCloser = () => {
     setShowConfirmModal(true);
   };
 
-  const confirmEvidenceUpload = () => {
-    if (!currentReport || !selectedFile) return;
-    
-    const updatedReports = reports.map(report => {
-      if (report.id === currentReport.id) {
-        return { 
-          ...report,
-          evidence: selectedFile.name,
-          evidenceFile: URL.createObjectURL(selectedFile),
-          status: "Submitted",
-          lastUpdated: new Date().toISOString()
-        };
-      }
-      return report;
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
-    
-    setReports(updatedReports);
-    localStorage.setItem("reports", JSON.stringify(updatedReports));
-    setShowConfirmModal(false);
-    setCurrentReport(null);
-    setSelectedFile(null);
+  };
+
+  const confirmEvidenceUpload = async () => {
+    if (!currentReport || !selectedFile) return;
+
+    try {
+      const base64File = await convertFileToBase64(selectedFile);
+
+      const updatedReports = reports.map((report) => {
+        if (report.id === currentReport.id) {
+          return {
+            ...report,
+            evidence: selectedFile.name,
+            evidenceFile: base64File,  // Store the base64 file as evidenceFile
+            status: "Submitted",
+            lastUpdated: new Date().toISOString()
+          };
+        }
+        return report;
+      });
+
+      setReports(updatedReports);
+      localStorage.setItem("reports", JSON.stringify(updatedReports)); // Save updated reports to localStorage
+      localStorage.setItem(currentReport.id, JSON.stringify({ fileName: selectedFile.name, fileUrl: base64File })); // Save the base64 data in localStorage
+      setShowConfirmModal(false);
+      setCurrentReport(null);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Error converting file to base64:", error);
+    }
   };
 
   const confirmClearEvidence = () => {
-    const updatedReports = reports.map(report => {
+    const updatedReports = reports.map((report) => {
       if (report.id === reportToClear.id) {
-        return { 
+        return {
           ...report,
           evidence: null,
           evidenceFile: null,
@@ -100,18 +120,21 @@ const ReportAndAuditNCCloser = () => {
       }
       return report;
     });
-    
+
     setReports(updatedReports);
-    localStorage.setItem("reports", JSON.stringify(updatedReports));
+    localStorage.setItem("reports", JSON.stringify(updatedReports)); // Save updated reports to localStorage
     setShowClearConfirmModal(false);
     setReportToClear(null);
+
+    // Clear the stored file details from localStorage
+    localStorage.removeItem(reportToClear.id);
   };
 
-  const filteredReports = reports.filter(report => {
+  const filteredReports = reports.filter((report) => {
     return (
       (filters.dptname === "" || report.dptname === filters.dptname) &&
-      (filters.auditCycleNo === "" || 
-       report.auditCycleNo?.toLowerCase().includes(filters.auditCycleNo.toLowerCase()))
+      (filters.auditCycleNo === "" ||
+        report.auditCycleNo?.toLowerCase().includes(filters.auditCycleNo.toLowerCase()))
     );
   });
 
@@ -124,6 +147,12 @@ const ReportAndAuditNCCloser = () => {
     );
   };
 
+  const loadFileFromStorage = (reportId) => {
+    const fileData = localStorage.getItem(reportId);
+    return fileData ? JSON.parse(fileData) : null;
+  };
+
+
   return (
     <div className="saved-reports-container">
       {/* Confirmation Modals */}
@@ -134,13 +163,13 @@ const ReportAndAuditNCCloser = () => {
             <p>Are you sure you want to submit this file as evidence?</p>
             <p><strong>File:</strong> {selectedFile?.name}</p>
             <div className="modal-actions">
-              <button 
+              <button
                 className="btn btn-secondary"
                 onClick={() => setShowConfirmModal(false)}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="btn btn-primary"
                 onClick={confirmEvidenceUpload}
               >
@@ -157,13 +186,13 @@ const ReportAndAuditNCCloser = () => {
             <h3>Confirm Evidence Clearance</h3>
             <p>Are you sure you want to clear the evidence for this report?</p>
             <div className="modal-actions">
-              <button 
+              <button
                 className="btn btn-secondary"
                 onClick={() => setShowClearConfirmModal(false)}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="btn btn-danger"
                 onClick={confirmClearEvidence}
               >
@@ -230,61 +259,70 @@ const ReportAndAuditNCCloser = () => {
                 <th>Audit Date</th>
                 <th>Evidence</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Evidence Actions</th>
+                <th>Action Report</th>
               </tr>
             </thead>
             <tbody>
-              {filteredReports.map((report) => (
-                <tr key={report.id}>
-                  <td>{report.ncsNumber || 'N/A'}</td>
-                  <td>{report.dptname || 'N/A'}</td>
-                  <td>{report.auditCycleNo || 'N/A'}</td>
-                  <td>{new Date(report.auditDate).toLocaleDateString() || 'N/A'}</td>
-                  <td>
-                    {report.evidenceFile ? (
-                      <div className="evidence-container">
-                        <a 
-                          href={report.evidenceFile} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="evidence-link"
+              {filteredReports.map((report) => {
+                const fileData = loadFileFromStorage(report.id);
+
+                return (
+                  <tr key={report.id}>
+                    <td>{report.ncsNumber || 'N/A'}</td>
+                    <td>{report.dptname || 'N/A'}</td>
+                    <td>{report.auditCycleNo || 'N/A'}</td>
+                    <td>{new Date(report.auditDate).toLocaleDateString() || 'N/A'}</td>
+                    <td>
+                      {fileData ? (
+                        <div className="evidence-container">
+                          <a
+                            href={fileData.fileUrl}
+                            download={fileData.fileName}  // This triggers the file download with the provided file name
+                            className="evidence-link"
+                          >
+                            {fileData.fileName}
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="file-upload-container">
+                          <label className="file-upload-label">
+                            <input
+                              type="file"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => e.target.files[0] &&
+                                handleFileSelect(report, e.target.files[0])}
+                              disabled={report.status === "Submitted"}
+                            />
+                            <span className="upload-button">Upload</span>
+                          </label>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <StatusBadge status={report.status} />
+                    </td>
+                    <td>
+                      {fileData && (
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => {
+                            setReportToClear(report);
+                            setShowClearConfirmModal(true);
+                          }}
                         >
-                          {report.evidence}
-                        </a>
-                      </div>
-                    ) : (
-                      <div className="file-upload-container">
-                        <label className="file-upload-label">
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => e.target.files[0] && 
-                              handleFileSelect(report, e.target.files[0])}
-                            disabled={report.status === "Submitted"}
-                          />
-                          <span className="upload-button">Upload</span>
-                        </label>
-                      </div>
-                    )}
-                  </td>
-                  <td>
-                    <StatusBadge status={report.status} />
-                  </td>
-                  <td>
-                    {report.evidenceFile && (
-                      <button 
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => {
-                          setReportToClear(report);
-                          setShowClearConfirmModal(true);
-                        }}
-                      >
-                        Clear
+                          Clear
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      <button className="btn btn-primary btn-sm" onClick={() => onView(report)}>
+                        View
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

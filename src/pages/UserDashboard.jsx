@@ -14,7 +14,7 @@ const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [accessApproved, setAccessApproved] = useState(true);
   const [userPermissions, setUserPermissions] = useState([]);
-  const [userDepartment, setUserDepartment] = useState(""); 
+  const [userDepartment, setUserDepartment] = useState("");
   const navigate = useNavigate();
 
   const WelcomeMessage = () => {
@@ -52,8 +52,8 @@ const UserDashboard = () => {
         return;
       }
 
-      const approved = requests.some(req => 
-        req.username === currentUser && req.status === "approved"
+      const approved = requests.some(
+        (req) => req.username === currentUser && req.status === "approved"
       );
 
       if (!approved) {
@@ -63,11 +63,10 @@ const UserDashboard = () => {
         }
         navigate("/user-login");
       } else {
-        // Fetch user permissions and department from localStorage
         const permissions = JSON.parse(localStorage.getItem("userPermissions") || "[]");
         const department = localStorage.getItem("userDepartment") || "";
         setUserPermissions(permissions);
-        setUserDepartment(department); // 👈 setting user department
+        setUserDepartment(department);
       }
     };
 
@@ -84,6 +83,23 @@ const UserDashboard = () => {
       </div>
     );
   }
+
+  const renderComponent = () => {
+    switch (activeComponent) {
+      case "audit-plan-sheet":
+        return userPermissions.includes("auditPlanSheet") && <AuditPlanSheet />;
+      case "audit-observation":
+        return userPermissions.includes("auditObservation") && <AuditObservation />;
+      case "audit-nc-closer":
+        return userPermissions.includes("auditNCCloser") && <UserAuditNcCloser />;
+      case "audit-nc-approval":
+        return userPermissions.includes("auditNCApproval") && <AuditNCApproval />;
+      case "iso-manual":
+        return userPermissions.includes("isoManual") && <ISOManual />;
+      default:
+        return <WelcomeMessage />;
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -152,14 +168,7 @@ const UserDashboard = () => {
           </div>
         </nav>
 
-        <main className="dashboard-content">
-          {activeComponent === "audit-plan-sheet" && <AuditPlanSheet />}
-          {activeComponent === "audit-observation" && <AuditObservation />}
-          {activeComponent === "audit-nc-closer" && <UserAuditNcCloser />}
-          {activeComponent === "audit-nc-approval" && <AuditNCApproval />}
-          {activeComponent === "iso-manual" && <ISOManual />}
-          {!activeComponent && <WelcomeMessage />}
-        </main>
+        <main className="dashboard-content">{renderComponent()}</main>
       </div>
     </div>
   );

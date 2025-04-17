@@ -1325,7 +1325,9 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
           <p>No reports found matching your filters.</p>
         </div>
       )}
+      
     </div>
+
   );
 };
 
@@ -1412,6 +1414,7 @@ const NewActionForm = () => {
 
 
 
+
   const handleBackToList = () => {
     setViewingReport(null);
   };
@@ -1450,6 +1453,7 @@ const NewActionForm = () => {
           onDelete={handleDelete}
           onAddNew={handleAddNew}
         />
+        
       )}
     </div>
   );
