@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "../assets/styles/AuditorList.css";
 
 const designations = [
@@ -16,7 +17,7 @@ const AuditorList = () => {
     name: "",
     employeeNumber: "",
     certifiedDate: "",
-    certifiedOnName: "", // <-- New field
+    certifiedOnName: "",
     mailID: "",
     designation: "",
     department: "",
@@ -25,15 +26,26 @@ const AuditorList = () => {
   const [filters, setFilters] = useState({ department: "", designation: "" });
 
   useEffect(() => {
-    const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
-    setAuditors(storedAuditors);
-
-    const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
-    setDepartments(storedDepartments.map((dept) => dept.name));
+    fetchAuditors();
+    fetchDepartments();
   }, []);
 
-  const saveToLocalStorage = (auditors) => {
-    localStorage.setItem("auditors", JSON.stringify(auditors));
+  const fetchAuditors = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/auditors");
+      setAuditors(response.data);
+    } catch (error) {
+      console.error("Error fetching auditors:", error);
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/departments");
+      setDepartments(response.data.map((dept) => dept.Department));
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
   };
 
   const handleFilterChange = (e) => {
@@ -50,43 +62,47 @@ const AuditorList = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let updatedAuditors;
-    if (editingIndex !== null) {
-      updatedAuditors = auditors.map((auditor, index) =>
-        index === editingIndex ? formData : auditor
-      );
+    try {
+      if (editingIndex !== null) {
+        const auditorId = auditors[editingIndex].id;
+        await axios.put(`http://localhost:3001/api/auditors/${auditorId}`, formData);
+        alert("Auditor updated successfully!");
+      } else {
+        await axios.post("http://localhost:3001/api/auditors", formData);
+        alert("Auditor added successfully!");
+      }
+      fetchAuditors();
+      setShowForm(false);
+      setFormData({
+        name: "",
+        employeeNumber: "",
+        certifiedDate: "",
+        certifiedOnName: "",
+        mailID: "",
+        designation: "",
+        department: "",
+      });
       setEditingIndex(null);
-      alert("Auditor updated successfully!");
-    } else {
-      updatedAuditors = [...auditors, formData];
-      alert("Auditor added successfully!");
+    } catch (error) {
+      console.error("Error saving auditor:", error);
+      alert("Failed to save auditor.");
     }
-    setAuditors(updatedAuditors);
-    saveToLocalStorage(updatedAuditors);
-    setShowForm(false);
-    setFormData({
-      name: "",
-      employeeNumber: "",
-      certifiedDate: "",
-      mailID: "",
-      designation: "",
-      department: "",
-    });
   };
 
-  const handleDelete = (index) => {
-    const auditorToDelete = auditors[index];
-    const isConfirmed = window.confirm(
-      `Are you sure you want to delete ${auditorToDelete.name} (Employee #: ${auditorToDelete.employeeNumber})?`
-    );
+  const handleDelete = async (index) => {
+    const auditor = auditors[index];
+    const isConfirmed = window.confirm(`Delete ${auditor.name}?`);
+    if (!isConfirmed) return;
 
-    if (isConfirmed) {
-      const updatedAuditors = auditors.filter((_, i) => i !== index);
-      setAuditors(updatedAuditors);
-      saveToLocalStorage(updatedAuditors);
-      alert("Auditor deleted successfully!");
+    try {
+      await axios.delete(`http://localhost:3001/api/auditors/${auditor.id}`);
+      alert("Auditor deleted!");
+      fetchAuditors();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("Failed to delete auditor.");
     }
   };
 
@@ -184,7 +200,7 @@ const AuditorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="no-records">
+                <td colSpan="9" className="no-records">
                   No Records
                 </td>
               </tr>

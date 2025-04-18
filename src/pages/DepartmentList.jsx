@@ -3,88 +3,91 @@ import axios from "axios";
 import "../assets/styles/DepartmentList.css";
 
 const DepartmentList = () => {
-  const [departmentData, setDepartmentData] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingDepartment, setEditingDepartment] = useState(null);
   const [formData, setFormData] = useState({ Department: "", email: "" });
 
   useEffect(() => {
-    fetchDepartment();
+    fetchDepartments();
   }, []);
 
-  const fetchDepartment = async () => {
+  const fetchDepartments = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/departments");
-      setDepartmentData(res.data);
-    } catch (err) {
-      console.error("Failed to fetch departments:", err);
+      const response = await axios.get("http://localhost:3001/api/departments");
+      setDepartments(response.data);
+    } catch (error) {
+      console.error("Failed to fetch departments:", error);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.Department.trim() || !formData.email.trim()) {
       alert("Please fill in all fields");
       return;
     }
 
     try {
-      if (editingIndex !== null) {
-        const dept = departmentData[editingIndex];
-        await axios.put(`http://localhost:3001/api/departments/${dept.id}`, formData);
+      if (editingDepartment) {
+        await axios.put(
+          `http://localhost:3001/api/departments/${editingDepartment.id}`,
+          formData
+        );
         alert("Department updated successfully!");
       } else {
         await axios.post("http://localhost:3001/api/departments", formData);
         alert("Department added successfully!");
       }
 
-      fetchDepartment();
-      setShowForm(false);
-      setEditingIndex(null);
-      setFormData({ Department: "", email: "" });
-    } catch (err) {
-      alert("Error saving department");
-      console.error(err);
+      fetchDepartments();
+      handleCloseForm();
+    } catch (error) {
+      console.error("Error saving department:", error);
+      alert("Failed to save department. Try again.");
     }
   };
 
-  const handleEdit = (index) => {
-    setFormData(departmentData[index]);
-    setEditingIndex(index);
+  const handleEdit = (dept) => {
+    setFormData({ Department: dept.Department, email: dept.email });
+    setEditingDepartment(dept);
     setShowForm(true);
   };
 
-  const handleDelete = async (index) => {
-    const dept = departmentData[index];
-    const isConfirmed = window.confirm(
-      `Are you sure you want to delete ${dept.Department}?\n\nAuditee Email: ${dept.email || "N/A"}`
+  const handleDelete = async (dept) => {
+    const confirmed = window.confirm(
+      `Delete ${dept.Department}?\nAuditee Email: ${dept.email || "N/A"}`
     );
+    if (!confirmed) return;
 
-    if (isConfirmed) {
-      try {
-        await axios.delete(`http://localhost:3001/api/departments/${dept.id}`);
-        fetchDepartment();
-        alert("Department deleted successfully!");
-      } catch (err) {
-        alert("Failed to delete department");
-      }
+    try {
+      await axios.delete(`http://localhost:3001/api/departments/${dept.id}`);
+      alert("Department deleted successfully!");
+      fetchDepartments();
+    } catch (error) {
+      alert("Failed to delete department.");
+      console.error(error);
     }
   };
 
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setFormData({ Department: "", email: "" });
+    setEditingDepartment(null);
+  };
+
   const handlePrint = () => {
-    const tableContent = document.querySelector(".department-table");
-    if (!tableContent) return;
-
-    const clonedTable = tableContent.cloneNode(true);
-    clonedTable.querySelectorAll("tr").forEach((row) => {
-      if (row.lastElementChild) row.removeChild(row.lastElementChild);
-    });
-
     const printWindow = window.open("", "", "width=800,height=600");
+    const tableHTML = document.querySelector(".department-table")?.outerHTML;
+
+    if (!tableHTML) return;
+
     printWindow.document.write(`
       <html>
         <head>
@@ -98,7 +101,7 @@ const DepartmentList = () => {
         </head>
         <body>
           <h2>Department List</h2>
-          ${clonedTable.outerHTML}
+          ${tableHTML}
         </body>
       </html>
     `);
@@ -116,8 +119,8 @@ const DepartmentList = () => {
       </div>
 
       <div className="department-table-wrapper">
-        {departmentData.length === 0 ? (
-          <p>No departments available. Add one!</p>
+        {departments.length === 0 ? (
+          <p>No departments available.</p>
         ) : (
           <table className="department-table">
             <thead>
@@ -129,14 +132,14 @@ const DepartmentList = () => {
               </tr>
             </thead>
             <tbody>
-              {departmentData.map((dept, index) => (
+              {departments.map((dept, index) => (
                 <tr key={dept.id}>
                   <td>{index + 1}</td>
                   <td>{dept.Department}</td>
                   <td>{dept.email || "N/A"}</td>
                   <td>
-                    <button className="edit-btn" onClick={() => handleEdit(index)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(index)}>Delete</button>
+                    <button className="edit-btn" onClick={() => handleEdit(dept)}>Edit</button>
+                    <button className="delete-btn" onClick={() => handleDelete(dept)}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -148,7 +151,7 @@ const DepartmentList = () => {
       {showForm && (
         <div className="popup-overlay">
           <div className="popup-form">
-            <h3>{editingIndex !== null ? "Edit Department" : "Add Department"}</h3>
+            <h3>{editingDepartment ? "Edit Department" : "Add Department"}</h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -167,22 +170,11 @@ const DepartmentList = () => {
                 required
               />
               <div className="form-buttons">
-                <button
-                  type="button"
-                  className="close-btns"
-                  onClick={() => {
-                    const isConfirmed = window.confirm("Are you sure you want to cancel? Unsaved changes will be lost.");
-                    if (isConfirmed) {
-                      setShowForm(false);
-                      setFormData({ Department: "", email: "" });
-                      setEditingIndex(null);
-                    }
-                  }}
-                >
+                <button type="button" className="close-btns" onClick={handleCloseForm}>
                   Close
                 </button>
                 <button type="submit" className="submit-btns">
-                  {editingIndex !== null ? "Update" : "Add"}
+                  {editingDepartment ? "Update" : "Add"}
                 </button>
               </div>
             </form>
