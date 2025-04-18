@@ -151,7 +151,7 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
     const pattern = /^(I|II|III|IV)\/\d{4}-(\d{2}|\d{4})$/;
     return pattern.test(value);
   };
- 
+
   const [departments, setDepartments] = useState([]);
 
   // Load departments from localStorage on component mount
@@ -1052,7 +1052,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                       style={{ height: '60px', objectFit: 'contain' }}
                     />
 
-                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "20px", borderLeft: "1px solid black", padding: "10px 30px" ,marginRight:"180px"}}>
+                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "20px", borderLeft: "1px solid black", padding: "10px 30px", marginRight: "180px" }}>
 
                       Internal Audit Non Conformity and Corrective Action Report
                     </h1>
@@ -1207,7 +1207,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   useEffect(() => {
     const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
     const storedDecisions = JSON.parse(localStorage.getItem('adminDecisions')) || {};
-  
+
     // Filter files that have not been marked as 'approved' or 'redo'
     const filteredFiles = {};
     for (const [reportId, file] of Object.entries(storedFiles)) {
@@ -1215,7 +1215,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         filteredFiles[reportId] = file;
       }
     }
-  
+
     setUploadedFiles(filteredFiles);
     setDecisions(storedDecisions);
   }, []);
@@ -1224,7 +1224,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     const updatedDecisions = { ...decisions, [reportId]: 'approved' };
     setDecisions(updatedDecisions);
     localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
-    
+
     const updatedFiles = { ...uploadedFiles };
     updatedFiles[reportId] = { ...updatedFiles[reportId], status: 'Completed' };
     setUploadedFiles(updatedFiles);
@@ -1298,7 +1298,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
             />
           </div>
         </div>
-        
+
         <div className="card-body p-0">
           <div className="table-responsive">
             <table className="table table-striped table-hover mb-0">
@@ -1320,8 +1320,8 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                     const fileData = uploadedFiles[report.id];
                     const status = getStatus(report.id);
                     return (
-                      <tr 
-                        key={report.id} 
+                      <tr
+                        key={report.id}
                         className={status === 'Completed' ? "table-success" : ""}
                       >
                         <td className="align-middle font-monospace fw-semibold">{report.ncsNumber}</td>
@@ -1329,7 +1329,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         <td className="align-middle text-center">{report.auditCycleNo}</td>
                         <td className="align-middle">{formatDate(report.auditDate)}</td>
                         <td className="align-middle">
-                          <button 
+                          <button
                             className="btn btn-outline-primary btn-sm"
                             onClick={() => onView(report)}
                             title="View details"
@@ -1360,10 +1360,12 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                                 onChange={(e) => handleFileChange(e, report.id)}
                                 accept=".pdf,.doc,.docx,.jpg,.png"
                                 id={`file-upload-${report.id}`}
+                                disabled={status === 'Completed'}  // Disable the file upload if approved
                               />
                             )}
                           </div>
                         </td>
+
                         <td className="align-middle">
                           <button
                             className="btn btn-outline-danger btn-sm"
@@ -1393,7 +1395,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
             </table>
           </div>
         </div>
-        
+
         <div className="card-footer bg-white d-flex justify-content-between align-items-center">
           <small className="text-muted">
             Showing {filteredReports.length} of {reports.length} reports
@@ -1444,15 +1446,15 @@ const NewActionForm = () => {
       alert('Please enter a valid Audit Cycle Number in format I/2025-26 or II/2026-2027');
       return;
     }
-  
+
     const newReport = {
       ...formData,
       id: Date.now(),
       savedDate: new Date().toLocaleString()
     };
-  
+
     let updatedReports;
-  
+
     if (editingIndex !== null) {
       updatedReports = [...savedReports];
       updatedReports[editingIndex] = newReport;
@@ -1461,14 +1463,14 @@ const NewActionForm = () => {
       updatedReports = [...savedReports, newReport];
       setSavedReports(updatedReports);
     }
-  
+
     // ✅ Save to localStorage
     localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
-  
+
     setShowForms(false);
     navigate('/user-dashboard/user-audit-nc-closer');
   };
-  
+
 
   const handleEdit = (index) => {
     dispatch({
@@ -1544,7 +1546,7 @@ const NewActionForm = () => {
           onDelete={handleDelete}
           onAddNew={handleAddNew}
         />
-        
+
       )}
     </div>
   );
