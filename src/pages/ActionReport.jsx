@@ -296,7 +296,7 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
         </div>
 
         <div className="document-card table-card">
-          <label htmlFor="">CORREACTION</label>
+          <label htmlFor="" >CORREACTION</label>
           <table className="document-table">
             <thead>
               <tr>
@@ -1332,7 +1332,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
 };
 
 // Main component
-const NewActionForm = () => {
+const ActionReport = () => {
   const [formData, dispatch] = useReducer(formReducer, INITIAL_FORM_DATA);
   const [savedReports, setSavedReports] = useLocalStorage('savedReports', []);
   const [departments, setDepartments] = useLocalStorage('departments', []); // Add this line
@@ -1362,22 +1362,31 @@ const NewActionForm = () => {
       alert('Please enter a valid Audit Cycle Number in format I/2025-26 or II/2026-2027');
       return;
     }
+  
     const newReport = {
       ...formData,
       id: Date.now(),
       savedDate: new Date().toLocaleString()
     };
-
+  
+    let updatedReports;
+  
     if (editingIndex !== null) {
-      const updatedReports = [...savedReports];
+      updatedReports = [...savedReports];
       updatedReports[editingIndex] = newReport;
       setSavedReports(updatedReports);
     } else {
-      setSavedReports([...savedReports, newReport]);
+      updatedReports = [...savedReports, newReport];
+      setSavedReports(updatedReports);
     }
-
+  
+    // ✅ Save to localStorage
+    localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
+  
     setShowForms(false);
+    navigate('/user-dashboard/user-audit-nc-closer');
   };
+  
 
   const handleEdit = (index) => {
     dispatch({
@@ -1484,4 +1493,4 @@ ReportList.propTypes = {
   onAddNew: PropTypes.func.isRequired
 };
 
-export default NewActionForm;
+export default ActionReport;

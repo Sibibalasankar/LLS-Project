@@ -41,11 +41,11 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
 
   
 
-  const handleOpenActionForm = (observation) => {
-    const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
-    window.open(url, "_blank");
-  };
-  
+    const handleOpenActionForm = (observation) => {
+      const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
+      window.open(url, "_blank");
+    };
+    
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);

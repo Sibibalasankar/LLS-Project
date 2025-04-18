@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import AdminLogin from "./pages/Admin_login";
@@ -10,8 +10,9 @@ import AuditObservation from "./pages/AuditObservation";
 import ObservationDetails from "./pages/Observationdetails";
 import AuditReport from "./pages/ObservationSheet";
 import ActionReport from "./pages/ActionReport";
-import NotificationsPage from "./pages/NotificationsPage";  
-import ReportDetailsPage from "./pages/ActionReport";
+import NotificationsPage from "./pages/NotificationsPage";
+import NewActionForm from "./pages/NewActionForm";
+import UserAuditNcCloser from "./pages/UserAuditNcCloser"; // ✅ added
 
 function App() {
   return (
@@ -31,12 +32,12 @@ function App() {
       <Route path="/admin-dashboard/audit-observation" element={<AuditObservation />} />
       <Route path="/admin-dashboard/observation-details/:departmentName" element={<ObservationDetails />} />
       <Route path="/admin-dashboard/action-report" element={<ActionReport />} />
-      <Route path="/view-report/:id" element={<ReportDetailsPage />} />
+      <Route path="/action-report" element={<NewActionForm />} />
 
-
-      {/* User Routes */}
+      {/* ✅ User Routes */}
       <Route path="/user-dashboard" element={<UserDashboard />} />
       <Route path="/user-dashboard/notifications" element={<NotificationsPage />} />
+      <Route path="/user-dashboard/user-audit-nc-closer" element={<UserAuditNcCloser />} /> {/* ✅ added */}
 
       {/* Redirects */}
       <Route path="/admin" element={<Navigate to="/admin-login" replace />} />
@@ -46,6 +47,5 @@ function App() {
     </Routes>
   );
 }
-
 
 export default App;

@@ -3,7 +3,13 @@ import "../assets/styles/login.css";
 import Header from "../components/Header";
 
 const Login = () => {
-  const navigate = useNavigate(); // ✅ Ensure useNavigate() is inside <Router>
+  const navigate = useNavigate();
+
+  const handleLogin = (role) => {
+    // Store the user role in localStorage
+    localStorage.setItem("role", role);
+    navigate(`/${role}`); // Navigate to the respective page based on the role
+  };
 
   return (
     <>
@@ -11,10 +17,10 @@ const Login = () => {
       <div className="container-fluid main_div">
         <div className="top"></div>
         <div className="child1">
-          <button className="btn_login" onClick={() => navigate("/admin")}>
+          <button className="btn_login" onClick={() => handleLogin("admin")}>
             Admin Login
           </button>
-          <button className="btn_login" onClick={() => navigate("/user")}>
+          <button className="btn_login" onClick={() => handleLogin("user")}>
             User Login
           </button>
         </div>

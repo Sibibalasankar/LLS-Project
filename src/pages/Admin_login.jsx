@@ -65,6 +65,7 @@ const Admin_login = () => {
             <i className="bi bi-arrow-left"></i> Back
           </div>
         </form>
+        
       </div>
     </div>
   );
