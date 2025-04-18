@@ -12,46 +12,6 @@ const AuditNcCloser = () => {
     setDecisions(storedDecisions);
   }, []);
 
-  const handleDecision = (reportId, action) => {
-    const confirmationMessage = `Are you sure you want to ${action} this report?`;
-  
-    if (window.confirm(confirmationMessage)) {
-      const updated = {
-        ...decisions,
-        [reportId]: action,
-      };
-      setDecisions(updated);
-      localStorage.setItem('adminDecisions', JSON.stringify(updated));
-  
-      if (action === 'approved') {
-        // Move to approved files in localStorage
-        const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-        const fileToApprove = uploadedFiles[reportId];
-        const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-        approvedFiles[reportId] = fileToApprove;
-        localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
-  
-        // Remove from uploadedFiles in localStorage
-        delete uploadedFiles[reportId];
-        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-  
-        // Remove the row from submittedFiles state
-        const updatedSubmitted = { ...submittedFiles };
-        delete updatedSubmitted[reportId];
-        setSubmittedFiles(updatedSubmitted);
-      } else if (action === 'redo') {
-        // Clear the uploaded file and set status to 'redo'
-        const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-        delete uploadedFiles[reportId];
-        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-  
-        // Update the submitted files state
-        const updatedSubmitted = { ...submittedFiles };
-        delete updatedSubmitted[reportId];
-        setSubmittedFiles(updatedSubmitted);
-      }
-    }
-  };
   
   const renderDecisionStatus = (reportId) => {
     const status = decisions[reportId];
@@ -70,6 +30,77 @@ const AuditNcCloser = () => {
       return false;
     }
   };
+  // Update in AuditNcApproval
+const handleRemoveApproval = (reportId) => {
+  const confirmationMessage = `Are you sure you want to remove approval for this report?`;
+  
+  if (window.confirm(confirmationMessage)) {
+    // Update decision to 'redo'
+    const updatedDecisions = { ...decisions, [reportId]: 'redo' };
+    setDecisions(updatedDecisions);
+    localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
+
+    // Remove from approvedFiles and add to uploadedFiles in localStorage
+    const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
+    const fileToRemove = approvedFiles[reportId];
+
+    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+    uploadedFiles[reportId] = fileToRemove;
+    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+
+    // Remove from approvedFiles in localStorage
+    delete approvedFiles[reportId];
+    localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
+
+    // Update state to reflect changes
+    const updatedApprovedFiles = { ...approvedFiles };
+    delete updatedApprovedFiles[reportId];
+    setApprovedFiles(updatedApprovedFiles);
+  }
+};
+
+// Update in AuditNcCloser
+const handleDecision = (reportId, action) => {
+  const confirmationMessage = `Are you sure you want to ${action} this report?`;
+
+  if (window.confirm(confirmationMessage)) {
+    const updated = {
+      ...decisions,
+      [reportId]: action,
+    };
+    setDecisions(updated);
+    localStorage.setItem('adminDecisions', JSON.stringify(updated));
+
+    if (action === 'approved') {
+      // Move to approved files in localStorage
+      const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+      const fileToApprove = uploadedFiles[reportId];
+      const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
+      approvedFiles[reportId] = fileToApprove;
+      localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
+
+      // Remove from uploadedFiles in localStorage
+      delete uploadedFiles[reportId];
+      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+
+      // Remove the row from submittedFiles state
+      const updatedSubmitted = { ...submittedFiles };
+      delete updatedSubmitted[reportId];
+      setSubmittedFiles(updatedSubmitted);
+    } else if (action === 'redo') {
+      // Clear the uploaded file and set status to 'redo'
+      const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+      delete uploadedFiles[reportId];
+      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+
+      // Update the submitted files state
+      const updatedSubmitted = { ...submittedFiles };
+      delete updatedSubmitted[reportId];
+      setSubmittedFiles(updatedSubmitted);
+    }
+  }
+};
+
 
   return (
     <div className="container p-4">

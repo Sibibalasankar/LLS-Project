@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 import AuditObservation from "./AuditObservation";
-import AuditNCCloser from "../pages/AuditNCCloser";
-import AuditNCApproval from "../pages/AuditNCApproval";
+import UserAuditNcCloser from "../pages/UserAuditNcCloser";
+import AuditNCApproval from "../pages/AuditNcApproval";
 import AuditPlanSheet from "./AuditPlanSheet";
-import AuditIntimationMail from "./AuditIntimationMail";
 import ISOManual from "../pages/ISOManual";
 import companyLogo from "../assets/images/lls_logo.png";
-import UserAuditNcCloser from "../pages/UserAuditNcCloser";
+import AuditNcUserView from "../pages/AuditNcUserView"; // ✅ added
 
 const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -92,10 +91,12 @@ const UserDashboard = () => {
         return userPermissions.includes("auditObservation") && <AuditObservation />;
       case "audit-nc-closer":
         return userPermissions.includes("auditNCCloser") && <UserAuditNcCloser />;
-      case "audit-nc-approval":
+      case "user-audit-nc-view":
         return userPermissions.includes("auditNCApproval") && <AuditNCApproval />;
       case "iso-manual":
         return userPermissions.includes("isoManual") && <ISOManual />;
+      case "user-nc-user-view":
+        return userPermissions.includes("auditNcUserView") && <AuditNcUserView />; // ✅
       default:
         return <WelcomeMessage />;
     }
@@ -151,8 +152,8 @@ const UserDashboard = () => {
             )}
             {userPermissions.includes("auditNCApproval") && (
               <button
-                className={`menu-btn ${activeComponent === "audit-nc-approval" ? "active" : ""}`}
-                onClick={() => setActiveComponent("audit-nc-approval")}
+                className={`menu-btn ${activeComponent === "user-audit-nc-view" ? "active" : ""}`}
+                onClick={() => setActiveComponent("user-audit-nc-view")}
               >
                 Audit NC Approval
               </button>
@@ -163,6 +164,14 @@ const UserDashboard = () => {
                 onClick={() => setActiveComponent("iso-manual")}
               >
                 ISO 9001-2015 Manual
+              </button>
+            )}
+            {userPermissions.includes("auditNcUserView") && (
+              <button
+                className={`menu-btn ${activeComponent === "audit-nc-user-view" ? "active" : ""}`}
+                onClick={() => navigate("/user-dashboard/user-audit-nc-view")} // Navigate to Audit NC User View
+              >
+                View Action Reports
               </button>
             )}
           </div>
