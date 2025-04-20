@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
 import AuditObservation from "./AuditObservation";
 import UserAuditNcCloser from "../pages/UserAuditNcCloser";
-import AuditNCApproval from "../pages/AuditNcApproval";
-import AuditPlanSheet from "./AuditPlanSheet";
+import UserAuditPlanSheet from "./UserAuditPlanSheet";
 import ISOManual from "../pages/ISOManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import AuditNcUserView from "../pages/AuditNcUserView"; // ✅ added
@@ -86,13 +85,13 @@ const UserDashboard = () => {
   const renderComponent = () => {
     switch (activeComponent) {
       case "audit-plan-sheet":
-        return userPermissions.includes("auditPlanSheet") && <AuditPlanSheet />;
+        return userPermissions.includes("auditPlanSheet") && <UserAuditPlanSheet />;
       case "audit-observation":
         return userPermissions.includes("auditObservation") && <AuditObservation />;
       case "audit-nc-closer":
         return userPermissions.includes("auditNCCloser") && <UserAuditNcCloser />;
       case "user-audit-nc-view":
-        return userPermissions.includes("auditNCApproval") && <AuditNCApproval />;
+        return userPermissions.includes("auditNCApproval") && <AuditNcUserView />;
       case "iso-manual":
         return userPermissions.includes("isoManual") && <ISOManual />;
       case "user-nc-user-view":

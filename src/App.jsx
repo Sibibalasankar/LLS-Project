@@ -13,7 +13,8 @@ import ActionReport from "./pages/ActionReport";
 import NotificationsPage from "./pages/NotificationsPage";
 import NewActionForm from "./pages/NewActionForm";
 import UserAuditNcCloser from "./pages/UserAuditNcCloser";
-import AuditNcUserView from "./pages/AuditNcUserView"; // ✅ new user view import
+import AuditNcUserView from "./pages/AuditNcUserView"; 
+import UserAuditPlanSheet from "./pages/UserAuditPlanSheet";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
       <Route path="/user-dashboard/notifications" element={<NotificationsPage />} />
       <Route path="/user-dashboard/user-audit-nc-closer" element={<UserAuditNcCloser />} />
       <Route path="/user-dashboard/user-audit-nc-view" element={<AuditNcUserView />} />
+      <Route path="/user-dashboard/user-audit-plan-sheet" element={<UserAuditPlanSheet />} />
 
       {/* Redirects */}
       <Route path="/admin" element={<Navigate to="/admin-login" replace />} />
