@@ -1,37 +1,22 @@
-.back-btn {
-    background-color: #007BFF;
-    color: #fff;
+/* Custom styles that override or complement Bootstrap */
+.observation-table {
+  --bs-table-hover-bg: rgba(13, 110, 253, 0.05);
+}
+
+/* Custom card styling if needed */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
   }
   
-  .observation_btn {
-    background-color: #28A745;
-    color: #fff;
-  }
-  
-  .delete-btn {
-    background-color: #DC3545;
-    color: #fff;
-  }
-  
-  .add-observation-btn {
-    background-color: #FFC107;
-    color: #000;
-  }
-  
-  .button {
-    padding: 8px 16px;
+  .table-responsive {
     border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: background 0.3s ease-in-out;
   }
-  
-  .button:hover {
-    opacity: 0.9;
-  }
-  .detail-header{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+}

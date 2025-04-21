@@ -1,35 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "../components/card";
-import { Button } from "../components/button";
 import Observations from "./Observations";
-import "../assets/styles/ObservationDetails.css";
 
 const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) => {
   const [observations, setObservations] = useState([]);
   const [viewObservationId, setViewObservationId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
-  useEffect(() => {
+  const fetchObservations = useCallback(() => {
+    setIsLoading(true);
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
     setObservations(storedObservations);
+    setIsLoading(false);
   }, [departmentName]);
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    setUserRole(role);
+    fetchObservations();
+  }, [departmentName, fetchObservations]);
 
   const handleAddObservation = () => {
     const stored = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
-
     const newObservation = {
       id: Date.now(),
       number: stored.length + 1,
       department: departmentName,
+      createdAt: new Date().toISOString()
     };
 
     const updated = [...stored, newObservation];
     localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updated));
     setObservations(updated);
-    // Notify parent component about the count update
     onObservationUpdate(departmentName, updated.length);
   };
 
   const handleDeleteObservation = (id) => {
+    if (!window.confirm("Are you sure you want to delete this observation? This action cannot be undone.")) {
+      return;
+    }
+
     const updatedObservations = observations
       .filter(obs => obs.id !== id)
       .map((obs, index) => ({
@@ -39,16 +50,11 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
 
     localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
     setObservations(updatedObservations);
-    // Notify parent component about the count update
     onObservationUpdate(departmentName, updatedObservations.length);
   };
 
   const handleGoToObservation = (id) => {
     setViewObservationId(id);
-  };
-
-  const handleBackToDepartments = () => {
-    onClose();
   };
 
   if (viewObservationId !== null) {
@@ -62,75 +68,92 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   }
 
   return (
-    <div className="observation-details">
-      <div className="detail-header">
-        <h3>Observations for {departmentName}</h3>
-        <Button
-          variant="outline"
-          onClick={handleBackToDepartments}
-          className="back-btn mb-3"
-          style={{ backgroundColor: "#007BFF", color: "#fff" }}
-        >
-          Back to Departments
-        </Button>
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center flex-wrap mb-4">
+        <h2 className="mb-3 mb-md-0 text-primary">{departmentName} Observations</h2>
+        <div className="d-flex gap-2">
+          <button
+            onClick={onClose}
+            className="btn btn-outline-secondary"
+          >
+            <i className="bi bi-arrow-left me-1"></i> Back to Departments
+          </button>
+          {userRole === "admin" && (
+            <button
+              onClick={handleAddObservation}
+              className="btn btn-success"
+            >
+              <i className="bi bi-plus-lg me-1"></i> Add New
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="observation-list-container">
-        <Card className="observation-list" style={{ width: "100%" }}>
-          <CardContent style={{ padding: 0 }}>
-            <div className="observation-table-wrapper" style={{ width: "100%", overflowX: "auto" }}>
-              <table className="observation-table" style={{ width: "100%", tableLayout: "fixed" }}>
-                <thead>
+      <Card className="shadow-sm">
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-2">Loading observations...</p>
+            </div>
+          ) : observations.length === 0 ? (
+            <div className="text-center py-5">
+              <i className="bi bi-binoculars fs-1 text-muted"></i>
+              <p className="text-muted mt-3">No observations found for this department</p>
+              {userRole === "admin" && (
+                <button
+                  onClick={handleAddObservation}
+                  className="btn btn-primary mt-2"
+                >
+                  Create First Observation
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover align-middle">
+                <thead className="table-light">
                   <tr>
-                    <th style={{ width: "10%" }}>S. No</th>
-                    <th style={{ width: "30%" }}>Observation</th>
-                    <th style={{ width: "40%" }}>Actions</th>
-                    <th style={{ width: "20%" }}>Delete</th>
+                    <th scope="col" style={{ width: '10%' }}>#</th>
+                    <th scope="col" style={{ width: '30%' }}>Observation</th>
+                    <th scope="col" style={{ width: '20%' }}>Created</th>
+                    <th scope="col" style={{ width: '40%' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {observations.map((obs, index) => (
                     <tr key={obs.id}>
-                      <td>{index + 1}</td>
+                      <th scope="row">{index + 1}</th>
                       <td>Observation {obs.number}</td>
+                      <td>{new Date(obs.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <Button
-                          variant="outline"
-                          className="observation_btn"
-                          onClick={() => handleGoToObservation(obs.id)}
-                          style={{ backgroundColor: "#28A745", color: "#fff" }}
-                        >
-                          Go to Observation
-                        </Button>
-                      </td>
-                      <td>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteObservation(obs.id)}
-                          className="delete-btn"
-                        >
-                          Delete
-                        </Button>
+                        <div className="d-flex gap-2">
+                          <button
+                            onClick={() => handleGoToObservation(obs.id)}
+                            className="btn btn-primary btn-sm"
+                          >
+                            <i className="bi bi-eye me-1"></i> View
+                          </button>
+                          {userRole === "admin" && (
+                            <button
+                              onClick={() => handleDeleteObservation(obs.id)}
+                              className="btn btn-danger btn-sm"
+                            >
+                              <i className="bi bi-trash me-1"></i> Delete
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {observations.length === 0 && (
-                <p className="no-observations-msg">No observations added yet</p>
-              )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Button
-        onClick={handleAddObservation}
-        className="add-observation-btn mt-4"
-        style={{ backgroundColor: "#FFC107", color: "#000" }}
-      >
-        Add
-      </Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
