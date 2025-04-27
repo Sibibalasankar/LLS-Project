@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Dashboard.css";
-import AuditObservation from "./AuditObservation";
+import AuditObservation from "./UserAuditObservation";
 import UserAuditNcCloser from "../pages/UserAuditNcCloser";
 import UserAuditPlanSheet from "./UserAuditPlanSheet";
 import ISOManual from "../pages/ISOManual";

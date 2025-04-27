@@ -1203,6 +1203,14 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [decisions, setDecisions] = useState({});
   const [filter, setFilter] = useState('');
+  const [userDepartment, setUserDepartment] = useState('');
+
+  useEffect(() => {
+    const dept = localStorage.getItem('userDepartment');
+    if (dept) {
+      setUserDepartment(dept);
+    }
+  }, []);
 
   useEffect(() => {
     const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
@@ -1226,7 +1234,20 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
 
     const updatedFiles = { ...uploadedFiles };
-    updatedFiles[reportId] = { ...updatedFiles[reportId], status: 'Completed' };
+    const fileData = uploadedFiles[reportId];
+
+    if (fileData) {
+      const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
+      approvedFiles[reportId] = {
+        name: fileData.name,
+        url: fileData.url,
+        ncsNumber: reports.find(r => r.id === reportId)?.ncsNumber || '',
+        auditCycleNo: reports.find(r => r.id === reportId)?.auditCycleNo || ''
+      };
+      localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
+    }
+
+    updatedFiles[reportId] = { ...fileData, status: 'Completed' };
     setUploadedFiles(updatedFiles);
     localStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
   };
@@ -1278,9 +1299,11 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   };
 
   const filteredReports = reports.filter(report =>
-    report.ncsNumber.toLowerCase().includes(filter.toLowerCase()) ||
-    report.dptname.toLowerCase().includes(filter.toLowerCase()) ||
-    report.auditCycleNo.toString().includes(filter)
+    report.dptname === userDepartment && (
+      report.ncsNumber.toLowerCase().includes(filter.toLowerCase()) ||
+      report.dptname.toLowerCase().includes(filter.toLowerCase()) ||
+      report.auditCycleNo.toString().includes(filter)
+    )
   );
 
   return (
@@ -1331,7 +1354,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         <td className="align-middle">
                           <button
                             className="btn btn-outline-primary btn-sm"
-                            onClick={() => onView(report)}
+                            onClick={() => onView(report)}  // Handling the onView function for navigation
                             title="View details"
                           >
                             <i className="bi bi-eye-fill me-1"></i> View
@@ -1413,6 +1436,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     </div>
   );
 };
+
 
 
 // Main component

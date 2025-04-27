@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
 
+
 const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
   const [observations, setObservations] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -39,13 +40,13 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
 
   const navigate = useNavigate();
 
-  
 
-    const handleOpenActionForm = (observation) => {
-      const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
-      window.open(url, "_blank");
-    };
-    
+
+  const handleOpenActionForm = (observation) => {
+    const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
+    window.open(url, "_blank");
+  };
+
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);
@@ -497,28 +498,30 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       )}
       <div className="signatures-summary">
         <div className="signature-info">
-        <div className="audit-info-item">
-  <strong>Auditor:</strong> {auditorInfo.name ? `${auditorInfo.name} (${auditorInfo.designation})` : "-"}
-</div>
-<div className="audit-info-item">
-  <strong>Auditee:</strong> {auditeeInfo.name ? `${auditeeInfo.name} (${auditeeInfo.designation})` : "-"}
-</div>
+          <div className="audit-info-item">
+            <strong>Auditor:</strong> {auditorInfo.name ? `${auditorInfo.name} (${auditorInfo.designation})` : "-"}
+          </div>
+          <div className="audit-info-item">
+            <strong>Auditee:</strong> {auditeeInfo.name ? `${auditeeInfo.name} (${auditeeInfo.designation})` : "-"}
+          </div>
 
         </div>
       </div>
 
       <div className="button-group">
-        <Button onClick={onBack} className="button back-btn">Back to Dashboard</Button>
-        <Button onClick={handleCreate} className="button create-btn">
+        <Button onClick={onBack} className="button back-btn" style={{ width: "200px" }}>
+          Back to Dashboard
+        </Button>
+        <Button onClick={handleCreate} className="button create-btn" style={{ width: "200px" }}>
           {observations.length > 0 ? "Add Observation" : "Create Observation"}
         </Button>
-        <Button
-          className="open-sheet-btn"
+        <Button className="button open-sheet-btn" style={{ width: "200px" }}
           onClick={() => window.open('/audit-report', '_blank')}
         >
           Open Record
         </Button>
       </div>
+
     </div>
   );
 };

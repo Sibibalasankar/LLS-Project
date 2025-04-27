@@ -394,3 +394,9 @@
     min-width: 100px;
   }
 }
+.button-group .button,
+.button-group .create-btn {
+  width: auto;
+  min-width: 200px;
+  max-width: 250px;
+}

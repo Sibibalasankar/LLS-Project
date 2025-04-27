@@ -6,48 +6,64 @@ const AuditNcApproval = () => {
 
   useEffect(() => {
     const storedApprovedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-    setApprovedFiles(storedApprovedFiles);
-
     const storedDecisions = JSON.parse(localStorage.getItem('adminDecisions')) || {};
+
+    // Log to see if data is being fetched properly from localStorage
+    console.log('Stored Approved Files:', storedApprovedFiles);
+    console.log('Stored Decisions:', storedDecisions);
+
+    setApprovedFiles(storedApprovedFiles);
     setDecisions(storedDecisions);
   }, []);
 
   const handleRemoveApproval = (reportId) => {
     const confirmationMessage = `Are you sure you want to remove approval for this report?`;
-    
+
     if (window.confirm(confirmationMessage)) {
-      // Update decision to 'redo'
+      // Copy the current decisions and files to ensure proper state update
       const updatedDecisions = { ...decisions, [reportId]: 'redo' };
-      setDecisions(updatedDecisions);
-      localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
+      const updatedApprovedFiles = { ...approvedFiles };
 
-      // Remove from approvedFiles and add to uploadedFiles in localStorage
-      const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-      const fileToRemove = approvedFiles[reportId];
+      // Retrieve the file to remove
+      const fileToRemove = updatedApprovedFiles[reportId];
 
+      // Log to ensure the file exists before removing
+      console.log('File to remove:', fileToRemove);
+
+      // Remove from approvedFiles and add back to uploadedFiles in localStorage
       const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
       uploadedFiles[reportId] = fileToRemove;
-      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
 
       // Remove from approvedFiles in localStorage
-      delete approvedFiles[reportId];
-      localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
+      delete updatedApprovedFiles[reportId];
+      localStorage.setItem('approvedFiles', JSON.stringify(updatedApprovedFiles));
+
+      // Update decisions in localStorage
+      localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
+
+      // Save the updated files in uploadedFiles
+      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
 
       // Update state to reflect changes
-      const updatedApprovedFiles = { ...approvedFiles };
-      delete updatedApprovedFiles[reportId];
       setApprovedFiles(updatedApprovedFiles);
+      setDecisions(updatedDecisions);
     }
   };
 
   const renderDecisionStatus = (reportId) => {
     const status = decisions[reportId];
 
-    if (status === 'approved') return <span className="badge bg-success">Approved</span>;
-    if (status === 'redo') return <span className="badge bg-danger">Redo Requested</span>;
-
+    if (status === 'approved') {
+      return <span className="badge bg-success">Approved</span>;
+    }
+    if (status === 'redo') {
+      return <span className="badge bg-danger">Redo Requested</span>;
+    }
     return <span className="badge bg-warning">Pending Review</span>;
   };
+
+  // Log the approvedFiles state to check if it's being correctly populated
+  console.log('Approved Files in State:', approvedFiles);
 
   return (
     <div className="container p-4">

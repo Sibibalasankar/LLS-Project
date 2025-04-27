@@ -1,51 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/card";
 import { Button } from "../components/button";
-import Observations from "./Observations";
-import { FiEye, FiTrash2, FiPlus, FiArrowLeft } from "react-icons/fi";
+import UserObservations from "./UserObservations ";
+import { FiEye, FiArrowLeft } from "react-icons/fi"; // Only Eye and Back icon needed
 import "../assets/styles/ObservationDetails.css";
 
-const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) => {
+
+const ObservationDetails = ({ departmentName, onClose }) => {
   const [observations, setObservations] = useState([]);
   const [viewObservationId, setViewObservationId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
     setObservations(storedObservations);
   }, [departmentName]);
-
-  const handleAddObservation = () => {
-    const stored = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
-
-    const newObservation = {
-      id: Date.now(),
-      number: stored.length + 1,
-      department: departmentName,
-    };
-
-    const updated = [...stored, newObservation];
-    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updated));
-    setObservations(updated);
-    onObservationUpdate(departmentName, updated.length);
-  };
-
-  const handleDeleteObservation = async (id) => {
-    setIsDeleting(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const updatedObservations = observations
-      .filter(obs => obs.id !== id)
-      .map((obs, index) => ({
-        ...obs,
-        number: index + 1,
-      }));
-
-    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
-    setObservations(updatedObservations);
-    onObservationUpdate(departmentName, updatedObservations.length);
-    setIsDeleting(false);
-  };
 
   const handleGoToObservation = (id) => {
     setViewObservationId(id);
@@ -57,7 +25,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
 
   if (viewObservationId !== null) {
     return (
-      <Observations 
+      <UserObservations 
         observationId={viewObservationId} 
         departmentName={departmentName}
         onBack={() => setViewObservationId(null)} 
@@ -83,13 +51,6 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
               icon={<FiArrowLeft size={16} />}
             >
               Back to Departments
-            </Button>
-            <Button
-              onClick={handleAddObservation}
-              className="submit-btns primary"
-              icon={<FiPlus size={16} />}
-            >
-              Add Observation
             </Button>
           </div>
         </div>
@@ -121,15 +82,6 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                         >
                           View
                         </Button>
-                        <Button
-                          variant="danger"
-                          onClick={() => handleDeleteObservation(obs.id)}
-                          className="delete-btn"
-                          icon={<FiTrash2 size={16} />}
-                          loading={isDeleting}
-                        >
-                          Delete
-                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -140,14 +92,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
             <div className="empty-state">
               <div className="empty-icon">🔍</div>
               <h3>No Observations Found</h3>
-              <p>You haven't added any observations for this department yet.</p>
-              <Button
-                onClick={handleAddObservation}
-                className="submit-btns primary"
-                icon={<FiPlus size={16} />}
-              >
-                Add First Observation
-              </Button>
+              <p>There are currently no observations available for this department.</p>
             </div>
           )}
         </CardContent>

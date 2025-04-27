@@ -1,0 +1,16 @@
+.button-group {
+    display: flex;
+    justify-content: space-between; /* Aligns buttons horizontally with space between them */
+  }
+  
+  .back-btn {
+    max-width: 150px; /* Prevent stretching */
+    width: auto; /* Allows the button to have its natural size */
+    flex-shrink: 0; /* Prevents shrinking if space is limited */
+  }
+  
+  .open-sheet-btn {
+    max-width: 200px; /* You can adjust the size of the "Open Record" button as well */
+    width: auto;
+  }
+  
