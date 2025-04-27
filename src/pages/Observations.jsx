@@ -205,7 +205,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       setObservations(observations.filter((obs) => obs.id !== id));
     }
   };
-
+  
   return (
     <div className="observations-container">
       <div className="header-with-logo">

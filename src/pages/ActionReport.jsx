@@ -220,7 +220,7 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
                   </div>
                 </td>
                 <td width="33%">
-                  <label>NCS. NO.</label>
+                  <label>NCR. NO.</label>
                   <div className="form-field">
                     <input type="text" name="ncsNumber" value={formData.ncsNumber} onChange={handleChange} />
                   </div>
@@ -937,7 +937,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               </tr>
               <tr>
                 <td width="33%"><strong>DEPT</strong>: {report.dptname}</td>
-                <td width="33%"><strong>NCS. NO.</strong>: {report.ncsNumber}</td>
+                <td width="33%"><strong>NCR. NO.</strong>: {report.ncsNumber}</td>
                 <td width="33%"><strong>AUDIT DATE</strong>: {report.auditDate}</td>
               </tr>
               <tr>
@@ -952,14 +952,19 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                 </td>
               </tr>
               <tr>
-                <td className='tbl_data' colSpan={2}>
+              <td colSpan={3}><div className='follow_split'>
+              <div className='follow_split_left'>
                   <p><strong>NONCONFORMITY STATEMENT</strong></p>
                   <p>{report.nonConformityStatement}</p>
-                </td>
-                <td className='tbl_data'>
+            
+                </div>
+                <div className='follow_split_right'>
                   <p><strong>OBJECTIVE EVIDENCE</strong></p>
                   <p>{report.objectiveEvidence}</p>
+                  </div>
+                </div>
                 </td>
+
               </tr>
               <tr>
                 <td>
@@ -1058,7 +1063,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                       style={{ height: '60px', objectFit: 'contain' }}
                     />
 
-                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "20px", borderLeft: "1px solid black", padding: "10px 30px" ,marginRight:"180px"}}>
+                    <h1 className="document-title" style={{ textAlign: "center", fontSize: "20px", borderLeft: "1px solid black", padding: "10px 30px", marginRight: "180px" }}>
 
                       Internal Audit Non Conformity and Corrective Action Report
                     </h1>
@@ -1150,7 +1155,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               </tr>
               <tr>
                 <td>
-                  <p><strong>NCS. CLOSING STATUS</strong></p>
+                  <p><strong>NCR. CLOSING STATUS</strong></p>
 
                   "a) Closed / Mixed Re-Action":<br />
                   "b) Amid similar nonconformity exist, could potentially occur at:"
@@ -1228,7 +1233,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
-  
+
 
   const filteredReports = reports.filter(report => {
     return (
@@ -1325,7 +1330,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
           <p>No reports found matching your filters.</p>
         </div>
       )}
-      
+
     </div>
 
   );
@@ -1362,15 +1367,15 @@ const ActionReport = () => {
       alert('Please enter a valid Audit Cycle Number in format I/2025-26 or II/2026-2027');
       return;
     }
-  
+
     const newReport = {
       ...formData,
       id: Date.now(),
       savedDate: new Date().toLocaleString()
     };
-  
+
     let updatedReports;
-  
+
     if (editingIndex !== null) {
       updatedReports = [...savedReports];
       updatedReports[editingIndex] = newReport;
@@ -1379,14 +1384,14 @@ const ActionReport = () => {
       updatedReports = [...savedReports, newReport];
       setSavedReports(updatedReports);
     }
-  
+
     // ✅ Save to localStorage
     localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
-  
+
     setShowForms(false);
     navigate('/user-dashboard/user-audit-nc-closer');
   };
-  
+
 
   const handleEdit = (index) => {
     dispatch({
@@ -1462,7 +1467,7 @@ const ActionReport = () => {
           onDelete={handleDelete}
           onAddNew={handleAddNew}
         />
-        
+
       )}
     </div>
   );

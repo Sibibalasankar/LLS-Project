@@ -214,7 +214,7 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
                   </div>
                 </td>
                 <td width="33%">
-                  <label>NCS. NO.</label>
+                  <label>NCR. NO.</label>
                   <div className="form-field">
                     <input type="text" name="ncsNumber" value={formData.ncsNumber} onChange={handleChange} />
                   </div>
@@ -931,7 +931,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               </tr>
               <tr>
                 <td width="33%"><strong>DEPT</strong>: {report.dptname}</td>
-                <td width="33%"><strong>NCS. NO.</strong>: {report.ncsNumber}</td>
+                <td width="33%"><strong>NCR. NO.</strong>: {report.ncsNumber}</td>
                 <td width="33%"><strong>AUDIT DATE</strong>: {report.auditDate}</td>
               </tr>
               <tr>
@@ -1144,7 +1144,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
               </tr>
               <tr>
                 <td>
-                  <p><strong>NCS. CLOSING STATUS</strong></p>
+                  <p><strong>NCR. CLOSING STATUS</strong></p>
 
                   "a) Closed / Mixed Re-Action":<br />
                   "b) Amid similar nonconformity exist, could potentially occur at:"
@@ -1327,7 +1327,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
             <table className="table table-striped table-hover mb-0">
               <thead className="table-dark">
                 <tr>
-                  <th className="align-middle">NRS Number</th>
+                  <th className="align-middle">NCR Number</th>
                   <th className="align-middle">Department</th>
                   <th className="align-middle text-center">Audit Cycle</th>
                   <th className="align-middle">Audit Date</th>

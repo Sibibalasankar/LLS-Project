@@ -10,6 +10,7 @@ import {
   Legend,
   ArcElement
 } from "chart.js";
+import * as XLSX from "xlsx";
 
 // Register ChartJS components
 ChartJS.register(
@@ -29,13 +30,20 @@ const AuditSummary = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [selectedCycle, setSelectedCycle] = useState("All");
   const [activeTab, setActiveTab] = useState("department");
+  const [timePeriod, setTimePeriod] = useState("12months");
+  const [financialYear, setFinancialYear] = useState("");
 
   useEffect(() => {
     // Load data from localStorage
     const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
     
-    // Convert the object of observations into a flat array
-    const observationsArray = Object.values(allObservations).flatMap(obsArray => obsArray);
+    // Convert the object of observations into a flat array with audit dates
+    const observationsArray = Object.values(allObservations).flatMap(obsArray => 
+      obsArray.map(obs => ({
+        ...obs,
+        auditDate: obs.auditDate ? new Date(obs.auditDate) : null
+      }))
+    );
     
     setAuditData(observationsArray);
     
@@ -46,14 +54,45 @@ const AuditSummary = () => {
     // Get unique audit cycles
     const uniqueCycles = [...new Set(observationsArray.map(obs => obs.auditCycleNo))].filter(Boolean);
     setAuditCycles(["All", ...uniqueCycles]);
+
+    // Set current financial year
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const fy = currentMonth >= 4 ? `${currentYear}-${currentYear + 1}` : `${currentYear - 1}-${currentYear}`;
+    setFinancialYear(fy);
   }, []);
 
+  // Filter data based on time period
+  const filterByTimePeriod = (data) => {
+    const now = new Date();
+    let startDate = new Date();
+
+    switch (timePeriod) {
+      case "6months":
+        startDate.setMonth(now.getMonth() - 6);
+        break;
+      case "financialYear":
+        const [startYear] = financialYear.split("-");
+        startDate = new Date(`${startYear}-04-01`);
+        break;
+      case "12months":
+      default:
+        startDate.setMonth(now.getMonth() - 12);
+        break;
+    }
+
+    return data.filter(obs => {
+      if (!obs.auditDate) return false;
+      return obs.auditDate >= startDate && obs.auditDate <= now;
+    });
+  };
+
   // Filter data based on selections
-  const filteredData = auditData.filter(obs => {
+  const filteredData = filterByTimePeriod(auditData.filter(obs => {
     const departmentMatch = selectedDepartment === "All" || obs.department === selectedDepartment;
     const cycleMatch = selectedCycle === "All" || obs.auditCycleNo === selectedCycle;
     return departmentMatch && cycleMatch;
-  });
+  }));
 
   // Count results by department
   const getResultCountsByDepartment = () => {
@@ -66,7 +105,7 @@ const AuditSummary = () => {
     deptsToShow.forEach(dept => {
       counts[dept] = {
         NC: 0,
-        "0+": 0,
+        "O+": 0,
         OFI: 0,
         total: 0
       };
@@ -79,7 +118,7 @@ const AuditSummary = () => {
         
         results.forEach(result => {
           if (result === "NC") counts[dept].NC++;
-          if (result === "0+") counts[dept]["0+"]++;
+          if (result === "O+") counts[dept]["O+"]++;
           if (result === "OFI") counts[dept].OFI++;
         });
         
@@ -101,7 +140,7 @@ const AuditSummary = () => {
     cyclesToShow.forEach(cycle => {
       counts[cycle] = {
         NC: 0,
-        "0+": 0,
+        "O+": 0,
         OFI: 0,
         total: 0
       };
@@ -114,7 +153,7 @@ const AuditSummary = () => {
         
         results.forEach(result => {
           if (result === "NC") counts[cycle].NC++;
-          if (result === "0+") counts[cycle]["0+"]++;
+          if (result === "O+") counts[cycle]["O+"]++;
           if (result === "OFI") counts[cycle].OFI++;
         });
         
@@ -138,8 +177,8 @@ const AuditSummary = () => {
         backgroundColor: "rgba(255, 99, 132, 0.7)",
       },
       {
-        label: "Observation Positive (0+)",
-        data: Object.values(departmentCounts).map(dept => dept["0+"]),
+        label: "Observation Positive (O+)",
+        data: Object.values(departmentCounts).map(dept => dept["O+"]),
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
       {
@@ -159,8 +198,8 @@ const AuditSummary = () => {
         backgroundColor: "rgba(255, 99, 132, 0.7)",
       },
       {
-        label: "Observation Positive (0+)",
-        data: Object.values(cycleCounts).map(cycle => cycle["0+"]),
+        label: "Observation Positive (O+)",
+        data: Object.values(cycleCounts).map(cycle => cycle["O+"]),
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
       {
@@ -172,11 +211,11 @@ const AuditSummary = () => {
   };
 
   const resultDistributionData = {
-    labels: ["NC", "0+", "OFI"],
+    labels: ["NC", "O+", "OFI"],
     datasets: [{
       data: [
         filteredData.reduce((sum, obs) => sum + ((Array.isArray(obs.result) ? obs.result : [obs.result]).filter(r => r === "NC").length), 0),
-        filteredData.reduce((sum, obs) => sum + ((Array.isArray(obs.result) ? obs.result : [obs.result]).filter(r => r === "0+").length), 0),
+        filteredData.reduce((sum, obs) => sum + ((Array.isArray(obs.result) ? obs.result : [obs.result]).filter(r => r === "O+").length), 0),
         filteredData.reduce((sum, obs) => sum + ((Array.isArray(obs.result) ? obs.result : [obs.result]).filter(r => r === "OFI").length), 0)
       ],
       backgroundColor: [
@@ -232,6 +271,102 @@ const AuditSummary = () => {
     },
   };
 
+  // Function to download department-wise data
+  const downloadDepartmentData = () => {
+    const data = Object.entries(departmentCounts).map(([dept, counts]) => ({
+      Department: dept,
+      "Non-Conformity (NC)": counts.NC,
+      "Observation Positive (O+)": counts["O+"],
+      "Opportunity For Improvement (OFI)": counts.OFI,
+      "Total Observations": counts.total,
+      "NC %": counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) + "%" : "0%"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Department Summary");
+    
+    const fileName = `Audit_Department_Summary_${timePeriod}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
+  // Function to download consolidated audit data
+  const downloadConsolidatedData = () => {
+    const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
+    const observationsArray = Object.values(allObservations).flat();
+    
+    const data = observationsArray.map(obs => ({
+      "Audit Cycle": obs.auditCycleNo,
+      "Department": obs.department,
+      "Observation": obs.observation,
+      "Result": Array.isArray(obs.result) ? obs.result.join(", ") : obs.result,
+      "Audit Date": obs.auditDate ? new Date(obs.auditDate).toLocaleDateString() : "",
+      "Auditor": obs.auditor,
+      "Status": obs.status,
+      "Root Cause": obs.rootCause,
+      "Corrective Action": obs.correctiveAction,
+      "Target Date": obs.targetDate,
+      "Remarks": obs.remarks
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "All Audit Observations");
+    
+    const fileName = `Consolidated_Audit_Data_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
+  // Function to download data by financial year
+  const downloadFinancialYearData = () => {
+    const [startYear] = financialYear.split("-");
+    const startDate = new Date(`${startYear}-04-01`);
+    const endDate = new Date(`${parseInt(startYear) + 1}-03-31`);
+
+    const fyData = auditData.filter(obs => {
+      if (!obs.auditDate) return false;
+      return obs.auditDate >= startDate && obs.auditDate <= endDate;
+    });
+
+    const counts = {};
+    departments.filter(d => d !== "All").forEach(dept => {
+      counts[dept] = {
+        NC: 0,
+        "O+": 0,
+        OFI: 0,
+        total: 0
+      };
+
+      const deptObservations = fyData.filter(obs => obs.department === dept);
+      
+      deptObservations.forEach(obs => {
+        const results = Array.isArray(obs.result) ? obs.result : [obs.result];
+        results.forEach(result => {
+          if (result === "NC") counts[dept].NC++;
+          if (result === "O+") counts[dept]["O+"]++;
+          if (result === "OFI") counts[dept].OFI++;
+        });
+        counts[dept].total += results.length;
+      });
+    });
+
+    const data = Object.entries(counts).map(([dept, counts]) => ({
+      Department: dept,
+      "Non-Conformity (NC)": counts.NC,
+      "Observation Positive (O+)": counts["O+"],
+      "Opportunity For Improvement (OFI)": counts.OFI,
+      "Total Observations": counts.total,
+      "NC %": counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) + "%" : "0%"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `FY ${financialYear} Summary`);
+    
+    const fileName = `Audit_FY_${financialYear}_Summary.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
   return (
     <div className="audit-summary-container" style={{ padding: "20px" }}>
       <h2 style={{ marginBottom: "20px" }}>Audit Summary Report</h2>
@@ -266,6 +401,19 @@ const AuditSummary = () => {
             {auditCycles.map(cycle => (
               <option key={cycle} value={cycle}>{cycle}</option>
             ))}
+          </select>
+        </div>
+
+        <div style={{ flex: 1, minWidth: "200px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>Time Period:</label>
+          <select 
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+            style={{ width: "100%", padding: "8px" }}
+          >
+            <option value="12months">Rolling 12 Months</option>
+            <option value="6months">Last 6 Months</option>
+            <option value="financialYear">Financial Year ({financialYear})</option>
           </select>
         </div>
       </div>
@@ -305,25 +453,72 @@ const AuditSummary = () => {
         </button>
       </div>
 
+      {/* Download buttons */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
+        <button 
+          onClick={downloadDepartmentData}
+          style={{
+            padding: "10px 15px",
+            background: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Download Department Data
+        </button>
+        
+        <button 
+          onClick={downloadConsolidatedData}
+          style={{
+            padding: "10px 15px",
+            background: "#17a2b8",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Download Consolidated Data
+        </button>
+        
+        {timePeriod === "financialYear" && (
+          <button 
+            onClick={downloadFinancialYearData}
+            style={{
+              padding: "10px 15px",
+              background: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Download FY {financialYear} Data
+          </button>
+        )}
+      </div>
+
       {/* Charts */}
       <div style={{ marginBottom: "30px" }}>
-  {activeTab === "department" ? (
-    <div style={{ width: "80%", maxWidth: "800px", margin: "0 auto" }}>
-      <Bar data={departmentChartData} options={chartOptions} />
-    </div>
-  ) : (
-    <div style={{ width: "80%", maxWidth: "800px", margin: "0 auto" }}>
-      <Bar data={cycleChartData} options={chartOptions} />
-    </div>
-  )}
-</div>
+        {activeTab === "department" ? (
+          <div style={{ width: "80%", maxWidth: "800px", margin: "0 auto" }}>
+            <Bar data={departmentChartData} options={chartOptions} />
+          </div>
+        ) : (
+          <div style={{ width: "80%", maxWidth: "800px", margin: "0 auto" }}>
+            <Bar data={cycleChartData} options={chartOptions} />
+          </div>
+        )}
+      </div>
 
-{/* Pie chart for result distribution */}
-<div style={{ marginBottom: "30px" }}>
-  <div style={{ width: "80%", maxWidth: "500px", margin: "0 auto" }}>
-    <Pie data={resultDistributionData} options={pieOptions} />
-  </div>
-</div>
+      {/* Pie chart for result distribution */}
+      <div style={{ marginBottom: "30px" }}>
+        <div style={{ width: "80%", maxWidth: "500px", margin: "0 auto" }}>
+          <Pie data={resultDistributionData} options={pieOptions} />
+        </div>
+      </div>
 
       {/* Table */}
       {filteredData.length > 0 ? (
@@ -337,7 +532,7 @@ const AuditSummary = () => {
                     {activeTab === "department" ? "Department" : "Audit Cycle"}
                   </th>
                   <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>NC</th>
-                  <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>0+</th>
+                  <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>O+</th>
                   <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>OFI</th>
                   <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>Total</th>
                   <th style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>NC %</th>
@@ -349,7 +544,7 @@ const AuditSummary = () => {
                     <tr key={dept} style={{ borderBottom: "1px solid #ddd" }}>
                       <td style={{ padding: "12px", border: "1px solid #ddd" }}>{dept}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.NC}</td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["0+"]}</td>
+                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["O+"]}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.OFI}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.total}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>
@@ -362,7 +557,7 @@ const AuditSummary = () => {
                     <tr key={cycle} style={{ borderBottom: "1px solid #ddd" }}>
                       <td style={{ padding: "12px", border: "1px solid #ddd" }}>{cycle}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.NC}</td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["0+"]}</td>
+                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["O+"]}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.OFI}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.total}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>
