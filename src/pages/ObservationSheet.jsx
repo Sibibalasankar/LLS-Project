@@ -62,7 +62,7 @@ const ObservationSheet = () => {
           ${styles}
           body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 10px;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }

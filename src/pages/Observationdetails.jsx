@@ -9,10 +9,25 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   const [observations, setObservations] = useState([]);
   const [viewObservationId, setViewObservationId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [auditCycleData, setAuditCycleData] = useState({});
 
   useEffect(() => {
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
     setObservations(storedObservations);
+
+    // Load audit cycle data from all observations
+    const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
+    const cycleData = {};
+    
+    storedObservations.forEach(obs => {
+      if (allObservations[obs.id] && allObservations[obs.id].length > 0) {
+        cycleData[obs.id] = allObservations[obs.id][0].auditCycleNo;
+      } else {
+        cycleData[obs.id] = "Not set";
+      }
+    });
+    
+    setAuditCycleData(cycleData);
   }, [departmentName]);
 
   const handleAddObservation = () => {
@@ -103,7 +118,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Observation</th>
+                    <th>Audit Cycle No</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -111,7 +126,9 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                   {observations.map((obs, index) => (
                     <tr key={obs.id}>
                       <td className="serial-number">{index + 1}</td>
-                      <td className="observation-name">Observation {obs.number}</td>
+                      <td className="audit-cycle-no">
+                        {auditCycleData[obs.id] || "Not set"}
+                      </td>
                       <td className="action-buttons-cell">
                         <Button
                           variant="primary"

@@ -85,7 +85,7 @@ const AuditObservation = () => {
                         <span className="stat-value">{plansCount}</span>
                       </div>
                       <div className="stat-item">
-                        <span className="stat-label">Observations:</span>
+                        <span className="stat-label">Audit Cycles:</span>
                         <span className="stat-value">{obsCount}</span>
                       </div>
                       <div className="stat-item">

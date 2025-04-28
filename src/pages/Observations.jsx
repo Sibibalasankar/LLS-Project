@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
 
-
 const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
   const [observations, setObservations] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -24,7 +23,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     potentialCauses: "",
     findings: "",
     isoClause: "",
-    result: [],
+    result: "",
     auditCycleNo: `I/${yearFormat}`,
     auditDate: new Date().toISOString().split("T")[0],
     auditorSignature: "",
@@ -39,8 +38,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [showActionForm, setShowActionForm] = useState(false);
 
   const navigate = useNavigate();
-
-
 
   const handleOpenActionForm = (observation) => {
     const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
@@ -103,36 +100,10 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   };
 
   const handleResultChange = (e) => {
-    const { value, checked } = e.target;
-
-    setCurrentObservation((prev) => {
-      let updatedResults = [...prev.result];
-
-      if (value === "NC") {
-        if (checked) {
-          // If NC is selected, clear other values and add only NC
-          updatedResults = ["NC"];
-        } else {
-          // If NC is deselected, clear NC from results
-          updatedResults = updatedResults.filter((item) => item !== "NC");
-        }
-      } else {
-        if (prev.result.includes("NC")) {
-          // Do nothing if NC is already selected
-          return prev;
-        }
-
-        if (checked) {
-          if (!updatedResults.includes(value)) {
-            updatedResults.push(value);
-          }
-        } else {
-          updatedResults = updatedResults.filter((item) => item !== value);
-        }
-      }
-
-      return { ...prev, result: updatedResults };
-    });
+    setCurrentObservation((prev) => ({
+      ...prev,
+      result: e.target.value
+    }));
   };
 
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
@@ -224,7 +195,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
         <div className="audit-info-item">
           <strong>Audit Date:</strong> {observations.length > 0 ? currentObservation.auditDate : "-"}
         </div>
-
       </div>
 
       <div className="observations-table-container p-3">
@@ -249,11 +219,11 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <td>{obs.potentialCauses}</td>
                   <td>{obs.findings}</td>
                   <td>{obs.isoClause}</td>
-                  <td>{Array.isArray(obs.result) ? obs.result.join(", ") : obs.result}</td>
+                  <td>{obs.result}</td>
                   <td className="btns_td">
                     <button className="edit-btn" onClick={() => handleEdit(obs)}>Edit</button>
                     <button className="delete-btn" onClick={() => handleDelete(obs.id)}>Delete</button>
-                    {Array.isArray(obs.result) && obs.result.includes("NC") && (
+                    {obs.result === "NC" && (
                       <button
                         className="action-form-btn"
                         onClick={() => handleOpenActionForm(obs)}
@@ -400,38 +370,36 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           </div>
           <div className="form-group">
             <label>Result:</label>
-            <div className="checkbox-group">
-              <label className="checkbox-label">
+            <div className="radio-group">
+              <label className="radio-label">
                 <input
-                  type="checkbox"
+                  type="radio"
                   name="result"
                   value="0+"
-                  checked={currentObservation.result.includes("0+")}
+                  checked={currentObservation.result === "0+"}
                   onChange={handleResultChange}
-                  disabled={currentObservation.result.includes("NC")}
                 />
-                <span>0+ (Observation Positive)</span>
+                <span className="radiotext">0+ (Observation Positive)</span>
               </label>
-              <label className="checkbox-label">
+              <label className="radio-label">
                 <input
-                  type="checkbox"
+                  type="radio"
                   name="result"
                   value="NC"
-                  checked={currentObservation.result.includes("NC")}
+                  checked={currentObservation.result === "NC"}
                   onChange={handleResultChange}
                 />
-                <span>NC (Non-Conformity)</span>
+                <span className="radiotext">NC (Non-Conformity)</span>
               </label>
-              <label className="checkbox-label">
+              <label className="radio-label">
                 <input
-                  type="checkbox"
+                  type="radio"
                   name="result"
                   value="OFI"
-                  checked={currentObservation.result.includes("OFI")}
+                  checked={currentObservation.result === "OFI"}
                   onChange={handleResultChange}
-                  disabled={currentObservation.result.includes("NC")}
                 />
-                <span>OFI (Opportunity For Improvement)</span>
+                <span className="radiotext">OFI (Opportunity For Improvement)</span>
               </label>
             </div>
           </div>
@@ -504,7 +472,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           <div className="audit-info-item">
             <strong>Auditee:</strong> {auditeeInfo.name ? `${auditeeInfo.name} (${auditeeInfo.designation})` : "-"}
           </div>
-
         </div>
       </div>
 
@@ -521,7 +488,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           Open Record
         </Button>
       </div>
-
     </div>
   );
 };
