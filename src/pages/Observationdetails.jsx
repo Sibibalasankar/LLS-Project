@@ -84,12 +84,15 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
     <div className="observation-details-container">
       <div className="detail-header">
         <div className="header-content">
-          <h2 className="department-title">
-            <span className="dept-name">{departmentName}</span>
-            <span className="observation-count">
-              {observations.length} observation{observations.length !== 1 ? 's' : ''}
-            </span>
-          </h2>
+          <div className="title-wrapper">
+            <h2 className="department-title">
+              <span className="dept-name">{departmentName}</span>
+              <span className="observation-count">
+                {observations.length} observation{observations.length !== 1 ? 's' : ''}
+              </span>
+            </h2>
+            <p className="department-subtitle">Manage all observations for this department</p>
+          </div>
           <div className="action-buttons">
             <Button
               variant="outline"
@@ -97,11 +100,11 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
               className="back-btn"
               icon={<FiArrowLeft size={16} />}
             >
-              Back to Departments
+              Departments
             </Button>
             <Button
               onClick={handleAddObservation}
-              className="submit-btns primary"
+              className="submit-btn primary"
               icon={<FiPlus size={16} />}
             >
               Add Observation
@@ -118,16 +121,20 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Audit Cycle No</th>
+                    <th>Observation</th>
+                    <th>Audit Cycle</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {observations.map((obs, index) => (
-                    <tr key={obs.id}>
+                    <tr key={obs.id} className="observation-row">
                       <td className="serial-number">{index + 1}</td>
+                      <td className="observation-name">Observation {index + 1}</td>
                       <td className="audit-cycle-no">
-                        {auditCycleData[obs.id] || "Not set"}
+                        <span className={`cycle-tag ${auditCycleData[obs.id] === "Not set" ? 'not-set' : ''}`}>
+                          {auditCycleData[obs.id] || "Not set"}
+                        </span>
                       </td>
                       <td className="action-buttons-cell">
                         <Button
@@ -160,7 +167,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
               <p>You haven't added any observations for this department yet.</p>
               <Button
                 onClick={handleAddObservation}
-                className="submit-btns primary"
+                className="submit-btn primary"
                 icon={<FiPlus size={16} />}
               >
                 Add First Observation
@@ -173,4 +180,4 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   );
 };
 
-export default ObservationDetails;
+export default ObservationDetails;  

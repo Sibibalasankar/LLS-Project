@@ -36,21 +36,21 @@ const AuditSummary = () => {
   useEffect(() => {
     // Load data from localStorage
     const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
-    
+
     // Convert the object of observations into a flat array with audit dates
-    const observationsArray = Object.values(allObservations).flatMap(obsArray => 
+    const observationsArray = Object.values(allObservations).flatMap(obsArray =>
       obsArray.map(obs => ({
         ...obs,
         auditDate: obs.auditDate ? new Date(obs.auditDate) : null
       }))
     );
-    
+
     setAuditData(observationsArray);
-    
+
     // Get unique departments from all observations
     const uniqueDepartments = [...new Set(observationsArray.map(obs => obs.department))].filter(Boolean);
     setDepartments(["All", ...uniqueDepartments]);
-    
+
     // Get unique audit cycles
     const uniqueCycles = [...new Set(observationsArray.map(obs => obs.auditCycleNo))].filter(Boolean);
     setAuditCycles(["All", ...uniqueCycles]);
@@ -94,76 +94,82 @@ const AuditSummary = () => {
     return departmentMatch && cycleMatch;
   }));
 
+  console.log("Filtered data:", filteredData);
+
   // Count results by department
   const getResultCountsByDepartment = () => {
     const counts = {};
-    
-    const deptsToShow = selectedDepartment === "All" 
-      ? departments.filter(d => d !== "All") 
+
+    const deptsToShow = selectedDepartment === "All"
+      ? departments.filter(d => d !== "All")
       : [selectedDepartment];
-    
+
     deptsToShow.forEach(dept => {
       counts[dept] = {
         NC: 0,
-        "O+": 0,
+        op: 0,
         OFI: 0,
         total: 0
       };
-      
+
       // Filter observations for this department
       const deptObservations = filteredData.filter(obs => obs.department === dept);
-      
+
       deptObservations.forEach(obs => {
         const results = Array.isArray(obs.result) ? obs.result : [obs.result];
-        
+
         results.forEach(result => {
           if (result === "NC") counts[dept].NC++;
-          if (result === "O+") counts[dept]["O+"]++;
+          if (result === "O+" || result === "op") counts[dept].op++;  // Check both formats
           if (result === "OFI") counts[dept].OFI++;
         });
-        
+
         counts[dept].total += results.length;
       });
     });
-    
+
     return counts;
   };
+
+
 
   // Count results by audit cycle
   const getResultCountsByCycle = () => {
     const counts = {};
-    
-    const cyclesToShow = selectedCycle === "All" 
-      ? auditCycles.filter(c => c !== "All") 
+
+    const cyclesToShow = selectedCycle === "All"
+      ? auditCycles.filter(c => c !== "All")
       : [selectedCycle];
-    
+
     cyclesToShow.forEach(cycle => {
       counts[cycle] = {
         NC: 0,
-        "O+": 0,
+        op: 0,  // Changed from "O+" to "op"
         OFI: 0,
         total: 0
       };
-      
+
       // Filter observations for this cycle
       const cycleObservations = filteredData.filter(obs => obs.auditCycleNo === cycle);
-      
+
       cycleObservations.forEach(obs => {
         const results = Array.isArray(obs.result) ? obs.result : [obs.result];
-        
+
         results.forEach(result => {
-          if (result === "NC") counts[cycle].NC++;
-          if (result === "O+") counts[cycle]["O+"]++;
-          if (result === "OFI") counts[cycle].OFI++;
+          // Normalize result values
+          const normalizedResult = result === "0+" ? "op" : result;
+
+          if (normalizedResult === "NC") counts[cycle].NC++;
+          if (normalizedResult === "op") counts[cycle].op++;  // Count both "op" and "O+"
+          if (normalizedResult === "OFI") counts[cycle].OFI++;
         });
-        
+
         counts[cycle].total += results.length;
       });
     });
-    
+
     return counts;
   };
-
   const departmentCounts = getResultCountsByDepartment();
   const cycleCounts = getResultCountsByCycle();
 
@@ -178,7 +184,7 @@ const AuditSummary = () => {
       },
       {
         label: "Observation Positive (O+)",
-        data: Object.values(departmentCounts).map(dept => dept["O+"]),
+        data: Object.values(departmentCounts).map(dept => dept.op),
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
       {
@@ -199,7 +205,7 @@ const AuditSummary = () => {
       },
       {
         label: "Observation Positive (O+)",
-        data: Object.values(cycleCounts).map(cycle => cycle["O+"]),
+        data: Object.values(cycleCounts).map(cycle => cycle.op),
         backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
       {
@@ -276,7 +282,7 @@ const AuditSummary = () => {
     const data = Object.entries(departmentCounts).map(([dept, counts]) => ({
       Department: dept,
       "Non-Conformity (NC)": counts.NC,
-      "Observation Positive (O+)": counts["O+"],
+      "Observation Positive (O+)": counts.op,
       "Opportunity For Improvement (OFI)": counts.OFI,
       "Total Observations": counts.total,
       "NC %": counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) + "%" : "0%"
@@ -285,7 +291,7 @@ const AuditSummary = () => {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Department Summary");
-    
+
     const fileName = `Audit_Department_Summary_${timePeriod}_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
@@ -294,7 +300,7 @@ const AuditSummary = () => {
   const downloadConsolidatedData = () => {
     const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
     const observationsArray = Object.values(allObservations).flat();
-    
+
     const data = observationsArray.map(obs => ({
       "Audit Cycle": obs.auditCycleNo,
       "Department": obs.department,
@@ -312,7 +318,7 @@ const AuditSummary = () => {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "All Audit Observations");
-    
+
     const fileName = `Consolidated_Audit_Data_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
@@ -323,7 +329,8 @@ const AuditSummary = () => {
     const startDate = new Date(`${startYear}-04-01`);
     const endDate = new Date(`${parseInt(startYear) + 1}-03-31`);
 
-    const fyData = auditData.filter(obs => {
+    // Changed from fyData to filteredFYData for clarity
+    const filteredFYData = auditData.filter(obs => {
       if (!obs.auditDate) return false;
       return obs.auditDate >= startDate && obs.auditDate <= endDate;
     });
@@ -332,19 +339,20 @@ const AuditSummary = () => {
     departments.filter(d => d !== "All").forEach(dept => {
       counts[dept] = {
         NC: 0,
-        "O+": 0,
+        op: 0,
         OFI: 0,
         total: 0
       };
 
-      const deptObservations = fyData.filter(obs => obs.department === dept);
-      
+      const deptObservations = filteredFYData.filter(obs => obs.department === dept);
+
       deptObservations.forEach(obs => {
         const results = Array.isArray(obs.result) ? obs.result : [obs.result];
         results.forEach(result => {
-          if (result === "NC") counts[dept].NC++;
-          if (result === "O+") counts[dept]["O+"]++;
-          if (result === "OFI") counts[dept].OFI++;
+          const normalizedResult = result === "0+" ? "op" : result;
+          if (normalizedResult === "NC") counts[dept].NC++;
+          if (normalizedResult === "op") counts[dept].op++;
+          if (normalizedResult === "OFI") counts[dept].OFI++;
         });
         counts[dept].total += results.length;
       });
@@ -353,7 +361,7 @@ const AuditSummary = () => {
     const data = Object.entries(counts).map(([dept, counts]) => ({
       Department: dept,
       "Non-Conformity (NC)": counts.NC,
-      "Observation Positive (O+)": counts["O+"],
+      "Observation Positive (O+)": counts.op,
       "Opportunity For Improvement (OFI)": counts.OFI,
       "Total Observations": counts.total,
       "NC %": counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) + "%" : "0%"
@@ -362,25 +370,24 @@ const AuditSummary = () => {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, `FY ${financialYear} Summary`);
-    
+
     const fileName = `Audit_FY_${financialYear}_Summary.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
-
   return (
     <div className="audit-summary-container" style={{ padding: "20px" }}>
       <h2 style={{ marginBottom: "20px" }}>Audit Summary Report</h2>
-      
+
       {/* Filters */}
-      <div style={{ 
-        display: "flex", 
-        gap: "20px", 
+      <div style={{
+        display: "flex",
+        gap: "20px",
         marginBottom: "20px",
         flexWrap: "wrap"
       }}>
         <div style={{ flex: 1, minWidth: "200px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Department:</label>
-          <select 
+          <select
             value={selectedDepartment}
             onChange={(e) => setSelectedDepartment(e.target.value)}
             style={{ width: "100%", padding: "8px" }}
@@ -390,10 +397,10 @@ const AuditSummary = () => {
             ))}
           </select>
         </div>
-        
+
         <div style={{ flex: 1, minWidth: "200px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Audit Cycle:</label>
-          <select 
+          <select
             value={selectedCycle}
             onChange={(e) => setSelectedCycle(e.target.value)}
             style={{ width: "100%", padding: "8px" }}
@@ -406,7 +413,7 @@ const AuditSummary = () => {
 
         <div style={{ flex: 1, minWidth: "200px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Time Period:</label>
-          <select 
+          <select
             value={timePeriod}
             onChange={(e) => setTimePeriod(e.target.value)}
             style={{ width: "100%", padding: "8px" }}
@@ -417,10 +424,10 @@ const AuditSummary = () => {
           </select>
         </div>
       </div>
-      
+
       {/* Tabs */}
-      <div style={{ 
-        display: "flex", 
+      <div style={{
+        display: "flex",
         borderBottom: "1px solid #ddd",
         marginBottom: "20px"
       }}>
@@ -437,7 +444,7 @@ const AuditSummary = () => {
         >
           By Department
         </button>
-        
+
         <button
           style={{
             padding: "10px 20px",
@@ -455,7 +462,7 @@ const AuditSummary = () => {
 
       {/* Download buttons */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
-        <button 
+        <button
           onClick={downloadDepartmentData}
           style={{
             padding: "10px 15px",
@@ -468,8 +475,8 @@ const AuditSummary = () => {
         >
           Download Department Data
         </button>
-        
-        <button 
+
+        <button
           onClick={downloadConsolidatedData}
           style={{
             padding: "10px 15px",
@@ -482,9 +489,9 @@ const AuditSummary = () => {
         >
           Download Consolidated Data
         </button>
-        
+
         {timePeriod === "financialYear" && (
-          <button 
+          <button
             onClick={downloadFinancialYearData}
             style={{
               padding: "10px 15px",
@@ -544,7 +551,7 @@ const AuditSummary = () => {
                     <tr key={dept} style={{ borderBottom: "1px solid #ddd" }}>
                       <td style={{ padding: "12px", border: "1px solid #ddd" }}>{dept}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.NC}</td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["O+"]}</td>
+                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.op}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.OFI}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.total}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>
@@ -557,7 +564,7 @@ const AuditSummary = () => {
                     <tr key={cycle} style={{ borderBottom: "1px solid #ddd" }}>
                       <td style={{ padding: "12px", border: "1px solid #ddd" }}>{cycle}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.NC}</td>
-                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts["O+"]}</td>
+                      <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.op}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.OFI}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>{counts.total}</td>
                       <td style={{ padding: "12px", border: "1px solid #ddd", textAlign: "center" }}>

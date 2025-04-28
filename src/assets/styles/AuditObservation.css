@@ -6,6 +6,7 @@
   font-size: 1.8rem;
   margin-bottom: 20px;
   text-align: center;
+  font-weight: bold;
 }
 
 .department-grid {
@@ -104,4 +105,19 @@
 
 .stat-value {
   font-weight: 600;
+}
+.filters-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  font-size: 1rem;
 }

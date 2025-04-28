@@ -7,70 +7,91 @@
 
 .detail-header {
   margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.title-wrapper {
+  flex: 1;
+  min-width: 300px;
 }
 
 .department-title {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .dept-name {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #2c3e50;
 }
 
+.department-subtitle {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
 .observation-count {
-  font-size: 1rem;
-  color: #7f8c8d;
-  background: #f0f0f0;
+  font-size: 0.9rem;
+  color: #ffffff;
+  background: #8589949a;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
+  font-weight: 600;
 }
 
 .action-buttons {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 
 .observation-list-card {
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+  overflow: hidden;
 }
 
 .observation-table-container {
   overflow-x: auto;
+  border-radius: 12px;
 }
 
 .observation-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .observation-table th {
-  background-color: #f8f9fa;
-  padding: 1rem;
+  background-color: #f8fafc;
+  padding: 1rem 1.25rem;
   text-align: left;
   font-weight: 600;
   color: #495057;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
 }
 
 .observation-table td {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
+  transition: background-color 0.2s ease;
 }
 
 .observation-table tr:last-child td {
@@ -78,7 +99,7 @@
 }
 
 .observation-table tr:hover td {
-  background-color: #f8f9fa;
+  background-color: #f8fafc;
 }
 
 .serial-number {
@@ -92,30 +113,53 @@
   color: #343a40;
 }
 
+.cycle-tag {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background-color: #e8f4fd;
+  color: #2c7be5;
+}
+
+.cycle-tag.not-set {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
 .action-buttons-cell {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin: 1rem;
 }
 
 .empty-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .empty-state h3 {
   color: #495057;
   margin-bottom: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .empty-state p {
   color: #6c757d;
   margin-bottom: 1.5rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Button styles */
@@ -129,6 +173,8 @@
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
 }
 
 .button:disabled {
@@ -166,34 +212,98 @@
   background-color: #d62c1a;
 }
 
-.button .icon {
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  min-width: 80px;
+  width: auto;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.action-buttons-cell .button {
+  flex: 0 0 auto;
+}
+/* If using flex layout for action buttons */
+.action-buttons-cell {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.delete-btn {
+  min-width: 90px;
+}
+
+/* Back Button Styles */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  background-color: #4e73df;
+  color: white;
+  border: 1px solid #4e73df;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background-color: #3a5ec2;
+  border-color: #3a5ec2;
+}
+
+.back-btn .icon {
   display: flex;
   align-items: center;
+}
+
+.submit-btn.primary {
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.submit-btn.primary:hover {
+  background-color: #218838;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
   
   .action-buttons {
     width: 100%;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
   }
   
   .observation-table td, 
   .observation-table th {
-    padding: 0.75rem 0.5rem;
+    padding: 0.75rem;
+    white-space: nowrap;
   }
   
   .action-buttons-cell {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
   }
   
   .button {
     width: 100%;
-    justify-content: center;
+  }
+  
+  .dept-name {
+    font-size: 1.5rem;
   }
 }

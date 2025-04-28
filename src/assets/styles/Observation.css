@@ -226,10 +226,10 @@
 /* Form Styles */
 .observation-form {
   background: white;
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
 }
 
 .form-row {
@@ -311,6 +311,80 @@
   flex: 1;
 }
 
+/* Modal Overlay Styles */
+.observation-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.observation-form-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.observation-form-modal h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Action Form Modal */
+.action-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.action-form-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 600px;
+}
+
+.action-form-modal h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .header-with-logo {
@@ -360,6 +434,12 @@
   .form-buttons {
     justify-content: stretch;
   }
+
+  .observation-form-modal,
+  .action-form-modal {
+    padding: 20px;
+    max-width: 95%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -394,12 +474,18 @@
     min-width: 100px;
   }
 }
+
 .button-group .button,
 .button-group .create-btn {
   width: auto;
   min-width: 200px;
   max-width: 250px;
 }
+
 .checktext{
+  color: black;
+}
+
+.radiotext {
   color: black;
 }

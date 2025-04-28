@@ -43,7 +43,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
     window.open(url, "_blank");
   };
-
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);
@@ -176,7 +175,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       setObservations(observations.filter((obs) => obs.id !== id));
     }
   };
-  
+
   return (
     <div className="observations-container">
       <div className="header-with-logo">
@@ -242,6 +241,8 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           </tbody>
         </table>
       </div>
+
+      {/* Action Form Modal */}
       {showActionForm && actionObservation && (
         <div className="action-form-overlay">
           <div className="action-form-modal">
@@ -269,201 +270,215 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
         </div>
       )}
 
+      {/* Observation Form Modal */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="observation-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label>
-                Audit Cycle No:
-                <select
-                  name="auditCycleNo"
-                  value={currentObservation.auditCycleNo.split('/')[0]}
-                  onChange={(e) => {
-                    const cyclePrefix = e.target.value;
-                    setCurrentObservation(prev => ({
-                      ...prev,
-                      auditCycleNo: `${cyclePrefix}/${yearFormat}`
-                    }));
-                  }}
-                  required
-                >
-                  {auditCycleOptions.map(option => (
-                    <option key={option} value={option}>{option}/{yearFormat}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="form-group">
-              <label>
-                Audit Date:
-                <input
-                  type="date"
-                  name="auditDate"
-                  value={currentObservation.auditDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-            </div>
+        <div className="observation-form-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
+          <div className="observation-form-modal">
+            <button 
+              className="close-modal-btn" 
+              onClick={() => setShowForm(false)}
+              aria-label="Close form"
+            >
+              &times;
+            </button>
+            <h3>{currentObservation.id ? "Edit Observation" : "Add New Observation"}</h3>
+            <form onSubmit={handleSubmit} className="observation-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Audit Cycle No:
+                    <select
+                      name="auditCycleNo"
+                      value={currentObservation.auditCycleNo.split('/')[0]}
+                      onChange={(e) => {
+                        const cyclePrefix = e.target.value;
+                        setCurrentObservation(prev => ({
+                          ...prev,
+                          auditCycleNo: `${cyclePrefix}/${yearFormat}`
+                        }));
+                      }}
+                      required
+                    >
+                      {auditCycleOptions.map(option => (
+                        <option key={option} value={option}>{option}/{yearFormat}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <div className="form-group">
+                  <label>
+                    Audit Date:
+                    <input
+                      type="date"
+                      name="auditDate"
+                      value={currentObservation.auditDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </label>
+                </div>
 
-            <div className="form-group">
-              <label>
-                Department:
-                <input
-                  type="text"
-                  name="department"
-                  value={currentObservation.department}
-                  onChange={handleInputChange}
-                  readOnly
-                />
-              </label>
-            </div>
-          </div>
-          <div className="form-group">
-            <label>
-              Process / Activity:
-              <textarea
-                name="processActivity"
-                value={currentObservation.processActivity}
-                onChange={handleInputChange}
-                required
-                rows={3}
-              />
-            </label>
-          </div>
-          <div className="form-group">
-            <label>
-              Potential Uncertainties / Causes:
-              <textarea
-                name="potentialCauses"
-                value={currentObservation.potentialCauses}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </label>
-          </div>
-          <div className="form-group">
-            <label>
-              Findings:
-              <textarea
-                name="findings"
-                value={currentObservation.findings}
-                onChange={handleInputChange}
-                required
-                rows={4}
-              />
-            </label>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>
-                ISO 9001 Clause:
-                <input
-                  type="text"
-                  name="isoClause"
-                  value={currentObservation.isoClause}
-                  onChange={handleInputChange}
-                  placeholder="Enter ISO 9001 Clause"
-                />
-              </label>
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Result:</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="result"
-                  value="0+"
-                  checked={currentObservation.result === "0+"}
-                  onChange={handleResultChange}
-                />
-                <span className="radiotext">0+ (Observation Positive)</span>
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="result"
-                  value="NC"
-                  checked={currentObservation.result === "NC"}
-                  onChange={handleResultChange}
-                />
-                <span className="radiotext">NC (Non-Conformity)</span>
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="result"
-                  value="OFI"
-                  checked={currentObservation.result === "OFI"}
-                  onChange={handleResultChange}
-                />
-                <span className="radiotext">OFI (Opportunity For Improvement)</span>
-              </label>
-            </div>
-          </div>
+                <div className="form-group">
+                  <label>
+                    Department:
+                    <input
+                      type="text"
+                      name="department"
+                      value={currentObservation.department}
+                      onChange={handleInputChange}
+                      readOnly
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>
+                  Process / Activity:
+                  <textarea
+                    name="processActivity"
+                    value={currentObservation.processActivity}
+                    onChange={handleInputChange}
+                    required
+                    rows={3}
+                  />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Potential Uncertainties / Causes:
+                  <textarea
+                    name="potentialCauses"
+                    value={currentObservation.potentialCauses}
+                    onChange={handleInputChange}
+                    rows={3}
+                  />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Findings:
+                  <textarea
+                    name="findings"
+                    value={currentObservation.findings}
+                    onChange={handleInputChange}
+                    required
+                    rows={4}
+                  />
+                </label>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    ISO 9001 Clause:
+                    <input
+                      type="text"
+                      name="isoClause"
+                      value={currentObservation.isoClause}
+                      onChange={handleInputChange}
+                      placeholder="Enter ISO 9001 Clause"
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Result:</label>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="result"
+                      value="O+"
+                      checked={currentObservation.result === "O+"}
+                      onChange={handleResultChange}
+                    />
+                    <span className="radiotext">0+ (Observation Positive)</span>
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="result"
+                      value="NC"
+                      checked={currentObservation.result === "NC"}
+                      onChange={handleResultChange}
+                    />
+                    <span className="radiotext">NC (Non-Conformity)</span>
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="result"
+                      value="OFI"
+                      checked={currentObservation.result === "OFI"}
+                      onChange={handleResultChange}
+                    />
+                    <span className="radiotext">OFI (Opportunity For Improvement)</span>
+                  </label>
+                </div>
+              </div>
 
-          {/* Only show auditor/auditee fields if this is the first observation */}
-          {observations.length === 0 && (
-            <div className="form-row">
-              <div className="form-group">
-                <label>
-                  Auditor Name:
-                  <input
-                    type="text"
-                    name="auditorSignature"
-                    value={currentObservation.auditorSignature}
-                    onChange={handleInputChange}
-                    required={observations.length === 0}
-                  />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Auditor Designation:
-                  <input
-                    type="text"
-                    name="auditorDesignation"
-                    value={currentObservation.auditorDesignation}
-                    onChange={handleInputChange}
-                    required={observations.length === 0}
-                  />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Auditee Name:
-                  <input
-                    type="text"
-                    name="auditeeSignature"
-                    value={currentObservation.auditeeSignature}
-                    onChange={handleInputChange}
-                    required={observations.length === 0}
-                  />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Auditee Designation:
-                  <input
-                    type="text"
-                    name="auditeeDesignation"
-                    value={currentObservation.auditeeDesignation}
-                    onChange={handleInputChange}
-                    required={observations.length === 0}
-                  />
-                </label>
-              </div>
-            </div>
-          )}
+              {/* Only show auditor/auditee fields if this is the first observation */}
+              {observations.length === 0 && (
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>
+                      Auditor Name:
+                      <input
+                        type="text"
+                        name="auditorSignature"
+                        value={currentObservation.auditorSignature}
+                        onChange={handleInputChange}
+                        required={observations.length === 0}
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      Auditor Designation:
+                      <input
+                        type="text"
+                        name="auditorDesignation"
+                        value={currentObservation.auditorDesignation}
+                        onChange={handleInputChange}
+                        required={observations.length === 0}
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      Auditee Name:
+                      <input
+                        type="text"
+                        name="auditeeSignature"
+                        value={currentObservation.auditeeSignature}
+                        onChange={handleInputChange}
+                        required={observations.length === 0}
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      Auditee Designation:
+                      <input
+                        type="text"
+                        name="auditeeDesignation"
+                        value={currentObservation.auditeeDesignation}
+                        onChange={handleInputChange}
+                        required={observations.length === 0}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
 
-          <div className="form-buttons">
-            <button type="submit" className="save-btn">Save Observation</button>
-            <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+              <div className="form-buttons">
+                <button type="submit" className="save-btn">Save Observation</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       )}
+
       <div className="signatures-summary">
         <div className="signature-info">
           <div className="audit-info-item">

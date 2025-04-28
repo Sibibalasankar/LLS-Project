@@ -7,28 +7,27 @@ const AuditPlanCreation = () => {
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [auditPlans, setAuditPlans] = useState([]);
+  const [auditors, setAuditors] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load all data from localStorage
     const loadData = () => {
       try {
         const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
         const storedPlans = JSON.parse(localStorage.getItem("auditPlans")) || [];
+        const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
         
         setDepartments(storedDepartments);
         setAuditPlans(storedPlans);
+        setAuditors(storedAuditors);
       } catch (error) {
         console.error("Error loading data:", error);
       }
     };
     
     loadData();
-    
-    // Set up storage event listener for cross-tab synchronization
     const handleStorageChange = () => loadData();
     window.addEventListener('storage', handleStorageChange);
-    
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
@@ -36,7 +35,10 @@ const AuditPlanCreation = () => {
     return auditPlans.filter(plan => plan.department === deptName).length;
   };
 
-  // Function to update plans when they change in child component
+  const hasAuditors = (departmentName) => {
+    return auditors.some(auditor => auditor.department === departmentName);
+  };
+
   const handlePlansUpdate = (updatedPlans) => {
     setAuditPlans(updatedPlans);
     localStorage.setItem("auditPlans", JSON.stringify(updatedPlans));
@@ -60,8 +62,10 @@ const AuditPlanCreation = () => {
                     </div>
                   </div>
                   <button
-                    className="view-details-btn"
-                    onClick={() => setSelectedDepartment(dept)}
+                    className={`view-details-btn ${!hasAuditors(dept.name) ? 'disabled' : ''}`}
+                    onClick={() => hasAuditors(dept.name) && setSelectedDepartment(dept)}
+                    disabled={!hasAuditors(dept.name)}
+                    title={!hasAuditors(dept.name) ? "No auditors assigned to this department" : ""}
                   >
                     View Details
                   </button>
