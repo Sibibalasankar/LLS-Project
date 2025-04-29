@@ -12,7 +12,6 @@ const AuditNcCloser = () => {
     setDecisions(storedDecisions);
   }, []);
 
-  
   const renderDecisionStatus = (reportId) => {
     const status = decisions[reportId];
 
@@ -30,77 +29,42 @@ const AuditNcCloser = () => {
       return false;
     }
   };
-  // Update in AuditNcApproval
-const handleRemoveApproval = (reportId) => {
-  const confirmationMessage = `Are you sure you want to remove approval for this report?`;
-  
-  if (window.confirm(confirmationMessage)) {
-    // Update decision to 'redo'
-    const updatedDecisions = { ...decisions, [reportId]: 'redo' };
-    setDecisions(updatedDecisions);
-    localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
 
-    // Remove from approvedFiles and add to uploadedFiles in localStorage
-    const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-    const fileToRemove = approvedFiles[reportId];
+  const handleDecision = (reportId, action) => {
+    const confirmationMessage = `Are you sure you want to ${action} this report?`;
 
-    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-    uploadedFiles[reportId] = fileToRemove;
-    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+    if (window.confirm(confirmationMessage)) {
+      const updated = {
+        ...decisions,
+        [reportId]: action,
+      };
+      setDecisions(updated);
+      localStorage.setItem('adminDecisions', JSON.stringify(updated));
 
-    // Remove from approvedFiles in localStorage
-    delete approvedFiles[reportId];
-    localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
+      if (action === 'approved') {
+        const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+        const fileToApprove = uploadedFiles[reportId];
+        const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
+        approvedFiles[reportId] = fileToApprove;
+        localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
 
-    // Update state to reflect changes
-    const updatedApprovedFiles = { ...approvedFiles };
-    delete updatedApprovedFiles[reportId];
-    setApprovedFiles(updatedApprovedFiles);
-  }
-};
+        delete uploadedFiles[reportId];
+        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
 
-// Update in AuditNcCloser
-const handleDecision = (reportId, action) => {
-  const confirmationMessage = `Are you sure you want to ${action} this report?`;
+        const updatedSubmitted = { ...submittedFiles };
+        delete updatedSubmitted[reportId];
+        setSubmittedFiles(updatedSubmitted);
+      } else if (action === 'redo') {
+        const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+        delete uploadedFiles[reportId];
+        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
 
-  if (window.confirm(confirmationMessage)) {
-    const updated = {
-      ...decisions,
-      [reportId]: action,
-    };
-    setDecisions(updated);
-    localStorage.setItem('adminDecisions', JSON.stringify(updated));
-
-    if (action === 'approved') {
-      // Move to approved files in localStorage
-      const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-      const fileToApprove = uploadedFiles[reportId];
-      const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-      approvedFiles[reportId] = fileToApprove;
-      localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
-
-      // Remove from uploadedFiles in localStorage
-      delete uploadedFiles[reportId];
-      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-
-      // Remove the row from submittedFiles state
-      const updatedSubmitted = { ...submittedFiles };
-      delete updatedSubmitted[reportId];
-      setSubmittedFiles(updatedSubmitted);
-    } else if (action === 'redo') {
-      // Clear the uploaded file and set status to 'redo'
-      const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-      delete uploadedFiles[reportId];
-      localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-
-      // Update the submitted files state
-      const updatedSubmitted = { ...submittedFiles };
-      delete updatedSubmitted[reportId];
-      setSubmittedFiles(updatedSubmitted);
+        const updatedSubmitted = { ...submittedFiles };
+        delete updatedSubmitted[reportId];
+        setSubmittedFiles(updatedSubmitted);
+      }
     }
-  }
-};
-
+  };
 
   return (
     <div className="container p-4">
@@ -117,7 +81,9 @@ const handleDecision = (reportId, action) => {
               <table className="table table-hover align-middle">
                 <thead className="table-dark">
                   <tr>
-                    <th>Report ID</th>
+                    <th>NCS Number</th>
+                    <th>Department</th>
+                    <th>Audit Cycle</th>
                     <th>File Name</th>
                     <th>View File</th>
                     <th>Decision</th>
@@ -125,14 +91,16 @@ const handleDecision = (reportId, action) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(submittedFiles).map(([reportId, file]) => (
+                  {Object.entries(submittedFiles).map(([reportId, fileData]) => (
                     <tr key={reportId}>
-                      <td>{reportId}</td>
-                      <td>{file.name}</td>
+                      <td>{fileData.ncsNumber || 'N/A'}</td>
+                      <td>{fileData.department || fileData.dptname || 'N/A'}</td>
+                      <td>{fileData.auditCycleNo || 'N/A'}</td>
+                      <td>{fileData.name}</td>
                       <td>
-                        {isValidUrl(file.url) ? (
+                        {isValidUrl(fileData.url) ? (
                           <a
-                            href={file.url}
+                            href={fileData.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-primary"
@@ -162,7 +130,7 @@ const handleDecision = (reportId, action) => {
                         </div>
                       </td>
                       <td>
-                        {isValidUrl(file.url) ? renderDecisionStatus(reportId) : (
+                        {isValidUrl(fileData.url) ? renderDecisionStatus(reportId) : (
                           <span className="badge bg-warning">Pending</span>
                         )}
                       </td>

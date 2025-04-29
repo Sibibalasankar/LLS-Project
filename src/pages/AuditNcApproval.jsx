@@ -3,12 +3,16 @@ import React, { useEffect, useState } from 'react';
 const AuditNcApproval = () => {
   const [approvedFiles, setApprovedFiles] = useState({});
   const [decisions, setDecisions] = useState({});
+  const [filters, setFilters] = useState({
+    department: '',
+    auditCycleNo: '',
+    ncsNumber: '',
+  });
 
   useEffect(() => {
     const storedApprovedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
     const storedDecisions = JSON.parse(localStorage.getItem('adminDecisions')) || {};
 
-    // Log to see if data is being fetched properly from localStorage
     console.log('Stored Approved Files:', storedApprovedFiles);
     console.log('Stored Decisions:', storedDecisions);
 
@@ -20,31 +24,20 @@ const AuditNcApproval = () => {
     const confirmationMessage = `Are you sure you want to remove approval for this report?`;
 
     if (window.confirm(confirmationMessage)) {
-      // Copy the current decisions and files to ensure proper state update
       const updatedDecisions = { ...decisions, [reportId]: 'redo' };
       const updatedApprovedFiles = { ...approvedFiles };
 
-      // Retrieve the file to remove
       const fileToRemove = updatedApprovedFiles[reportId];
-
-      // Log to ensure the file exists before removing
       console.log('File to remove:', fileToRemove);
 
-      // Remove from approvedFiles and add back to uploadedFiles in localStorage
       const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
       uploadedFiles[reportId] = fileToRemove;
 
-      // Remove from approvedFiles in localStorage
       delete updatedApprovedFiles[reportId];
       localStorage.setItem('approvedFiles', JSON.stringify(updatedApprovedFiles));
-
-      // Update decisions in localStorage
       localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
-
-      // Save the updated files in uploadedFiles
       localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
 
-      // Update state to reflect changes
       setApprovedFiles(updatedApprovedFiles);
       setDecisions(updatedDecisions);
     }
@@ -53,16 +46,29 @@ const AuditNcApproval = () => {
   const renderDecisionStatus = (reportId) => {
     const status = decisions[reportId];
 
-    if (status === 'approved') {
-      return <span className="badge bg-success">Approved</span>;
-    }
-    if (status === 'redo') {
-      return <span className="badge bg-danger">Redo Requested</span>;
-    }
+    if (status === 'approved') return <span className="badge bg-success">Approved</span>;
+    if (status === 'redo') return <span className="badge bg-danger">Redo Requested</span>;
     return <span className="badge bg-warning">Pending Review</span>;
   };
 
-  // Log the approvedFiles state to check if it's being correctly populated
+  // Filter the approved files based on filter states
+  const filteredFiles = Object.entries(approvedFiles).filter(([reportId, file]) => {
+    const { department, auditCycleNo, ncsNumber } = filters;
+    const matchesDepartment = department ? file.department?.toLowerCase().includes(department.toLowerCase()) : true;
+    const matchesAuditCycleNo = auditCycleNo ? file.auditCycleNo?.toString().includes(auditCycleNo) : true;
+    const matchesNcsNumber = ncsNumber ? file.ncsNumber?.toString().includes(ncsNumber) : true;
+
+    return matchesDepartment && matchesAuditCycleNo && matchesNcsNumber;
+  });
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   console.log('Approved Files in State:', approvedFiles);
 
   return (
@@ -73,23 +79,63 @@ const AuditNcApproval = () => {
         </div>
 
         <div className="card-body">
-          {Object.keys(approvedFiles).length === 0 ? (
-            <p className="text-muted">No files have been approved yet.</p>
+          <div className="mb-3">
+            <div className="row">
+              <div className="col-md-4">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="department"
+                  placeholder="Filter by Department"
+                  value={filters.department}
+                  onChange={handleFilterChange}
+                />
+              </div>
+              <div className="col-md-4">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="auditCycleNo"
+                  placeholder="Filter by Audit Cycle No"
+                  value={filters.auditCycleNo}
+                  onChange={handleFilterChange}
+                />
+              </div>
+              <div className="col-md-4">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="ncsNumber"
+                  placeholder="Filter by NCR No"
+                  value={filters.ncsNumber}
+                  onChange={handleFilterChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {filteredFiles.length === 0 ? (
+            <p className="text-muted">No files found with the selected filters.</p>
           ) : (
             <div className="table-responsive">
               <table className="table table-hover align-middle">
                 <thead className="table-dark">
                   <tr>
-                    <th>Report ID</th>
+                    <th>NCS Number</th>
+                    <th>Department</th>
+                    <th>Audit Cycle</th>
                     <th>File Name</th>
                     <th>View File</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(approvedFiles).map(([reportId, file]) => (
+                  {filteredFiles.map(([reportId, file]) => (
                     <tr key={reportId}>
-                      <td>{reportId}</td>
+                      <td>{file.ncsNumber || 'N/A'}</td>
+                      <td>{file.department || file.dptname || 'N/A'}</td>
+                      <td>{file.auditCycleNo || 'N/A'}</td>
                       <td>{file.name}</td>
                       <td>
                         <a
@@ -100,6 +146,9 @@ const AuditNcApproval = () => {
                         >
                           View
                         </a>
+                      </td>
+                      <td>
+                        {renderDecisionStatus(reportId)}
                       </td>
                       <td>
                         <button

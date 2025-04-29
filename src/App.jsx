@@ -35,7 +35,7 @@ function App() {
       <Route path="/admin-dashboard/audit-observation" element={<AuditObservation />} />
       <Route path="/admin-dashboard/observation-details/:departmentName" element={<ObservationDetails />} />
       <Route path="/admin-dashboard/action-report" element={<ActionReport />} />
-      <Route path="/action-report" element={<NewActionForm />} />
+      <Route path="/action-report" element={<NewActionForm  />} />
       
       {/* User Routes */}
       <Route path="/user-dashboard" element={<UserDashboard />} />

@@ -1228,45 +1228,29 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     setDecisions(storedDecisions);
   }, []);
 
-  const handleApproval = (reportId) => {
-    const updatedDecisions = { ...decisions, [reportId]: 'approved' };
-    setDecisions(updatedDecisions);
-    localStorage.setItem('adminDecisions', JSON.stringify(updatedDecisions));
 
-    const updatedFiles = { ...uploadedFiles };
-    const fileData = uploadedFiles[reportId];
-
-    if (fileData) {
-      const approvedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-      approvedFiles[reportId] = {
-        name: fileData.name,
-        url: fileData.url,
-        ncsNumber: reports.find(r => r.id === reportId)?.ncsNumber || '',
-        auditCycleNo: reports.find(r => r.id === reportId)?.auditCycleNo || ''
-      };
-      localStorage.setItem('approvedFiles', JSON.stringify(approvedFiles));
-    }
-
-    updatedFiles[reportId] = { ...fileData, status: 'Completed' };
-    setUploadedFiles(updatedFiles);
-    localStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
-  };
 
   const handleFileChange = (e, reportId) => {
     const file = e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
+      const report = reports.find(r => r.id === reportId);
       const updated = {
         ...uploadedFiles,
         [reportId]: {
           name: file.name,
           url: url,
+          ncsNumber: report?.ncsNumber || '',
+          auditCycleNo: report?.auditCycleNo || '',
+          department: report?.dptname || ''  // Add department information
         },
       };
       setUploadedFiles(updated);
       updateLocalStorage(updated);
     }
   };
+  
+  
 
   const handleClearUpload = (reportId) => {
     const updated = { ...uploadedFiles };

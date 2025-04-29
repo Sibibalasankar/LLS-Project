@@ -1300,7 +1300,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         <table className="reports-table">
           <thead>
             <tr>
-              <th>NRS Number</th>
+              <th>NCR Number</th>
               <th>Department</th>
               <th>Audit Cycle No.</th>
               <th>Audit Date</th>
