@@ -298,3 +298,13 @@
     padding: 1rem;
   }
 }
+.header-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-right: 15px;
+  cursor: default;
+}
+.icon-container {
+  display: flex;
+  align-items: center;
+}

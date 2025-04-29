@@ -15,6 +15,9 @@ import AuditSummary from "./AuditSummary";
 import ISOManual from "./ISOManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import NotificationsPage from "./NotificationsPage";
+import UserProfile from "./UserProfile";
+
+
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -24,7 +27,7 @@ const Dashboard = () => {
   const [notifications, setNotifications] = useState([]); // Add notifications state
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const navigate = useNavigate();
-  
+
 
   // Function to reset to welcome view
   const resetToWelcome = () => {
@@ -99,17 +102,23 @@ const Dashboard = () => {
             </h1>
           </div>
           <div className="header-right">
+            <div className="icon-container" onClick={() => setActiveComponent("user-profile")}>
+              <i className="bi bi-person-circle header-icon" style={{ cursor: "pointer" }}></i>
+            </div>
+
+
             <div className="notification-icon-container" onClick={toggleNotifications}>
               <i className="bi bi-bell notification-icon"></i>
               {hasUnreadNotifications && <span className="notification-badge"></span>}
             </div>
+
             <button className="logout-btn" onClick={() => {
               if (window.confirm("Are you sure you want to logout?")) navigate("/login");
-            }}
-            >
+            }}>
               Logout
             </button>
           </div>
+
         </div>
       </header>
 
@@ -222,9 +231,11 @@ const Dashboard = () => {
           {activeComponent === "audit-nc-approval" && <AuditNCApproval />}
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
+          {activeComponent === "user-profile" && <UserProfile />}
 
           {!activeComponent && !showNotifications && <WelcomeMessage />}
         </main>
+
 
         {/* Notification Panel */}
         {showNotifications && (

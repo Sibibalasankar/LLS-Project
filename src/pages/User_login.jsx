@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/styles/Admin_login.css";
 
+
 const User_login = () => {
   const navigate = useNavigate();
 
@@ -57,7 +58,7 @@ const User_login = () => {
           setCurrentRequestId(null);
           navigate("/user-dashboard", { replace: true });
         }
-      } 
+      }
       else if (currentRequest.status === "rejected") {
         clearInterval(interval);
         if (isMounted) {
@@ -76,12 +77,18 @@ const User_login = () => {
     };
   }, [isRequestSubmitted, currentRequestId, navigate]);
 
-  const USER_USERNAME = "user";
-  const USER_PASSWORD = "user@123";
-
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username === USER_USERNAME && password === USER_PASSWORD) {
+
+    // Get stored users from localStorage
+    const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+
+    // Check if credentials match any user
+    const user = storedUsers.find(
+      user => user.username === username && user.password === password
+    );
+
+    if (user) {
       setError("");
       setStage("form");
     } else {
@@ -159,7 +166,7 @@ const User_login = () => {
           <div className="form_div">
             <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Request Access</h3>
 
-            <label htmlFor="department" style={{color:'white'}}>Select Department:</label>
+            <label htmlFor="department" style={{ color: 'white' }}>Select Department:</label>
             <select
               id="department"
               value={selectedDept}
@@ -192,20 +199,20 @@ const User_login = () => {
             </div>
 
             <div className="modal-buttons">
-              <button 
-                className="user_login_btn" 
+              <button
+                className="user_login_btn"
                 onClick={handleRequest}
                 disabled={isRequestSubmitted}
               >
                 {isRequestSubmitted ? "Waiting for admin response..." : "Request"}
               </button>
-              <button 
-                className="back_button" 
+              <button
+                className="back_button"
                 onClick={() => navigate("/user-login")}
-                disabled={isRequestSubmitted}
               >
                 <i className="bi bi-arrow-left"></i> Back
               </button>
+
             </div>
           </div>
         )}
