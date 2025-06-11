@@ -17,17 +17,15 @@ import companyLogo from "../assets/images/lls_logo.png";
 import NotificationsPage from "./NotificationsPage";
 import UserProfile from "./UserProfile";
 
-
-
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [showAuditPlan, setShowAuditPlan] = useState(false);
   const [showAuditCheckList, setShowAuditCheckList] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]); // Add notifications state
+  const [notifications, setNotifications] = useState([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-
 
   // Function to reset to welcome view
   const resetToWelcome = () => {
@@ -69,6 +67,15 @@ const Dashboard = () => {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleMenuItemClick = (component) => {
+    setActiveComponent(component);
+    setIsMobileMenuOpen(false); // Close mobile menu when an item is selected
+  };
+
   // Simulate receiving a new notification
   useEffect(() => {
     const notificationInterval = setInterval(() => {
@@ -92,6 +99,9 @@ const Dashboard = () => {
       <header className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
+            <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
+              <i className="bi bi-list"></i>
+            </button>
             <img src={companyLogo} alt="Company Logo" className="header-logo" />
             <h1
               className="header-title"
@@ -102,10 +112,9 @@ const Dashboard = () => {
             </h1>
           </div>
           <div className="header-right">
-            <div className="icon-container" onClick={() => setActiveComponent("user-profile")}>
+            <div className="icon-container" onClick={() => handleMenuItemClick("user-profile")}>
               <i className="bi bi-person-circle header-icon" style={{ cursor: "pointer" }}></i>
             </div>
-
 
             <div className="notification-icon-container" onClick={toggleNotifications}>
               <i className="bi bi-bell notification-icon"></i>
@@ -118,24 +127,23 @@ const Dashboard = () => {
               Logout
             </button>
           </div>
-
         </div>
       </header>
 
       {/* Main Content Area */}
       <div className="dashboard-main">
         {/* Sidebar Navigation */}
-        <nav className="dashboard-sidebar">
+        <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <div className="sidebar-menu">
             <button
               className={`menu-btn ${activeComponent === "auditor-list" ? "active" : ""}`}
-              onClick={() => setActiveComponent("auditor-list")}
+              onClick={() => handleMenuItemClick("auditor-list")}
             >
               Auditor List
             </button>
             <button
               className={`menu-btn ${activeComponent === "department-list" ? "active" : ""}`}
-              onClick={() => setActiveComponent("department-list")}
+              onClick={() => handleMenuItemClick("department-list")}
             >
               Department List
             </button>
@@ -152,19 +160,19 @@ const Dashboard = () => {
                 <div className="submenu">
                   <button
                     className={`submenu-btn ${activeComponent === "audit-plan-creation" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-plan-creation")}
+                    onClick={() => handleMenuItemClick("audit-plan-creation")}
                   >
                     Audit Plan Creation
                   </button>
                   <button
                     className={`submenu-btn ${activeComponent === "audit-plan-sheet" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-plan-sheet")}
+                    onClick={() => handleMenuItemClick("audit-plan-sheet")}
                   >
                     Audit Plan Sheet
                   </button>
                   <button
                     className={`submenu-btn ${activeComponent === "audit-intimation-mail" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-intimation-mail")}
+                    onClick={() => handleMenuItemClick("audit-intimation-mail")}
                   >
                     Audit Intimation Mail
                   </button>
@@ -184,19 +192,19 @@ const Dashboard = () => {
                 <div className="submenu">
                   <button
                     className={`submenu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-observation")}
+                    onClick={() => handleMenuItemClick("audit-observation")}
                   >
                     Audit Observation
                   </button>
                   <button
                     className={`submenu-btn ${activeComponent === "audit-nc-closer" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-nc-closer")}
+                    onClick={() => handleMenuItemClick("audit-nc-closer")}
                   >
                     Audit NC Closer
                   </button>
                   <button
                     className={`submenu-btn ${activeComponent === "audit-nc-approval" ? "active" : ""}`}
-                    onClick={() => setActiveComponent("audit-nc-approval")}
+                    onClick={() => handleMenuItemClick("audit-nc-approval")}
                   >
                     Audit NC Approval
                   </button>
@@ -206,13 +214,13 @@ const Dashboard = () => {
 
             <button
               className={`menu-btn ${activeComponent === "audit-summary" ? "active" : ""}`}
-              onClick={() => setActiveComponent("audit-summary")}
+              onClick={() => handleMenuItemClick("audit-summary")}
             >
               Audit Summary Report
             </button>
             <button
               className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
-              onClick={() => setActiveComponent("iso-manual")}
+              onClick={() => handleMenuItemClick("iso-manual")}
             >
               ISO 9001-2015 Manual
             </button>
@@ -236,12 +244,11 @@ const Dashboard = () => {
           {!activeComponent && !showNotifications && <WelcomeMessage />}
         </main>
 
-
         {/* Notification Panel */}
         {showNotifications && (
           <div className="notification-panel">
             <NotificationsPage
-              notifications={notifications} // Pass notifications to NotificationsPage
+              notifications={notifications}
               onClose={() => setShowNotifications(false)}
               onNewNotification={() => setHasUnreadNotifications(true)}
             />
