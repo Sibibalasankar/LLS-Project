@@ -304,10 +304,12 @@
 @media (max-width: 992px) {
   .dashboard-header {
     padding: 0.5rem;
+    position: relative;
   }
   
   .header-content {
     padding: 0;
+
   }
   
   .header-left {
@@ -327,6 +329,8 @@
   
   .mobile-menu-btn {
     display: block;
+    position: absolute;
+    left: 10px;
   }
   
   .mobile-menu-items {
