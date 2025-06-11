@@ -38,3 +38,9 @@ h2 {
   word-spacing: 10px;
   margin-left: 50px;
 }
+
+@media (max-width: 425px) {
+  .Nav_bar{
+    visibility: hidden;
+  }
+}
