@@ -27,7 +27,6 @@ const Dashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Function to reset to welcome view
   const resetToWelcome = () => {
     setActiveComponent(null);
     setShowAuditPlan(false);
@@ -65,6 +64,7 @@ const Dashboard = () => {
     if (hasUnreadNotifications && !showNotifications) {
       setHasUnreadNotifications(false);
     }
+    setIsMobileMenuOpen(false);
   };
 
   const toggleMobileMenu = () => {
@@ -73,10 +73,9 @@ const Dashboard = () => {
 
   const handleMenuItemClick = (component) => {
     setActiveComponent(component);
-    setIsMobileMenuOpen(false); // Close mobile menu when an item is selected
+    setIsMobileMenuOpen(false);
   };
 
-  // Simulate receiving a new notification
   useEffect(() => {
     const notificationInterval = setInterval(() => {
       const newNotification = {
@@ -88,14 +87,19 @@ const Dashboard = () => {
         newNotification,
       ]);
       setHasUnreadNotifications(true);
-    }, 30000); // Check every 30 seconds
+    }, 30000);
 
     return () => clearInterval(notificationInterval);
   }, []);
 
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="dashboard-container">
-      {/* Top Navigation Bar */}
       <header className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
@@ -121,18 +125,14 @@ const Dashboard = () => {
               {hasUnreadNotifications && <span className="notification-badge"></span>}
             </div>
 
-            <button className="logout-btn" onClick={() => {
-              if (window.confirm("Are you sure you want to logout?")) navigate("/login");
-            }}>
+            <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
       <div className="dashboard-main">
-        {/* Sidebar Navigation */}
         <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <div className="sidebar-menu">
             <button
@@ -148,7 +148,6 @@ const Dashboard = () => {
               Department List
             </button>
 
-            {/* Audit Plan Section */}
             <div className="menu-section">
               <button
                 className={`menu-btn ${showAuditPlan ? "active" : ""}`}
@@ -180,7 +179,6 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Audit Check List Section */}
             <div className="menu-section">
               <button
                 className={`menu-btn ${showAuditCheckList ? "active" : ""}`}
@@ -224,10 +222,27 @@ const Dashboard = () => {
             >
               ISO 9001-2015 Manual
             </button>
+
+            <div className="mobile-menu-items">
+              <div className="mobile-menu-item" onClick={() => handleMenuItemClick("user-profile")}>
+                <i className="bi bi-person-circle"></i>
+                <span>Profile</span>
+              </div>
+              
+              <div className="mobile-menu-item" onClick={toggleNotifications}>
+                <i className="bi bi-bell"></i>
+                <span>Notifications</span>
+                {hasUnreadNotifications && <span className="notification-badge"></span>}
+              </div>
+              
+              <div className="mobile-menu-item" onClick={handleLogout}>
+                <i className="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+              </div>
+            </div>
           </div>
         </nav>
 
-        {/* Main Content Display */}
         <main className="dashboard-content">
           {activeComponent === "auditor-list" && <AuditorList />}
           {activeComponent === "department-list" && <DepartmentList />}
@@ -244,7 +259,6 @@ const Dashboard = () => {
           {!activeComponent && !showNotifications && <WelcomeMessage />}
         </main>
 
-        {/* Notification Panel */}
         {showNotifications && (
           <div className="notification-panel">
             <NotificationsPage
