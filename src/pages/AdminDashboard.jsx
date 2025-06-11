@@ -12,7 +12,7 @@ import AuditObservation from "./AuditObservation";
 import AuditNCCloser from "./AuditNcCloser";
 import AuditNCApproval from "./AuditNcApproval";
 import AuditSummary from "./AuditSummary";
-import ISOManual from "./ISOManual";
+import ISOManual from "./IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import NotificationsPage from "./NotificationsPage";
 import UserProfile from "./UserProfile";
