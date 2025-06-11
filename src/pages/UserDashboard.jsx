@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/styles/Dashboard.css";
+import "../assets/styles/UserDashboard.css";
 import AuditObservation from "./UserAuditObservation";
 import UserAuditNcCloser from "../pages/UserAuditNcCloser";
 import UserAuditPlanSheet from "./UserAuditPlanSheet";
 import ISOManual from "../pages/IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
-import AuditNcUserView from "../pages/AuditNcUserView"; // ✅ added
+import AuditNcUserView from "../pages/AuditNcUserView";
 
 const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [accessApproved, setAccessApproved] = useState(true);
   const [userPermissions, setUserPermissions] = useState([]);
   const [userDepartment, setUserDepartment] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const WelcomeMessage = () => {
@@ -95,10 +96,14 @@ const UserDashboard = () => {
       case "iso-manual":
         return userPermissions.includes("isoManual") && <ISOManual />;
       case "user-nc-user-view":
-        return userPermissions.includes("auditNcUserView") && <AuditNcUserView />; // ✅
+        return userPermissions.includes("auditNcUserView") && <AuditNcUserView />;
       default:
         return <WelcomeMessage />;
     }
+  };
+
+  const handleLogout = () => {
+    navigate("/login");
   };
 
   return (
@@ -106,29 +111,38 @@ const UserDashboard = () => {
       <header className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
+            <button 
+              className="mobile-menu-btn" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              ☰
+            </button>
             <img src={companyLogo} alt="Company Logo" className="header-logo" />
             <div>
               <h1 className="header-title">LLS Audit Management System</h1>
               {userDepartment && (
-                <p className="department-info" style={{ fontSize: "14px", color: "#ccc" }}>
+                <p className="department-info">
                   Department: {userDepartment}
                 </p>
               )}
             </div>
           </div>
-          <button className="logout-btn" onClick={() => navigate("/login")}>
+          <button className="logout-btn desktop-logout" onClick={handleLogout}>
             Logout
           </button>
         </div>
       </header>
 
       <div className="dashboard-main">
-        <nav className="dashboard-sidebar">
+        <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <div className="sidebar-menu">
             {userPermissions.includes("auditPlanSheet") && (
               <button
                 className={`menu-btn ${activeComponent === "audit-plan-sheet" ? "active" : ""}`}
-                onClick={() => setActiveComponent("audit-plan-sheet")}
+                onClick={() => {
+                  setActiveComponent("audit-plan-sheet");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 Audit Plan Sheet
               </button>
@@ -136,7 +150,10 @@ const UserDashboard = () => {
             {userPermissions.includes("auditObservation") && (
               <button
                 className={`menu-btn ${activeComponent === "audit-observation" ? "active" : ""}`}
-                onClick={() => setActiveComponent("audit-observation")}
+                onClick={() => {
+                  setActiveComponent("audit-observation");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 Audit Observation
               </button>
@@ -144,7 +161,10 @@ const UserDashboard = () => {
             {userPermissions.includes("auditNCCloser") && (
               <button
                 className={`menu-btn ${activeComponent === "audit-nc-closer" ? "active" : ""}`}
-                onClick={() => setActiveComponent("audit-nc-closer")}
+                onClick={() => {
+                  setActiveComponent("audit-nc-closer");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 Audit NC Closer
               </button>
@@ -152,7 +172,10 @@ const UserDashboard = () => {
             {userPermissions.includes("auditNCApproval") && (
               <button
                 className={`menu-btn ${activeComponent === "user-audit-nc-view" ? "active" : ""}`}
-                onClick={() => setActiveComponent("user-audit-nc-view")}
+                onClick={() => {
+                  setActiveComponent("user-audit-nc-view");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 Audit NC Approval
               </button>
@@ -160,7 +183,10 @@ const UserDashboard = () => {
             {userPermissions.includes("isoManual") && (
               <button
                 className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
-                onClick={() => setActiveComponent("iso-manual")}
+                onClick={() => {
+                  setActiveComponent("iso-manual");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 ISO 9001-2015 Manual
               </button>
@@ -168,11 +194,20 @@ const UserDashboard = () => {
             {userPermissions.includes("auditNcUserView") && (
               <button
                 className={`menu-btn ${activeComponent === "audit-nc-user-view" ? "active" : ""}`}
-                onClick={() => navigate("/user-dashboard/user-audit-nc-view")} // Navigate to Audit NC User View
+                onClick={() => {
+                  navigate("/user-dashboard/user-audit-nc-view");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 View Action Reports
               </button>
             )}
+            <button
+              className="menu-btn mobile-logout"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           </div>
         </nav>
 
