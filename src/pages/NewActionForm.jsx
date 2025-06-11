@@ -1183,6 +1183,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
             <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
             Print Report
           </button>
+          <button type="button" className="submit-btns" style={{ width: "100px" }} onClick={onEdit}>Edit</button>
 
           <button
             className="download-pdf-btn"
@@ -1249,8 +1250,8 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
       updateLocalStorage(updated);
     }
   };
-  
-  
+
+
 
   const handleClearUpload = (reportId) => {
     const updated = { ...uploadedFiles };

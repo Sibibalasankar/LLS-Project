@@ -82,6 +82,7 @@ const ObservationDetails = ({ departmentName, onClose }) => {
                         >
                           View
                         </Button>
+                        
                       </td>
                     </tr>
                   ))}
