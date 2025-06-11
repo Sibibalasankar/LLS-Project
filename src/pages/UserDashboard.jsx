@@ -4,7 +4,7 @@ import "../assets/styles/Dashboard.css";
 import AuditObservation from "./UserAuditObservation";
 import UserAuditNcCloser from "../pages/UserAuditNcCloser";
 import UserAuditPlanSheet from "./UserAuditPlanSheet";
-import ISOManual from "../pages/ISOManual";
+import ISOManual from "../pages/IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import AuditNcUserView from "../pages/AuditNcUserView"; // ✅ added
 
