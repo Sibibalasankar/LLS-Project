@@ -13,10 +13,12 @@ const Login = () => {
 
   return (
     <>
-      <Header />
+      <Header/>
       <div className="login-container">
+        
         <div className="login-background"></div>
         <div className="login-content">
+          
           <h1 className="login-title">Welcome to LSS</h1>
           <p className="login-subtitle">Please select your role to continue</p>
           <div className="login-buttons">
@@ -26,6 +28,7 @@ const Login = () => {
             >
               Admin Login
             </button>
+            
             <button 
               className="login-btn user-btn" 
               onClick={() => handleLogin("user")}

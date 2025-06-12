@@ -7,65 +7,84 @@ const Admin_login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Hardcoded Admin Credentials
   const ADMIN_USERNAME = "admin";
   const ADMIN_PASSWORD = "admin@123";
 
-  // Handle Form Submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setIsLoading(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       setError("");
-
-      // Directly navigate to the admin dashboard without storing any tokens
-      alert("Login Successful!");
+      setIsLoading(false);
       navigate("/admin-dashboard", { replace: true });
     } else {
       setError("Invalid username or password!");
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container-fluid main_login_div">
-      <div className="form_div">
-        <div className="login_title">
-          <p className="login_subtitle">Admin Login</p>
+    <div className="admin-login-container">
+      <div className="admin-login-card">
+        <div className="admin-login-header">
+          <h2>Admin Portal</h2>
+          <p>Enter your credentials to access the dashboard</p>
         </div>
 
-        <form className="form_elements" onSubmit={handleSubmit}>
-          <label htmlFor="admin-username" style={{ color: "white" }}>
-            Username
-          </label>
-          <input
-            type="text"
-            id="admin-username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <label htmlFor="admin-password" style={{ color: "white" }}>
-            Password
-          </label>
-          <input
-            type="password"
-            id="admin-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-          <button type="submit" className="user_login_btn">
-            Submit
+        <form className="admin-login-form" onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="admin-username">Username</label>
+            <input
+              type="text"
+              id="admin-username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder="Enter admin username"
+              autoComplete="username"
+            />
+          </div>
+          
+          <div className="input-group">
+            <label htmlFor="admin-password">Password</label>
+            <input
+              type="password"
+              id="admin-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
+          </div>
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? <div className="spinner"></div> : "Sign In"}
           </button>
 
-          {/* Back Button */}
-          <div className="back_button" onClick={() => navigate("/login")}>
-            <i className="bi bi-arrow-left"></i> Back
+          <div className="login-footer">
+            <button 
+              type="button" 
+              className="back-button" 
+              onClick={() => navigate("/login")}
+            >
+              <i className="bi bi-arrow-left"></i> Back to Login
+            </button>
           </div>
         </form>
-        
       </div>
     </div>
   );

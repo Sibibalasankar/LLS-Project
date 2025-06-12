@@ -9,10 +9,8 @@ const AuditNcCloser = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const event = new CustomEvent("changeDashboardView", { detail: "action-report" });
-    window.dispatchEvent(event);
-  };
-
+  window.open('/admin-dashboard/action-report', '_blank');
+};
 
 
   useEffect(() => {

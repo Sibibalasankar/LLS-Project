@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Alias for the "src" folder
+      '@': path.resolve(__dirname, './src'),
     },
+  },
+  server: {
+    allowedHosts: ['3bd7-103-186-233-90.ngrok-free.app'], // 👈 Add this line
   },
 });

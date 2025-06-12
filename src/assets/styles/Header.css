@@ -15,6 +15,7 @@
   margin-top: 25px;
   font-family: "Cinzel", serif;
   position: absolute;
+  z-index:1000 ;
 }
 
 .child_bar {
@@ -39,7 +40,7 @@ h2 {
   margin-left: 50px;
 }
 
-@media (max-width: 425px) {
+@media (max-width: 555px) {
   .Nav_bar{
     visibility: hidden;
   }
