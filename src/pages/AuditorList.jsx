@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import "../assets/styles/AuditorList.css";
 
 const designations = [
-  "Cheif Engineer",
+  "Chief Engineer",
   "Supervisor",
   "Engineer",
 ];
@@ -15,13 +16,9 @@ const AuditorList = () => {
   const [formData, setFormData] = useState({
     name: "",
     employeeNumber: "",
-    certifiedDate: "",
-    certifiedOnName: "", // <-- New field
-    mailID: "",
-    designation: "",
     department: "",
+    certifiedOnName: "",
   });
-
   const [filters, setFilters] = useState({ department: "", designation: "" });
 
   useEffect(() => {
@@ -31,6 +28,24 @@ const AuditorList = () => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
     setDepartments(storedDepartments.map((dept) => dept.name));
   }, []);
+
+  // Lookup employee name when employee number changes
+  useEffect(() => {
+    if (formData.employeeNumber && formData.employeeNumber.length >= 3) {
+      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+      const foundUser = storedUsers.find(
+        (user) => user.empId === formData.employeeNumber
+      );
+      
+      if (foundUser) {
+        setFormData((prev) => ({
+          ...prev,
+          name: foundUser.empName,
+          department: prev.department || foundUser.department
+        }));
+      }
+    }
+  }, [formData.employeeNumber]);
 
   const saveToLocalStorage = (auditors) => {
     localStorage.setItem("auditors", JSON.stringify(auditors));
@@ -48,6 +63,22 @@ const AuditorList = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleEmployeeNumberBlur = () => {
+    if (formData.employeeNumber) {
+      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+      const foundUser = storedUsers.find(
+        (user) => user.empId === formData.employeeNumber
+      );
+      if (foundUser) {
+        setFormData((prev) => ({
+          ...prev,
+          name: foundUser.empName,
+          department: prev.department || foundUser.department
+        }));
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -69,10 +100,8 @@ const AuditorList = () => {
     setFormData({
       name: "",
       employeeNumber: "",
-      certifiedDate: "",
-      mailID: "",
-      designation: "",
       department: "",
+      certifiedOnName: "",
     });
   };
 
@@ -119,19 +148,6 @@ const AuditorList = () => {
             </option>
           ))}
         </select>
-
-        <select
-          name="designation"
-          value={filters.designation}
-          onChange={handleFilterChange}
-        >
-          <option value="">All Designations</option>
-          {designations.map((designation, index) => (
-            <option key={index} value={designation}>
-              {designation}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="auditor-table-wrapper">
@@ -139,13 +155,10 @@ const AuditorList = () => {
           <thead>
             <tr>
               <th>S.no</th>
-              <th>Name</th>
               <th>Employee Number</th>
-              <th>Certified Date</th>
-              <th>Certified On (Name)</th>
-              <th>Mail ID</th>
-              <th>Department</th>
-              <th>Designation</th>
+              <th>Auditor Name</th>
+              <th>Department to Audit</th>
+              <th>Auditee</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -155,13 +168,10 @@ const AuditorList = () => {
               filteredAuditors.map((auditor, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{auditor.name}</td>
                   <td>{auditor.employeeNumber}</td>
-                  <td>{auditor.certifiedDate}</td>
-                  <td>{auditor.certifiedOnName}</td>
-                  <td>{auditor.mailID}</td>
+                  <td>{auditor.name}</td>
                   <td>{auditor.department}</td>
-                  <td>{auditor.designation}</td>
+                  <td>{auditor.certifiedOnName}</td>
                   <td>
                     <button
                       className="edit-btn"
@@ -184,7 +194,7 @@ const AuditorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="no-records">
+                <td colSpan="6" className="no-records">
                   No Records
                 </td>
               </tr>
@@ -198,78 +208,62 @@ const AuditorList = () => {
           <div className="popup-form">
             <h3>{editingIndex !== null ? "Edit Auditor" : "Add Auditor"}</h3>
             <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Name"
-                required
-              />
-              <input
-                type="text"
-                name="employeeNumber"
-                value={formData.employeeNumber}
-                onChange={handleChange}
-                placeholder="Employee Number"
-                required
-              />
-              <input
-                type="date"
-                name="certifiedDate"
-                value={formData.certifiedDate}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="certifiedOnName"
-                value={formData.certifiedOnName}
-                onChange={handleChange}
-                placeholder="Certified On (Name)"
-                required
-              />
+              <div className="form-group">
+                <label>Employee Number</label>
+                <input
+                  type="text"
+                  name="employeeNumber"
+                  value={formData.employeeNumber}
+                  onChange={handleChange}
+                  onBlur={handleEmployeeNumberBlur}
+                  placeholder="Employee Number"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Auditor Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Auditor Name"
+                  required
+                  className={formData.employeeNumber && formData.name ? "auto-filled" : ""}
+                />
+              </div>
 
-              <input
-                type="email"
-                name="mailID"
-                value={formData.mailID}
-                onChange={handleChange}
-                placeholder="Mail ID"
-                required
-              />
-
-              <select
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>
-                  Select Department
-                </option>
-                {departments.map((dept, index) => (
-                  <option key={index} value={dept}>
-                    {dept}
+              <div className="form-group">
+                <label>Department to Audit</label>
+                <select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="" disabled>
+                    Select Department to Audit
                   </option>
-                ))}
-              </select>
+                  {departments.map((dept, index) => (
+                    <option key={index} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <select
-                name="designation"
-                value={formData.designation}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>
-                  Select Designation
-                </option>
-                {designations.map((designation, index) => (
-                  <option key={index} value={designation}>
-                    {designation}
-                  </option>
-                ))}
-              </select>
+              <div className="form-group">
+                <label>Auditee Name</label>
+                <input
+                  type="text"
+                  name="certifiedOnName"
+                  value={formData.certifiedOnName}
+                  onChange={handleChange}
+                  placeholder="Auditee Name"
+                  required
+                />
+              </div>
 
               <div className="form-buttons">
                 <button

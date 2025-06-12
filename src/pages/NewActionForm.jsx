@@ -1346,7 +1346,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                           </button>
                         </td>
                         <td className="align-middle">
-                          <div className="input-group input-group-sm">
+                          <div className=" input-group-sm int-box">
                             {fileData ? (
                               <>
                                 <a

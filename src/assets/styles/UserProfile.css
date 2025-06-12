@@ -74,7 +74,7 @@ body {
 
 .search-icon {
   position: absolute;
-  left: 1rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--gray-color);
@@ -393,14 +393,15 @@ body {
 .icon-button {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 10%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: var(--transition);
   border: none;
-  color: var(--white);
+  color: white;
+  background-color: #6c757d;
 }
 
 .icon-button:hover {
@@ -493,4 +494,22 @@ body {
   .title {
     font-size: 1.5rem;
   }
+}
+.tabs{
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.tab-button{
+border:1px solid #27272985;
+  width: 300px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  
+}
+.tab-button:hover{
+  background-color: #2855553d;
+  color: #ffffff;
+  width: 300px;
+  
 }

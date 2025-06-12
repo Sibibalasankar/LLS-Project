@@ -128,7 +128,7 @@ const Dashboard = () => {
           </div>
           <div className="header-right">
             <div className="icon-container" onClick={() => handleMenuItemClick("user-profile")}>
-              <i className="bi bi-person-circle header-icon" style={{ cursor: "pointer" }}></i>
+              <i className="bi bi-person-circle header-icons" style={{ cursor: "pointer" }}></i>
             </div>
 
             <div className="notification-icon-container" onClick={toggleNotifications}>
