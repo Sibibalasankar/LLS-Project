@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import "../assets/styles/AuditNcCloser.css"; // Assuming you have a CSS file for styles
+import { useNavigate } from 'react-router-dom';
+
 
 const AuditNcCloser = () => {
   const [submittedFiles, setSubmittedFiles] = useState({});
   const [decisions, setDecisions] = useState({});
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    const event = new CustomEvent("changeDashboardView", { detail: "action-report" });
+    window.dispatchEvent(event);
+  };
+
+
 
   useEffect(() => {
     const files = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
@@ -69,8 +80,11 @@ const AuditNcCloser = () => {
   return (
     <div className="container p-4">
       <div className="card shadow">
-        <div className="card-header bg-white">
+        <div className="card-header bg-white top-head-btn">
           <h4 className="mb-0">Audit NC Closer – Submitted Evidence</h4>
+          <button className='nc-btn' onClick={handleClick}>
+            NC Forms
+          </button>
         </div>
 
         <div className="card-body">

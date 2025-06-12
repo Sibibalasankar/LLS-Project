@@ -4,6 +4,7 @@ import "../assets/styles/Dashboard.css";
 
 // Import all pages
 import AuditorList from "./AuditorList";
+import ActionReport from "./ActionReport";
 import DepartmentList from "./DepartmentList";
 import AuditPlanCreation from "./AuditPlanCreation";
 import AuditPlanSheet from "./AuditPlanSheet";
@@ -44,6 +45,16 @@ const Dashboard = () => {
 
       return () => clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+      const handleViewChange = (e) => {
+        setActiveComponent(e.detail);
+      };
+
+      window.addEventListener("changeDashboardView", handleViewChange);
+      return () => window.removeEventListener("changeDashboardView", handleViewChange);
+    }, []);
+
 
     const formattedDate = currentTime.toLocaleDateString();
     const formattedTime = currentTime.toLocaleTimeString();
@@ -216,25 +227,32 @@ const Dashboard = () => {
             >
               Audit Summary Report
             </button>
+             <button
+              className={`menu-btn ${activeComponent === "action-report" ? "active" : ""}`}
+              onClick={() => handleMenuItemClick("action-report")}
+            >
+             All Department NC
+            </button>
             <button
               className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
               onClick={() => handleMenuItemClick("iso-manual")}
             >
               ISO 9001-2015 Manual
             </button>
+           
 
             <div className="mobile-menu-items">
               <div className="mobile-menu-item" onClick={() => handleMenuItemClick("user-profile")}>
                 <i className="bi bi-person-circle"></i>
                 <span>Profile</span>
               </div>
-              
+
               <div className="mobile-menu-item" onClick={toggleNotifications}>
                 <i className="bi bi-bell"></i>
                 <span>Notifications</span>
                 {hasUnreadNotifications && <span className="notification-badge"></span>}
               </div>
-              
+
               <div className="mobile-menu-item" onClick={handleLogout}>
                 <i className="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
@@ -255,6 +273,8 @@ const Dashboard = () => {
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
           {activeComponent === "user-profile" && <UserProfile />}
+          {activeComponent === "action-report" && <ActionReport />}
+
 
           {!activeComponent && !showNotifications && <WelcomeMessage />}
         </main>

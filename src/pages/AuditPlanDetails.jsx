@@ -313,11 +313,11 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 onChange={handleChange}
               >
                 <option value="">Select Time Duration</option>
-                <option value="1 Month">1 Month</option>
-                <option value="3 Months">3 Months</option>
-                <option value="6 Months">6 Months</option>
-                <option value="1 Year">1 Year</option>
-                <option value="2 Years">2 Years</option>
+                <option value="1 Hrs">1 Hrs</option>
+                <option value="2 Hrs">2 Hrs</option>
+                <option value="3 Hrs">3 Hrs</option>
+                <option value="4 Hrs">4 Hrs</option>
+                <option value="5 Hrs">5 Hrs</option>
               </select>
 
               <div className="processes-container">

@@ -1,0 +1,10 @@
+.top-head-btn{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.nc-btn{
+    padding:0px 10px;
+    background-color: rgb(252, 214, 1);
+    color: black;
+}
