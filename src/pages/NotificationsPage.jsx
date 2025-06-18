@@ -194,7 +194,7 @@ const NotificationsPage = ({ onClose }) => {
               )}
             </div>
           </div>
-          <div className="header-right">
+          <div className="header-rights">
             <div className="action-group">
               <button 
                 onClick={fetchAllNotifications} 
