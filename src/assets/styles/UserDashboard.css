@@ -325,3 +325,154 @@ padding: 10px;
     display: none;
   }
 }
+/* Enhanced Welcome Container Styles */
+.welcome-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #2e3191, #1b9ce2);
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.welcome-header h1 {
+  font-size: 2.2rem;
+  color: #2e3191;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.highlight {
+  color: #1b9ce2;
+  font-weight: 700;
+}
+
+.designation {
+  font-size: 1.1rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.employee-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.8rem;
+  margin: 3rem 0;
+}
+
+.info-card {
+  background: #f8f9ff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(46, 49, 145, 0.08);
+  border: 1px solid rgba(46, 49, 145, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(46, 49, 145, 0.15);
+}
+
+.info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #2e3191, #1b9ce2);
+}
+
+.info-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2e3191;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.time-display {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  font-size: 1.2rem;
+  color: #495057;
+  background: #f8f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(46, 49, 145, 0.1);
+}
+
+.time-display span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date::before {
+  content: '📅';
+  margin-right: 0.5rem;
+}
+
+.time::before {
+  content: '⏰';
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .welcome-container {
+    padding: 1.8rem;
+  }
+  
+  .welcome-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .employee-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin: 2rem 0;
+  }
+  
+  .time-display {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+  }
+}

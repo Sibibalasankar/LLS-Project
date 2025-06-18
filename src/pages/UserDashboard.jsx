@@ -29,40 +29,71 @@ const UserDashboard = () => {
       return () => clearInterval(intervalId);
     }, []);
 
+    const formatDate = (dateString) => {
+      if (!dateString) return "Not certified";
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    };
+
     return (
       <div className="welcome-container">
         <div className="welcome-header">
           <h1>Welcome back, <span className="highlight">{employeeData.empName}</span></h1>
           {employeeData.designation && (
-            <p className="designation"> ( {employeeData.designation} )</p>
+            <p className="designation">{employeeData.designation}</p>
           )}
         </div>
-        
+
         <div className="employee-info-grid">
           <div className="info-card">
             <span className="info-label">Employee ID</span>
-            <span className="info-value">{employeeData.empId}</span>
+            <span className="info-value">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#2e3191" />
+              </svg>
+              {employeeData.empId}
+            </span>
           </div>
           <div className="info-card">
             <span className="info-label">Department</span>
-            <span className="info-value">{employeeData.department}</span>
+            <span className="info-value">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 18H5V16H8V18ZM8 13H5V11H8V13ZM8 8H5V6H8V8ZM13.5 18H10.5V16H13.5V18ZM13.5 13H10.5V11H13.5V13ZM13.5 8H10.5V6H13.5V8ZM19 18H16V16H19V18ZM19 13H16V11H19V13ZM19 8H16V6H19V8Z" fill="#2e3191" />
+              </svg>
+              {employeeData.department}
+            </span>
           </div>
           <div className="info-card">
             <span className="info-label">Certified Since</span>
             <span className="info-value">
-              {employeeData.certifiedDate || "Not certified"}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 14.9L12.5 12.2V7Z" fill="#2e3191" />
+              </svg>
+              {formatDate(employeeData.certifiedDate)}
             </span>
           </div>
         </div>
 
         <div className="time-display">
-          <span className="date">📅 {currentTime.toLocaleDateString()}</span>
-          <span className="time">⏰ {currentTime.toLocaleTimeString()}</span>
+          <span className="date">{currentTime.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}</span>
+          <span className="time">{currentTime.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          })}</span>
         </div>
       </div>
     );
   };
-
   useEffect(() => {
     const loadEmployeeData = () => {
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -73,8 +104,8 @@ const UserDashboard = () => {
 
       // Fetch from userCredentials where employee data is stored
       const allEmployees = JSON.parse(localStorage.getItem("userCredentials") || "[]");
-      const employee = allEmployees.find(emp => 
-        emp.username === currentUser.username || 
+      const employee = allEmployees.find(emp =>
+        emp.username === currentUser.username ||
         emp.empId === currentUser.empId
       );
 
@@ -87,7 +118,7 @@ const UserDashboard = () => {
           certifiedDate: employee.certifiedDate
         });
         setUserPermissions(employee.permissions || []);
-        
+
         // Update localStorage for backward compatibility
         localStorage.setItem("userDepartment", employee.department || "");
       } else {
@@ -140,7 +171,7 @@ const UserDashboard = () => {
       <div className="denied-icon">🚫</div>
       <h3>Access Restricted</h3>
       <p>You don't have permission to access {feature}.</p>
-      <button 
+      <button
         className="back-button"
         onClick={() => setActiveComponent(null)}
       >
@@ -161,8 +192,8 @@ const UserDashboard = () => {
       <header className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
-            <button 
-              className="mobile-menu-btn" 
+            <button
+              className="mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -177,13 +208,13 @@ const UserDashboard = () => {
               </p>
             </div>
           </div>
-          
+
           <div className="header-right">
             <div className="user-profile">
               <span className="user-name">{employeeData.empName}</span>
               <span className="user-id">{employeeData.empId}</span>
             </div>
-            <button 
+            <button
               className="logout-btn"
               onClick={handleLogout}
               aria-label="Logout"
@@ -196,8 +227,8 @@ const UserDashboard = () => {
 
       <div className="dashboard-main">
         <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-         
-          
+
+
           <div className="sidebar-menu">
             <button
               className={`menu-btn ${!activeComponent ? "active" : ""}`}
