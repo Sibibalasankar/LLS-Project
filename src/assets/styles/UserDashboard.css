@@ -187,6 +187,7 @@
   .header-title {
     font-size: 1.2rem;
     max-width: calc(100vw - 120px);
+    
   }
   
   .mobile-menu-btn {
@@ -391,6 +392,9 @@
   
   .info-card {
     padding: 1.2rem;
+  }
+  .header-left{
+    margin-left: 50px;
   }
 }
 .user-profile{
