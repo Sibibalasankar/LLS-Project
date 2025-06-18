@@ -41,11 +41,13 @@ const User_login = () => {
       }
 
       // Store user data
+      // Store user data
       localStorage.setItem("currentUser", JSON.stringify({
         username: user.username,
         empId: user.empId,
         empName: user.empName,
-        department: user.department || department,
+        department: user.department, // Allocated department from profile
+        loginDepartment: department, // Department selected during login
         designation: user.designation
       }));
 

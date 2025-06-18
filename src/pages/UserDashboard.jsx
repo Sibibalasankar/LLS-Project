@@ -15,7 +15,8 @@ const UserDashboard = () => {
     empName: "",
     empId: "",
     designation: "",
-    department: "",
+    department: "", // Allocated department
+    loginDepartment: "", // Department selected during login
     certifiedDate: ""
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ const UserDashboard = () => {
         <div className="welcome-header">
           <h1>Welcome back, <span className="highlight">{employeeData.empName}</span></h1>
           {employeeData.designation && (
-            <p className="designation">{employeeData.designation}</p>
+            <p className="designation">({employeeData.designation})</p>
           )}
         </div>
 
@@ -64,7 +65,9 @@ const UserDashboard = () => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 18H5V16H8V18ZM8 13H5V11H8V13ZM8 8H5V6H8V8ZM13.5 18H10.5V16H13.5V18ZM13.5 13H10.5V11H13.5V13ZM13.5 8H10.5V6H13.5V8ZM19 18H16V16H19V18ZM19 13H16V11H19V13ZM19 8H16V6H19V8Z" fill="#2e3191" />
               </svg>
-              {employeeData.department}
+              {employeeData.department} {/* Allocated department */}
+              {employeeData.department !== employeeData.loginDepartment &&
+                ` (Logged in as: ${employeeData.loginDepartment})`}
             </span>
           </div>
           <div className="info-card">
@@ -94,6 +97,7 @@ const UserDashboard = () => {
       </div>
     );
   };
+
   useEffect(() => {
     const loadEmployeeData = () => {
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -102,7 +106,6 @@ const UserDashboard = () => {
         return;
       }
 
-      // Fetch from userCredentials where employee data is stored
       const allEmployees = JSON.parse(localStorage.getItem("userCredentials") || "[]");
       const employee = allEmployees.find(emp =>
         emp.username === currentUser.username ||
@@ -114,7 +117,8 @@ const UserDashboard = () => {
           empName: employee.empName,
           empId: employee.empId,
           designation: employee.designation,
-          department: employee.department,
+          department: employee.department, // Allocated department
+          loginDepartment: currentUser.loginDepartment || currentUser.department, // Fallback to department if loginDepartment doesn't exist
           certifiedDate: employee.certifiedDate
         });
         setUserPermissions(employee.permissions || []);
@@ -203,7 +207,9 @@ const UserDashboard = () => {
             <div className="header-titles">
               <h1 className="header-title">LLS Audit Management System</h1>
               <p className="header-subtitle">
-                {employeeData.department}
+                {employeeData.loginDepartment} {/* Login department shown here */}
+                {employeeData.department !== employeeData.loginDepartment &&
+                  ` (Allocated: ${employeeData.department})`}
                 {employeeData.designation && ` • ${employeeData.designation}`}
               </p>
             </div>
@@ -212,7 +218,7 @@ const UserDashboard = () => {
           <div className="header-right">
             <div className="user-profile">
               <span className="user-name">{employeeData.empName}</span>
-              <span className="user-id">{employeeData.empId}</span>
+              <span className="user-id">( {employeeData.empId} )</span>
             </div>
             <button
               className="logout-btn"
@@ -227,8 +233,6 @@ const UserDashboard = () => {
 
       <div className="dashboard-main">
         <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-
-
           <div className="sidebar-menu">
             <button
               className={`menu-btn ${!activeComponent ? "active" : ""}`}
