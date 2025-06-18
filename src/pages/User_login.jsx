@@ -22,37 +22,58 @@ const User_login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    if (!department) {
-      setError("Please select a department");
-      setIsLoading(false);
-      return;
-    }
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
-    const user = storedUsers.find(
-      user => user.username === username && user.password === password
-    );
+    try {
+      if (!department) {
+        setError("Please select a department");
+        return;
+      }
 
-    if (user) {
-      localStorage.setItem("currentUser", username);
+      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+      const user = storedUsers.find(u =>
+        u.username.toLowerCase() === username.toLowerCase() &&
+        u.password === password
+      );
+
+      if (!user) {
+        setError("Invalid username or password!");
+        return;
+      }
+
+      // Store user data
+      localStorage.setItem("currentUser", JSON.stringify({
+        username: user.username,
+        empId: user.empId,
+        empName: user.empName,
+        department: user.department || department,
+        designation: user.designation
+      }));
+
       localStorage.setItem("userPermissions", JSON.stringify(user.permissions || []));
-      localStorage.setItem("userDepartment", department);
+      localStorage.setItem("userDepartment", user.department || department);
       localStorage.setItem("userRole", role);
-      navigate("/user-dashboard", { replace: true });
-    } else {
-      setError("Invalid username or password!");
-    }
-    setIsLoading(false);
-  };
 
+      console.log("Login successful, navigating..."); // Debug log
+      console.log("About to navigate. Current path:", window.location.pathname);
+      console.log("User data:", {
+        currentUser: localStorage.getItem("currentUser"),
+        permissions: localStorage.getItem("userPermissions"),
+        department: localStorage.getItem("userDepartment"),
+        role: localStorage.getItem("userRole")
+      });
+      navigate("/user-dashboard", { replace: true });
+
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     if (newPassword !== confirmPassword) {
       setPasswordError("Passwords don't match");
       setIsLoading(false);
@@ -67,12 +88,12 @@ const User_login = () => {
 
     // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
-    const updatedUsers = storedUsers.map(user => 
+    const updatedUsers = storedUsers.map(user =>
       user.username === forgotUsername ? { ...user, password: newPassword } : user
     );
-    
+
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     alert("Password reset successfully!");
     setStage("login");
@@ -91,7 +112,7 @@ const User_login = () => {
               <h2>User Login</h2>
               <p>Welcome back! Please enter your details</p>
             </div>
-            
+
             <form className="login-form" onSubmit={handleLogin}>
               <div className="input-group">
                 <label htmlFor="user-username">Username</label>
@@ -104,7 +125,7 @@ const User_login = () => {
                   placeholder="Enter your username"
                 />
               </div>
-              
+
               <div className="input-group">
                 <label htmlFor="user-password">Password</label>
                 <input
@@ -116,7 +137,7 @@ const User_login = () => {
                   placeholder="••••••••"
                 />
               </div>
-              
+
               <div className="input-group">
                 <label htmlFor="user-department">Department</label>
                 <select
@@ -131,7 +152,7 @@ const User_login = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="input-group">
                 <label htmlFor="user-role">Role</label>
                 <select
@@ -144,9 +165,9 @@ const User_login = () => {
                   <option value="auditee">Auditee</option>
                 </select>
               </div>
-              
+
               {error && <div className="error-message">{error}</div>}
-              
+
               <button type="submit" className="login-button" disabled={isLoading}>
                 {isLoading ? <div className="spinner"></div> : "Log In"}
               </button>
@@ -155,9 +176,9 @@ const User_login = () => {
                 <button type="button" className="back-button" onClick={() => navigate("/login")}>
                   <i className="bi bi-arrow-left"></i> Back
                 </button>
-                <button 
-                  type="button" 
-                  className="forgot-password" 
+                <button
+                  type="button"
+                  className="forgot-password"
                   onClick={() => setStage("forgot")}
                 >
                   Forgot Password?
@@ -173,7 +194,7 @@ const User_login = () => {
               <h2>Forgot Password</h2>
               <p>Enter your username to reset your password</p>
             </div>
-            
+
             <div className="input-group">
               <label htmlFor="forgot-username">Username</label>
               <input
@@ -185,7 +206,7 @@ const User_login = () => {
                 placeholder="Enter your username"
               />
             </div>
-            
+
             <div className="button-group">
               <button
                 className="primary-button"
@@ -194,8 +215,8 @@ const User_login = () => {
               >
                 Continue
               </button>
-              <button 
-                className="secondary-button" 
+              <button
+                className="secondary-button"
                 onClick={() => setStage("login")}
               >
                 <i className="bi bi-arrow-left"></i> Back to Login
@@ -210,7 +231,7 @@ const User_login = () => {
               <h2>Reset Password</h2>
               <p>Create a new password for your account</p>
             </div>
-            
+
             <form onSubmit={handlePasswordReset}>
               <div className="input-group">
                 <label htmlFor="new-password">New Password</label>
@@ -225,7 +246,7 @@ const User_login = () => {
                 />
                 <small className="password-hint">Minimum 6 characters</small>
               </div>
-              
+
               <div className="input-group">
                 <label htmlFor="confirm-password">Confirm Password</label>
                 <input
@@ -238,9 +259,9 @@ const User_login = () => {
                   placeholder="••••••••"
                 />
               </div>
-              
+
               {passwordError && <div className="error-message">{passwordError}</div>}
-              
+
               <div className="button-group">
                 <button type="submit" className="primary-button" disabled={isLoading}>
                   {isLoading ? <div className="spinner"></div> : "Reset Password"}
