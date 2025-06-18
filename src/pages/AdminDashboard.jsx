@@ -123,7 +123,7 @@ const Dashboard = () => {
               onClick={resetToWelcome}
               style={{ cursor: "pointer" }}
             >
-              LLS Audit Management Systems
+              LLS Audit Management System
             </h1>
           </div>
           <div className="header-right">
