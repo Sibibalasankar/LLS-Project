@@ -118,7 +118,7 @@
 }
 
 /* Sidebar Styles */
-.dashboard-sidebar {
+.dashboard-sidebars {
   width: 250px;
   background-color: #2e3191;
   color: white;
@@ -337,7 +337,7 @@
     display: block;
   }
   
-  .dashboard-sidebar {
+  .dashboard-sidebars {
     position: fixed;
     top: 60px;
     left: -250px;
@@ -347,8 +347,10 @@
     z-index: 1000;
   }
 
-  .dashboard-sidebar.mobile-menu-open {
+  .dashboard-sidebars.mobile-menu-open {
     left: 0;
+    top:48px;
+    height: auto;
   }
 }
 

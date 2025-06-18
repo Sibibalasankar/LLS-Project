@@ -144,7 +144,7 @@ const Dashboard = () => {
       </header>
 
       <div className="dashboard-main">
-        <nav className={`dashboard-sidebar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+        <nav className={`dashboard-sidebars ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <div className="sidebar-menu">
             <button
               className={`menu-btn ${activeComponent === "auditor-list" ? "active" : ""}`}
