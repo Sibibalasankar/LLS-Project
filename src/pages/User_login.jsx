@@ -41,13 +41,12 @@ const User_login = () => {
       }
 
       // Store user data
-      // Store user data
       localStorage.setItem("currentUser", JSON.stringify({
         username: user.username,
         empId: user.empId,
         empName: user.empName,
-        department: user.department, // Allocated department from profile
-        loginDepartment: department, // Department selected during login
+        department: user.department,
+        loginDepartment: department,
         designation: user.designation
       }));
 
@@ -55,14 +54,21 @@ const User_login = () => {
       localStorage.setItem("userDepartment", user.department || department);
       localStorage.setItem("userRole", role);
 
-      console.log("Login successful, navigating..."); // Debug log
-      console.log("About to navigate. Current path:", window.location.pathname);
-      console.log("User data:", {
-        currentUser: localStorage.getItem("currentUser"),
-        permissions: localStorage.getItem("userPermissions"),
-        department: localStorage.getItem("userDepartment"),
-        role: localStorage.getItem("userRole")
-      });
+      // Record login activity
+      const loginActivity = {
+        username: user.username,
+        department: department,
+        role: role,
+        timestamp: Date.now(),
+        read: false
+      };
+
+      const existingActivities = JSON.parse(localStorage.getItem("userLoginActivities") || "[]");
+      localStorage.setItem(
+        "userLoginActivities", 
+        JSON.stringify([...existingActivities, loginActivity])
+      );
+
       navigate("/user-dashboard", { replace: true });
 
     } catch (error) {
@@ -72,6 +78,7 @@ const User_login = () => {
       setIsLoading(false);
     }
   };
+  
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setIsLoading(true);
