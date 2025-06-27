@@ -1,25 +1,22 @@
-
 import { useState, useEffect } from "react";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaCheck, FaPrint, FaPlus } from "react-icons/fa";
+import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 import "../assets/styles/AuditorList.css";
-
-const designations = [
-  "Chief Engineer",
-  "Supervisor",
-  "Engineer",
-];
 
 const AuditorList = () => {
   const [auditors, setAuditors] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [availableAuditees, setAvailableAuditees] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     employeeNumber: "",
     department: "",
     certifiedOnName: "",
   });
-  const [filters, setFilters] = useState({ department: "", designation: "" });
+  const [filters, setFilters] = useState({ department: "" });
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
 
   useEffect(() => {
     const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
@@ -27,21 +24,25 @@ const AuditorList = () => {
 
     const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
     setDepartments(storedDepartments.map((dept) => dept.name));
+
+    const draft = loadDraft("auditorListDraft");
+    if (draft) {
+      setFormData(draft.formData);
+      setEditingIndex(draft.editingIndex);
+      setAvailableAuditees(draft.availableAuditees || []);
+    }
   }, []);
 
-  // Lookup employee name when employee number changes
   useEffect(() => {
     if (formData.employeeNumber && formData.employeeNumber.length >= 3) {
       const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
       const foundUser = storedUsers.find(
         (user) => user.empId === formData.employeeNumber
       );
-      
       if (foundUser) {
         setFormData((prev) => ({
           ...prev,
-          name: foundUser.empName,
-          department: prev.department || foundUser.department
+          name: foundUser.empName
         }));
       }
     }
@@ -57,12 +58,30 @@ const AuditorList = () => {
 
   const filteredAuditors = auditors.filter(
     (auditor) =>
-      (filters.department === "" || auditor.department === filters.department) &&
-      (filters.designation === "" || auditor.designation === filters.designation)
+      (filters.department === "" || auditor.department === filters.department)
   );
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "department") {
+      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+      const filteredEmployees = storedUsers.filter(user => user.department === value);
+      setAvailableAuditees(filteredEmployees);
+
+      if (filteredEmployees.length === 1) {
+        setFormData((prev) => ({
+          ...prev,
+          certifiedOnName: filteredEmployees[0].empName
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          certifiedOnName: ""
+        }));
+      }
+    }
   };
 
   const handleEmployeeNumberBlur = () => {
@@ -74,8 +93,7 @@ const AuditorList = () => {
       if (foundUser) {
         setFormData((prev) => ({
           ...prev,
-          name: foundUser.empName,
-          department: prev.department || foundUser.department
+          name: foundUser.empName
         }));
       }
     }
@@ -96,6 +114,7 @@ const AuditorList = () => {
     }
     setAuditors(updatedAuditors);
     saveToLocalStorage(updatedAuditors);
+    clearDraft("auditorListDraft");
     setShowForm(false);
     setFormData({
       name: "",
@@ -103,6 +122,7 @@ const AuditorList = () => {
       department: "",
       certifiedOnName: "",
     });
+    setAvailableAuditees([]);
   };
 
   const handleDelete = (index) => {
@@ -123,15 +143,21 @@ const AuditorList = () => {
     window.print();
   };
 
+  const handleSaveDraft = () => {
+    saveDraft("auditorListDraft", { formData, editingIndex, availableAuditees });
+    setIsDraftSaved(true);
+    setTimeout(() => setIsDraftSaved(false), 2000);
+  };
+
   return (
     <div className="auditor-list-container">
       <h2>Auditor List</h2>
       <div className="auditor-list-header">
-        <button className="add-btn" onClick={() => setShowForm(true)}>
-          Add Auditor
+        <button className="icon-btn add-btn" onClick={() => setShowForm(true)}>
+          <FaPlus />
         </button>
-        <button className="print-btn" onClick={handlePrint}>
-          🖨️ Print
+        <button className="icon-btn print-btn" onClick={handlePrint}>
+          <FaPrint />
         </button>
       </div>
 
@@ -174,20 +200,25 @@ const AuditorList = () => {
                   <td>{auditor.certifiedOnName}</td>
                   <td>
                     <button
-                      className="edit-btn"
+                      className="icon-btn edit-btns"
                       onClick={() => {
                         setEditingIndex(index);
                         setFormData(auditor);
+
+                        const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+                        const filteredEmployees = storedUsers.filter(user => user.department === auditor.department);
+                        setAvailableAuditees(filteredEmployees);
+
                         setShowForm(true);
                       }}
                     >
-                      Edit
+                      <FaEdit />
                     </button>
                     <button
-                      className="delete-btn"
+                      className="icon-btn delete-btns"
                       onClick={() => handleDelete(index)}
                     >
-                      Delete
+                      <FaTrash />
                     </button>
                   </td>
                 </tr>
@@ -207,6 +238,9 @@ const AuditorList = () => {
         <div className="popup-overlay">
           <div className="popup-form">
             <h3>{editingIndex !== null ? "Edit Auditor" : "Add Auditor"}</h3>
+
+            {isDraftSaved && <div className="draft-toast">✔️ Draft Saved</div>}
+
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Employee Number</label>
@@ -220,7 +254,7 @@ const AuditorList = () => {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label>Auditor Name</label>
                 <input
@@ -242,9 +276,7 @@ const AuditorList = () => {
                   onChange={handleChange}
                   required
                 >
-                  <option value="" disabled>
-                    Select Department to Audit
-                  </option>
+                  <option value="" disabled>Select Department to Audit</option>
                   {departments.map((dept, index) => (
                     <option key={index} value={dept}>
                       {dept}
@@ -255,31 +287,58 @@ const AuditorList = () => {
 
               <div className="form-group">
                 <label>Auditee Name</label>
-                <input
-                  type="text"
-                  name="certifiedOnName"
-                  value={formData.certifiedOnName}
-                  onChange={handleChange}
-                  placeholder="Auditee Name"
-                  required
-                />
+                {availableAuditees.length > 1 ? (
+                  <select
+                    name="certifiedOnName"
+                    value={formData.certifiedOnName}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="" disabled>Select Auditee</option>
+                    {availableAuditees.map((employee, index) => (
+                      <option key={index} value={employee.empName}>
+                        {employee.empName} ({employee.empId})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    name="certifiedOnName"
+                    value={formData.certifiedOnName}
+                    onChange={handleChange}
+                    placeholder="Auditee Name"
+                    required
+                    readOnly={availableAuditees.length === 1}
+                  />
+                )}
               </div>
 
               <div className="form-buttons">
                 <button
                   type="button"
-                  className="close-btns"
+                  className="icon-btn save-draft-btn"
+                  onClick={handleSaveDraft}
+                >
+                  <FaSave />
+                </button>
+
+                <button
+                  type="button"
+                  className="icon-btn close-btns"
                   onClick={() => {
                     const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
                     if (isConfirmed) {
                       setShowForm(false);
+                      setAvailableAuditees([]);
                     }
                   }}
                 >
-                  Close
+                  <FaTimes />
                 </button>
-                <button type="submit" className="submit-btns">
-                  {editingIndex !== null ? "Update" : "Add"}
+
+                <button type="submit" className="icon-btn submit-btns">
+                  <FaCheck />
                 </button>
               </div>
             </form>

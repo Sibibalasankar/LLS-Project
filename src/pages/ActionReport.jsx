@@ -169,7 +169,6 @@ const ActionReport = () => {
 
     localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
     setShowForms(false);
-    navigate('/user-dashboard/user-audit-nc-closer');
   };
 
   const handleEdit = (index) => {

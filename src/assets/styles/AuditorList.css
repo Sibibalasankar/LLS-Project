@@ -1,3 +1,48 @@
+/* Common icon button style */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.add-btn {
+    background-color: #007bff;
+}
+
+.print-btn {
+    background-color: #28a745;
+}
+
+.edit-btns {
+    background-color: #ffc107;
+}
+
+.delete-btns {
+    background-color: #dc3545;
+}
+
+.save-draft-btn {
+    background-color: #ffc107;
+}
+
+.close-btns {
+    background-color: red;
+}
+
+.submit-btns {
+    background-color: #28a745;
+}
+
+/* Existing styles remain unchanged below */
 .auditor-list-container {
     padding: 20px;
     width: 100%;
@@ -6,59 +51,38 @@
 .auditor-list-header {
     display: flex;
     justify-content: right;
-    align-items:center;
+    align-items: center;
     margin-bottom: 10px;
 }
 
-.add-btn {
-    background-color: #007bff;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Table */
-/* Table Styles */
 .auditor-table {
     width: 100%;
-    border-collapse: collapse; /* Ensures borders merge properly */
+    border-collapse: collapse;
     margin-top: 20px;
-    border: 1px solid black; /* Ensure this is applied */
+    border: 1px solid black;
 }
 
-/* Border for Table Header & Cells */
 th, td {
     padding: 12px;
-    border: 1px solid black !important; /* Force border if needed */
+    border: 1px solid black !important;
     text-align: left;
 }
 
-/* Table Header Styling */
 th {
     background-color: #007bff;
     color: #f1f1f1;
 }
 
-/* Hover Effect */
 tr:hover {
     background-color: #f1f1f1;
 }
 
-/* Table hover effect */
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Show 'No Records' when empty */
 .no-records {
     text-align: center;
     font-style: italic;
     color: #777;
 }
 
-/* Popup Form */
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -87,7 +111,6 @@ input, select {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
-   
 }
 
 .form-buttons {
@@ -95,46 +118,6 @@ input, select {
     justify-content: space-between;
 }
 
-.close-btns, .submit-btns {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 48%;
-}
-
-.close-btns {
-    background-color: red;
-    color: white;
-}
-
-.submit-btns {
-    background-color: #28a745;
-    color: white;
-}
-
-/* Buttons */
-.edit-btn {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 6px 20px;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-/* Filter Section */
 .filter-container {
     display: flex;
     gap: 15px;
@@ -147,32 +130,21 @@ input, select {
     border: 1px solid #ccc;
     font-size: 16px;
 }
+
 .popup-form input,
 .popup-form select {
-    margin-bottom: 10px; /* Adjust as needed */
+    margin-bottom: 10px;
 }
 
-.print-btn {
-    background-color: #28a745; /* Green color */
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px; /* Add spacing */
-}
-/* Make table scrollable on small screens */
 .auditor-table-wrapper {
     overflow-x: auto;
     width: 100%;
 }
 
-/* Optional: Make table take full width on large screens */
 .auditor-table {
-    min-width: 1000px; /* Minimum width before scroll kicks in */
+    min-width: 1000px;
 }
 
-/* Media query for better readability on small devices */
 @media screen and (max-width: 768px) {
     .auditor-list-header, .filter-container {
         flex-direction: column;
@@ -195,25 +167,20 @@ input, select {
     }
 }
 
-
 @media print {
-    /* Hide unnecessary elements */
-    .auditor-list-header, .popup-overlay, .filter-container, .edit-btn, .delete-btn {
+    .auditor-list-header, .popup-overlay, .filter-container, .edit-btns, .delete-btns {
         display: none !important;
     }
 
-    /* Hide Actions column */
-    .auditor-table th:last-child, 
+    .auditor-table th:last-child,
     .auditor-table td:last-child {
         display: none;
     }
 
-    /* Ensure everything except the table is hidden */
     * {
         visibility: hidden;
     }
 
-    /* Make the table visible and take up the full page */
     .auditor-table-wrapper, .auditor-table-wrapper * {
         visibility: visible;
     }
@@ -226,3 +193,18 @@ input, select {
     }
 }
 
+.draft-toast {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}

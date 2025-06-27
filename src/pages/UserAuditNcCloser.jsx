@@ -114,13 +114,15 @@ const UserAuditNcCloser = () => {
       )}
 
       <ReportList
-        reports={filteredReports}
-        uploadedFiles={uploadedFiles}
-        onView={onView}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        refreshData={refreshData}
-      />
+  reports={filteredReports}
+  uploadedFiles={uploadedFiles}
+  onView={onView}
+  onEdit={onEdit}
+  onDelete={onDelete}
+  refreshData={refreshData}
+  decisions={decisions} // Pass decisions here
+/>
+
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaPlus, FaPrint, FaEdit,FaCheck, FaTrash, FaPlusCircle, FaTimes, FaSave } from "react-icons/fa";
+import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 import "../assets/styles/AuditPlanDetails.css";
 
 const AuditPlanDetails = ({ department, onClose }) => {
@@ -12,7 +14,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [currentYear, setCurrentYear] = useState("");
-  const [newProcess, setNewProcess] = useState(""); // For adding new processes
+  const [newProcess, setNewProcess] = useState("");
   const [formData, setFormData] = useState({
     auditCycle: "I",
     date: "",
@@ -65,7 +67,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
         ...prev,
         processes: [...prev.processes, newProcess.trim()],
       }));
-      setNewProcess(""); // Clear input after adding
+      setNewProcess("");
     }
   };
 
@@ -74,6 +76,21 @@ const AuditPlanDetails = ({ department, onClose }) => {
       ...prev,
       processes: prev.processes.filter((_, i) => i !== index),
     }));
+  };
+
+  const handleFormOpen = () => {
+    const draft = loadDraft("auditPlanDraft");
+    if (draft) {
+      if (window.confirm("A draft is available. Do you want to load it?")) {
+        setFormData(draft);
+      }
+    }
+    setShowForm(true);
+  };
+
+  const handleSaveDraft = () => {
+    saveDraft("auditPlanDraft", formData);
+    alert("Draft saved successfully!");
   };
 
   const handleSubmit = (e) => {
@@ -90,7 +107,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
           : "Are you sure you want to add this audit plan?"
       )
     ) {
-      return; // If user cancels, do nothing
+      return;
     }
 
     let updatedPlans;
@@ -112,13 +129,14 @@ const AuditPlanDetails = ({ department, onClose }) => {
 
     setAuditPlans(updatedPlans);
     localStorage.setItem("auditPlans", JSON.stringify(updatedPlans));
+    clearDraft("auditPlanDraft");
     resetForm();
     setShowForm(false);
   };
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData({ ...auditPlans[index] }); // Populate form with existing data
+    setFormData({ ...auditPlans[index] });
     setShowForm(true);
   };
 
@@ -129,16 +147,14 @@ const AuditPlanDetails = ({ department, onClose }) => {
       return;
     }
 
-    // Clone the table to manipulate it without affecting the original
     const clonedTable = printContent.cloneNode(true);
 
-    // Remove the last column (Action column) from the header and all rows
     const headers = clonedTable.querySelectorAll("thead th");
-    if (headers.length) headers[headers.length - 1].remove(); // Remove "Action" column header
+    if (headers.length) headers[headers.length - 1].remove();
 
     clonedTable.querySelectorAll("tbody tr").forEach((row) => {
       const cells = row.querySelectorAll("td");
-      if (cells.length) cells[cells.length - 1].remove(); // Remove "Action" column data
+      if (cells.length) cells[cells.length - 1].remove();
     });
 
     const printWindow = window.open("", "", "width=800,height=600");
@@ -151,20 +167,20 @@ const AuditPlanDetails = ({ department, onClose }) => {
             table { width: 100%; border-collapse: collapse; }
             th, td { border: 1px solid black; padding: 8px; text-align: left; }
             th { background-color: #f2f2f2; }
-            h5{
-               background-color: #FFC000;
-               padding: 10px;
-               border-top: 1px solid black; 
-               border-bottom: 1px solid black;
-               text-align: center;
-             }
+            h5 {
+              background-color: #FFC000;
+              padding: 10px;
+              border-top: 1px solid black; 
+              border-bottom: 1px solid black;
+              text-align: center;
+            }
           </style>
         </head>
         <body>
           <h2>Audit Plan Details</h2>
           <h5 className="iso_title mb-4">
-        INTERNAL AUDIT SCHEDULE - ISO 9001:2015
-      </h5>
+            INTERNAL AUDIT SCHEDULE - ISO 9001:2015
+          </h5>
           ${clonedTable.outerHTML}
         </body>
       </html>
@@ -173,6 +189,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
     printWindow.document.close();
     printWindow.print();
   };
+
   const resetForm = () => {
     setFormData({
       auditCycle: "I",
@@ -182,37 +199,37 @@ const AuditPlanDetails = ({ department, onClose }) => {
       auditor: auditor,
       auditees: "",
     });
-    setNewProcess(""); // Ensure new process input is cleared
+    setNewProcess("");
     setEditIndex(null);
   };
 
   return (
     <div className="audit-plan-container">
-      <center className="mb-4"> <h2>Audit Plan Details</h2></center>
+      <center className="mb-4"><h2>Audit Plan Details</h2></center>
       <h5 className="iso_title mb-4">
         INTERNAL AUDIT SCHEDULE - ISO 9001:2015
       </h5>
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-      <div className="header-buttons">
+      {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
+
+      <div className="header-buttons mb-4">
         <button
-          onClick={() =>
-            onClose ? onClose() : navigate("/audit-plan-creation")
-          }
-          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+          onClick={() => onClose ? onClose() : navigate("/audit-plan-creation")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors"
         >
-          ← Back
+          <FaArrowLeft />
         </button>
-        <div className="two_btns">
+
+        <div className="two_btns flex gap-2">
           <button
             className="add-btn mb-3"
-            onClick={() => setShowForm(true)}
+            onClick={handleFormOpen}
             disabled={!isAuditorAssigned}
           >
-            Add Audit Plan
+            <FaPlus />
           </button>
           <button className="print-btn mb-3" onClick={handlePrint}>
-            🖨️ Print
+            <FaPrint />
           </button>
         </div>
       </div>
@@ -251,23 +268,19 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 <td>
                   <button
                     onClick={() => handleEdit(index)}
-                    className="edit-btn styled-btn"
+                    className="auditdetail-edit-btns styled-btn"
                   >
-                    Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => {
-                      if (
-                        window.confirm(
-                          "Are you sure you want to delete this audit plan?"
-                        )
-                      ) {
+                      if (window.confirm("Are you sure you want to delete this audit plan?")) {
                         setAuditPlans(auditPlans.filter((_, i) => i !== index));
                       }
                     }}
-                    className="delete-btn styled-btn"
+                    className="auditdetail-delete-btns styled-btn"
                   >
-                    Delete
+                    <FaTrash />
                   </button>
                 </td>
               </tr>
@@ -329,10 +342,10 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 />
                 <button
                   type="button"
-                  className="edit-btn"
+                  className="auditdetail-edit-btns"
                   onClick={handleAddProcess}
                 >
-                  + Add
+                  <FaPlusCircle />
                 </button>
                 <ol>
                   {formData.processes.map((process, index) => (
@@ -342,7 +355,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                         type="button"
                         onClick={() => handleRemoveProcess(index)}
                       >
-                        ❌
+                        <FaTimes />
                       </button>
                     </li>
                   ))}
@@ -360,17 +373,24 @@ const AuditPlanDetails = ({ department, onClose }) => {
               <div className="form-buttons">
                 <button
                   type="button"
-                  className="close-btns"
+                  className="icon-btn save-draft-btn"
+                  onClick={handleSaveDraft}
+                >
+                  <FaSave /> 
+                </button>
+                <button
+                  type="button"
+                  className="icon-btn close-btns"
                   onClick={() => setShowForm(false)}
                 >
-                  Close
+                   <FaTimes />
                 </button>
                 <button
                   type="submit"
-                  className="submit-btns"
+                  className="icon-btn submit-btns"
                   disabled={!isAuditorAssigned}
                 >
-                  Save
+                  <FaCheck />
                 </button>
               </div>
             </form>

@@ -1,15 +1,12 @@
-.print_btn_DL{
-    width: 150px;
+/* General Styling */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-@media print {
-    .no-print {
-      display: none !important;
-    }
-  }
-
-
-  .department-list-container {
+.department-list-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,92 +14,192 @@
     height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-  }
-  
-  .department-list-header {
+}
+
+.department-list-header {
     display: flex;
     justify-content: space-between;
     width: 100%;
     max-width: 900px;
     margin-bottom: 20px;
-  }
-  
-  .add-btn, .print-btn {
+}
+
+.add-btn, .print-btn {
     background-color: #007bff;
     color: white;
     border: none;
     padding: 10px 15px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px; /* Increased icon size */
     border-radius: 5px;
-  }
-  
-  .add-btn:hover, .print-btn:hover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.add-btn:hover, .print-btn:hover {
     background-color: #0056b3;
-  }
-  
-  .department-table-wrapper {
+}
+
+.department-table-wrapper {
     width: 100%;
     max-width: 900px;
     overflow-x: auto;
     flex-grow: 1;
-  }
-  
-  .department-table {
+}
+
+.department-table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-  }
-  
-  .department-table th, .department-table td {
+}
+
+.department-table th, .department-table td {
     border: 1px solid #ddd;
     padding: 12px;
-  }
-  
-  .department-table th {
+}
+
+.department-table th {
     background-color: #007bff;
+    color: white;
     font-weight: bold;
-  }
-  
-  .department-table tbody tr:nth-child(even) {
+}
+
+.department-table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
-  }
-  
-  .department-table tbody tr:hover {
+}
+
+.department-table tbody tr:hover {
     background-color: #f1f1f1;
-  }
-  
-  .edit-btn, .delete-btn {
+}
+
+.dept-edit-btns, .dept-delete-btns {
     background-color: #28a745;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 6px 10px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px; /* Icon size */
     border-radius: 3px;
     margin-right: 5px;
-  }
-  
-  .delete-btn {
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dept-delete-btns {
     background-color: #dc3545;
-  }
-  
-  .edit-btn:hover {
+}
+
+.dept-edit-btns:hover {
     background-color: #218838;
-  }
-  
-  .delete-btn:hover {
+}
+
+.dept-delete-btns:hover {
     background-color: #c82333;
-  }
-  
-  .no-records {
+}
+
+.no-records {
     text-align: center;
     font-weight: bold;
     color: #999;
-  }
-  
-  *{
-    user-select: none;
-  }
-  
-  
+}
+
+/* Popup Form */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.popup-form h3 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.popup-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.close-btns, .submit-btns {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px; /* Icon size */
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.close-btns:hover {
+    background-color: #dc3545;
+}
+
+.submit-btns:hover {
+    background-color: #28a745;
+}
+
+/* Print Settings */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Scrollbar Styling */
+.department-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.department-table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 4px;
+}
+
+.department-table-wrapper::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .department-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .add-btn, .print-btn {
+        width: 100%;
+    }
+}

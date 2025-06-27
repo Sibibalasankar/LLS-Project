@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/card";
 import { Button } from "../components/button";
+import {  FaPrint } from "react-icons/fa";
+
 import {
   Table,
   TableHeader,
@@ -200,7 +202,7 @@ const AuditPlanSheet = () => {
       {/* Print Button */}
       <div className="mt-4 flex justify-end">
         <Button className="print-btn" onClick={handlePrint}>
-          🖨️ Print
+          <FaPrint />
         </Button>
       </div>
     </Card>

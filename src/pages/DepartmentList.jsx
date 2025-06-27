@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaCheck, FaPrint, FaPlus } from "react-icons/fa";
+import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 import "../assets/styles/DepartmentList.css";
 
+const DepartmentList = () => {
+  const [departmentData, setDepartmentData] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [formData, setFormData] = useState({ name: "", email: "", dept: "" });
 const departments = [
   "Quality Management System",
   "Marketing - Industrial Automation",
@@ -24,28 +31,15 @@ const departments = [
   "Stores",
   "Customer Service Department",
   "Human Resources",
-  "Total Plant Maintenance",
+  "Total Plant Maintenance"
 ];
-
-const DepartmentList = () => {
-  const [departmentData, setDepartmentData] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", dept: "" });
 
   // Load departments from localStorage on mount
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
-
-    // Create a map of stored departments
     const storedDeptMap = new Map(storedDepartments.map(dept => [dept.name, dept]));
+    const updatedDepartments = departments.map(name => storedDeptMap.get(name) || { name, email: "" });
 
-    // Merge default departments with stored ones
-    const updatedDepartments = departments.map(name =>
-      storedDeptMap.get(name) || { name, email: "" }
-    );
-
-    // Ensure any newly added departments are preserved
     storedDepartments.forEach(dept => {
       if (!departments.includes(dept.name)) {
         updatedDepartments.push(dept);
@@ -56,13 +50,14 @@ const DepartmentList = () => {
     localStorage.setItem("departments", JSON.stringify(updatedDepartments));
   }, []);
 
-
   const saveToLocalStorage = (departments) => {
     localStorage.setItem("departments", JSON.stringify(departments));
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const updatedFormData = { ...formData, [e.target.name]: e.target.value };
+    setFormData(updatedFormData);
+    saveDraft("departmentDraft", updatedFormData);
   };
 
   const handleSubmit = (e) => {
@@ -87,7 +82,8 @@ const DepartmentList = () => {
     setDepartmentData(updatedDepartments);
     saveToLocalStorage(updatedDepartments);
     setShowForm(false);
-    setFormData({ name: "", email: "" });
+    setFormData({ name: "", email: "", dept: "" });
+    clearDraft("departmentDraft");
     alert(message);
   };
 
@@ -99,10 +95,7 @@ const DepartmentList = () => {
 
   const handleDelete = (index) => {
     const departmentToDelete = departmentData[index];
-    const isConfirmed = window.confirm(
-      `Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditee Email: ${departmentToDelete.email || "N/A"}`
-    );
-
+    const isConfirmed = window.confirm(`Are you sure you want to delete ${departmentToDelete.name}?\n\nAuditee Email: ${departmentToDelete.email || "N/A"}`);
     if (isConfirmed) {
       const updatedDepartments = departmentData.filter((_, i) => i !== index);
       setDepartmentData(updatedDepartments);
@@ -116,8 +109,6 @@ const DepartmentList = () => {
     if (!tableContent) return;
 
     const clonedTable = tableContent.cloneNode(true);
-
-    // Remove "Actions" column
     clonedTable.querySelectorAll("tr").forEach((row) => {
       if (row.lastElementChild) row.removeChild(row.lastElementChild);
     });
@@ -144,17 +135,28 @@ const DepartmentList = () => {
     printWindow.print();
   };
 
+  const handleFormOpen = () => {
+    const draft = loadDraft("departmentDraft");
+    if (draft) {
+      const isConfirmed = window.confirm("You have unsaved draft data. Do you want to continue editing it?");
+      if (isConfirmed) {
+        setFormData(draft);
+      }
+    }
+    setShowForm(true);
+  };
+
   return (
     <div className="department-list-container">
       <h2>Department List</h2>
 
       <div className="department-list-header">
-        <button className="add-btn" onClick={() => setShowForm(true)}>
-          Add Department
+        <button className="add-btn no-print" onClick={handleFormOpen}>
+          <FaPlus />
         </button>
 
-        <button className="print-btn" onClick={handlePrint}>
-          🖨️ Print
+        <button className="print-btn no-print" onClick={handlePrint}>
+          <FaPrint />
         </button>
       </div>
 
@@ -168,22 +170,21 @@ const DepartmentList = () => {
                 <th>S.No</th>
                 <th>Department Name</th>
                 <th>Auditee Email</th>
-                <th>Actions</th>
+                <th className="no-print">Actions</th>
               </tr>
             </thead>
-
             <tbody>
               {departmentData.map((dept, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{dept.name}</td>
                   <td>{dept.email || "N/A"}</td>
-                  <td>
-                    <button className="edit-btn" onClick={() => handleEdit(index)}>
-                      Edit
+                  <td className="no-print">
+                    <button className="dept-edit-btns" onClick={() => handleEdit(index)}>
+                      <FaEdit />
                     </button>
-                    <button className="delete-btn" onClick={() => handleDelete(index)}>
-                      Delete
+                    <button className="dept-delete-btns" onClick={() => handleDelete(index)}>
+                      <FaTrash />
                     </button>
                   </td>
                 </tr>
@@ -222,13 +223,16 @@ const DepartmentList = () => {
                     const isConfirmed = window.confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
                     if (isConfirmed) {
                       setShowForm(false);
+                      clearDraft("departmentDraft");
+                      setFormData({ name: "", email: "", dept: "" });
+                      setEditingIndex(null);
                     }
                   }}
                 >
-                  Close
+                  <FaTimes />
                 </button>
                 <button type="submit" className="submit-btns">
-                  {editingIndex !== null ? "Update" : "Add"}
+                  {editingIndex !== null ? <FaSave /> : <FaCheck />}
                 </button>
               </div>
             </form>
