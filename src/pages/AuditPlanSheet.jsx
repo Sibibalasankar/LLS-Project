@@ -201,7 +201,7 @@ const AuditPlanSheet = () => {
 
       {/* Print Button */}
       <div className="mt-4 flex justify-end">
-        <Button className="print-btn" onClick={handlePrint}>
+        <Button className="print-btn" onClick={handlePrint} title="Print Audit Plan">
           <FaPrint />
         </Button>
       </div>

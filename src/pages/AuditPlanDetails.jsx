@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaPlus, FaPrint, FaEdit,FaCheck, FaTrash, FaPlusCircle, FaTimes, FaSave } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaPrint, FaEdit, FaCheck, FaTrash, FaPlusCircle, FaTimes, FaSave } from "react-icons/fa";
 import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 import "../assets/styles/AuditPlanDetails.css";
 
@@ -216,6 +216,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
         <button
           onClick={() => onClose ? onClose() : navigate("/audit-plan-creation")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+          title="Back"
         >
           <FaArrowLeft />
         </button>
@@ -225,10 +226,15 @@ const AuditPlanDetails = ({ department, onClose }) => {
             className="add-btn mb-3"
             onClick={handleFormOpen}
             disabled={!isAuditorAssigned}
+            title="Add Audit Plan"
           >
             <FaPlus />
           </button>
-          <button className="print-btn mb-3" onClick={handlePrint}>
+          <button
+            className="print-btn mb-3"
+            onClick={handlePrint}
+            title="Print Audit Plan"
+          >
             <FaPrint />
           </button>
         </div>
@@ -269,6 +275,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                   <button
                     onClick={() => handleEdit(index)}
                     className="auditdetail-edit-btns styled-btn"
+                    title="Edit Audit Plan"
                   >
                     <FaEdit />
                   </button>
@@ -279,6 +286,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                       }
                     }}
                     className="auditdetail-delete-btns styled-btn"
+                    title="Delete Audit Plan"
                   >
                     <FaTrash />
                   </button>
@@ -344,6 +352,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                   type="button"
                   className="auditdetail-edit-btns"
                   onClick={handleAddProcess}
+                  title="Add Process"
                 >
                   <FaPlusCircle />
                 </button>
@@ -354,6 +363,7 @@ const AuditPlanDetails = ({ department, onClose }) => {
                       <button
                         type="button"
                         onClick={() => handleRemoveProcess(index)}
+                        title="Remove Process"
                       >
                         <FaTimes />
                       </button>
@@ -375,20 +385,23 @@ const AuditPlanDetails = ({ department, onClose }) => {
                   type="button"
                   className="icon-btn save-draft-btn"
                   onClick={handleSaveDraft}
+                  title="Save Draft"
                 >
-                  <FaSave /> 
+                  <FaSave />
                 </button>
                 <button
                   type="button"
                   className="icon-btn close-btns"
                   onClick={() => setShowForm(false)}
+                  title="Close"
                 >
-                   <FaTimes />
+                  <FaTimes />
                 </button>
                 <button
                   type="submit"
                   className="icon-btn submit-btns"
                   disabled={!isAuditorAssigned}
+                  title="Submit Audit Plan"
                 >
                   <FaCheck />
                 </button>

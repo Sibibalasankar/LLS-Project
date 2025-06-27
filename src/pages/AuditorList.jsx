@@ -153,10 +153,10 @@ const AuditorList = () => {
     <div className="auditor-list-container">
       <h2>Auditor List</h2>
       <div className="auditor-list-header">
-        <button className="icon-btn add-btn" onClick={() => setShowForm(true)}>
+        <button className="icon-btn add-btn" onClick={() => setShowForm(true)} title="Add Auditor">
           <FaPlus />
         </button>
-        <button className="icon-btn print-btn" onClick={handlePrint}>
+        <button className="icon-btn print-btn" onClick={handlePrint} title="Print Auditor List">
           <FaPrint />
         </button>
       </div>
@@ -211,12 +211,14 @@ const AuditorList = () => {
 
                         setShowForm(true);
                       }}
+                      title="Edit Auditor"
                     >
                       <FaEdit />
                     </button>
                     <button
                       className="icon-btn delete-btns"
                       onClick={() => handleDelete(index)}
+                      title="Delete Auditor"
                     >
                       <FaTrash />
                     </button>
@@ -319,6 +321,7 @@ const AuditorList = () => {
                   type="button"
                   className="icon-btn save-draft-btn"
                   onClick={handleSaveDraft}
+                  title="Save Draft"
                 >
                   <FaSave />
                 </button>
@@ -333,11 +336,12 @@ const AuditorList = () => {
                       setAvailableAuditees([]);
                     }
                   }}
+                  title="Close Form"
                 >
                   <FaTimes />
                 </button>
 
-                <button type="submit" className="icon-btn submit-btns">
+                <button type="submit" className="icon-btn submit-btns" title="Save Auditor">
                   <FaCheck />
                 </button>
               </div>

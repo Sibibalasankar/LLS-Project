@@ -151,11 +151,11 @@ const departments = [
       <h2>Department List</h2>
 
       <div className="department-list-header">
-        <button className="add-btn no-print" onClick={handleFormOpen}>
+        <button className="add-btn no-print" onClick={handleFormOpen} title="Add Department">
           <FaPlus />
         </button>
 
-        <button className="print-btn no-print" onClick={handlePrint}>
+        <button className="print-btn no-print" onClick={handlePrint} title="Print Department List">
           <FaPrint />
         </button>
       </div>
@@ -180,10 +180,10 @@ const departments = [
                   <td>{dept.name}</td>
                   <td>{dept.email || "N/A"}</td>
                   <td className="no-print">
-                    <button className="dept-edit-btns" onClick={() => handleEdit(index)}>
+                    <button className="dept-edit-btns" onClick={() => handleEdit(index)} title="Edit Department">
                       <FaEdit />
                     </button>
-                    <button className="dept-delete-btns" onClick={() => handleDelete(index)}>
+                    <button className="dept-delete-btns" onClick={() => handleDelete(index)} title="Delete Department">
                       <FaTrash />
                     </button>
                   </td>
@@ -228,10 +228,11 @@ const departments = [
                       setEditingIndex(null);
                     }
                   }}
+                  title="close form"
                 >
                   <FaTimes />
                 </button>
-                <button type="submit" className="submit-btns">
+                <button type="submit" className="submit-btns" title="Save Department">
                   {editingIndex !== null ? <FaSave /> : <FaCheck />}
                 </button>
               </div>
