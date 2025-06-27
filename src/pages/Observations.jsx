@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
 import { FiEdit, FiTrash2, FiFileText, FiArrowLeft, FiPlus, FiFolder } from "react-icons/fi";
+import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 
 
 const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
@@ -110,26 +111,41 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
 
   const handleCreate = () => {
-    const newObservation = {
-      id: "",
-      slNo: getNextSlNo(),
-      processActivity: "",
-      potentialCauses: "",
-      findings: "",
-      isoClause: "",
-      result: "",
-      auditCycleNo: `I/${yearFormat}`,
-      auditDate: new Date().toISOString().split("T")[0],
-      auditorSignature: auditorInfo.name || "",
-      auditorDesignation: auditorInfo.designation || "",
-      auditeeSignature: auditeeInfo.name || "",
-      auditeeDesignation: auditeeInfo.designation || "",
-      department: departmentName || "",
-    };
+    const draftKey = `observationDraft_${observationId}`;
+    const savedDraft = loadDraft(draftKey);
 
-    setCurrentObservation(newObservation);
+    if (savedDraft) {
+      setCurrentObservation(savedDraft);
+    } else {
+      const newObservation = {
+        id: "",
+        slNo: getNextSlNo(),
+        processActivity: "",
+        potentialCauses: "",
+        findings: "",
+        isoClause: "",
+        result: "",
+        auditCycleNo: `I/${yearFormat}`,
+        auditDate: new Date().toISOString().split("T")[0],
+        auditorSignature: auditorInfo.name || "",
+        auditorDesignation: auditorInfo.designation || "",
+        auditeeSignature: auditeeInfo.name || "",
+        auditeeDesignation: auditeeInfo.designation || "",
+        department: departmentName || "",
+      };
+
+      setCurrentObservation(newObservation);
+    }
+
     setShowForm(true);
   };
+
+  const handleSaveDraft = () => {
+    const draftKey = `observationDraft_${observationId}`;
+    saveDraft(draftKey, currentObservation);
+    alert('Draft Saved!');
+  };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -176,6 +192,8 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     if (window.confirm("Are you sure you want to delete this observation?")) {
       setObservations(observations.filter((obs) => obs.id !== id));
     }
+    const draftKey = `observationDraft_${observationId}`;
+  clearDraft(draftKey);
   };
 
   return (
@@ -480,7 +498,9 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
               <div className="form-buttons">
                 <button type="submit" className="save-btn">Save Observation</button>
                 <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+                <button type="button" className="nc-btn" onClick={handleSaveDraft}>Save Draft</button>
               </div>
+
             </form>
           </div>
         </div>

@@ -60,7 +60,7 @@ const UserAuditNcCloser = () => {
         <h1 className="document-title">Audit Non-Conformity and Corrective Action Reports</h1>
         <div className="no-data-message">No reports available</div>
         <div className="form-buttons">
-          <button onClick={() => navigate(-1)}>Back</button>
+          <button onClick={() => navigate(-1)} className='nc-btn'>Back</button>
         </div>
       </div>
     );

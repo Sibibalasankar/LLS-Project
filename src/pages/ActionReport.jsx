@@ -1,9 +1,11 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer ,useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import NonConformityFormSection from './NonConformityFormSection';
 import CorrectiveActionFormSection from './CorrectiveActionFormSection';
 import ReportViewer from './ReportViewer';
 import ReportList from './ReportList';
+import { saveDraft, loadDraft, clearDraft } from '../utils/draftUtils';
+
 
 const INITIAL_FORM_DATA = {
   auditCycleNo: "",
@@ -48,6 +50,8 @@ const ACTION_TYPES = {
   RESET_FORM: 'RESET_FORM',
   LOAD_FORM: 'LOAD_FORM'
 };
+const draftKey = 'actionReportDraft';
+
 
 const formReducer = (state, action) => {
   switch (action.type) {
@@ -131,13 +135,36 @@ const ActionReport = () => {
   const [viewingReport, setViewingReport] = useState(null);
   const [newDeptInput, setNewDeptInput] = useState('');
   const navigate = useNavigate();
-
+useEffect(() => {
+  const savedDraft = loadDraft(draftKey);
+  if (savedDraft) {
+    if (window.confirm('A draft was found. Do you want to continue editing the draft?')) {
+      dispatch({ type: ACTION_TYPES.LOAD_FORM, payload: savedDraft });
+      setShowForms(true); // Automatically open the form if draft is loaded
+    } else {
+      clearDraft(draftKey);
+    }
+  }
+}, []);
   const handleAddNew = () => {
-    dispatch({ type: ACTION_TYPES.RESET_FORM });
+    const savedDraft = loadDraft(draftKey);
+
+    if (savedDraft) {
+      if (window.confirm('A draft was found. Do you want to continue editing the draft?')) {
+        dispatch({ type: ACTION_TYPES.LOAD_FORM, payload: savedDraft });
+      } else {
+        clearDraft(draftKey);
+        dispatch({ type: ACTION_TYPES.RESET_FORM });
+      }
+    } else {
+      dispatch({ type: ACTION_TYPES.RESET_FORM });
+    }
+
     setEditingIndex(null);
     setViewingReport(null);
     setShowForms(true);
   };
+
 
   const validateAuditCycleNo = (value) => {
     const pattern = /^(I|II|III|IV)\/\d{4}-(\d{2}|\d{4})$/;
@@ -169,6 +196,8 @@ const ActionReport = () => {
 
     localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
     setShowForms(false);
+    clearDraft(draftKey);
+
   };
 
   const handleEdit = (index) => {
@@ -191,6 +220,10 @@ const ActionReport = () => {
       setSavedReports(updatedReports);
     }
   };
+const handleSaveDraft = () => {
+  saveDraft(draftKey, formData);
+  alert('Draft Saved!');
+};
 
   const handleViewReport = (report) => {
     setViewingReport(report);
@@ -211,6 +244,10 @@ const ActionReport = () => {
             <button type="button" className="save-btn" onClick={handleSave}>
               {editingIndex !== null ? 'Update Report' : 'Save Reports'}
             </button>
+            <button type="button" className="nc-btn" onClick={() => handleSaveDraft()}>
+              Save Draft
+            </button>
+
             <button type="button" className="cancel-btn" onClick={handleCancel}>Cancel</button>
           </div>
         </>
