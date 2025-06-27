@@ -6,10 +6,12 @@ const User_login = () => {
   const navigate = useNavigate();
 
   const [stage, setStage] = useState("login");
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState("");
-  const [role, setRole] = useState("auditor");
+  const [role, setRole] = useState("");
+  const [auditorDepartments, setAuditorDepartments] = useState([]);
   const [forgotUsername, setForgotUsername] = useState("");
   const [error, setError] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -17,18 +19,72 @@ const User_login = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const departments = JSON.parse(localStorage.getItem("departments") || []);
+  const departments = JSON.parse(localStorage.getItem("departments") || "[]");
+
+  const handleUsernameBlur = () => {
+    if (!username) return;
+
+    const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+    const user = storedUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+    if (user) {
+      if (role === "auditor") {
+        const auditorList = JSON.parse(localStorage.getItem("auditors")) || [];
+        const auditorEntries = auditorList.filter(auditor => auditor.employeeNumber === user.empId);
+
+        if (auditorEntries.length > 0) {
+          const deptNames = auditorEntries.map(entry => entry.department);
+          setDepartment(deptNames[0]); // Preselect first department
+          setAuditorDepartments(deptNames);
+        } else {
+          setDepartment("");
+          setAuditorDepartments([]);
+        }
+      } else if (role === "auditee") {
+        setDepartment(user.department);
+        setAuditorDepartments([]);
+      }
+    } else {
+      setDepartment("");
+      setAuditorDepartments([]);
+    }
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setRole(selectedRole);
+
+    const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+    const user = storedUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+    if (user) {
+      if (selectedRole === "auditor") {
+        const auditorList = JSON.parse(localStorage.getItem("auditors")) || [];
+        const auditorEntries = auditorList.filter(auditor => auditor.employeeNumber === user.empId);
+
+        if (auditorEntries.length > 0) {
+          const deptNames = auditorEntries.map(entry => entry.department);
+          setDepartment(deptNames[0]); // Preselect first department
+          setAuditorDepartments(deptNames);
+        } else {
+          setDepartment("");
+          setAuditorDepartments([]);
+        }
+      } else if (selectedRole === "auditee") {
+        setDepartment(user.department);
+        setAuditorDepartments([]);
+      }
+    } else {
+      setDepartment("");
+      setAuditorDepartments([]);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (!department) {
-        setError("Please select a department");
-        return;
-      }
-
       const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
       const user = storedUsers.find(u =>
         u.username.toLowerCase() === username.toLowerCase() &&
@@ -40,7 +96,6 @@ const User_login = () => {
         return;
       }
 
-      // Store user data
       localStorage.setItem("currentUser", JSON.stringify({
         username: user.username,
         empId: user.empId,
@@ -51,10 +106,10 @@ const User_login = () => {
       }));
 
       localStorage.setItem("userPermissions", JSON.stringify(user.permissions || []));
-      localStorage.setItem("userDepartment", user.department || department);
+      localStorage.setItem("userOwnDepartment", user.department);
+      localStorage.setItem("userAuditDepartment", department);
       localStorage.setItem("userRole", role);
 
-      // Record login activity
       const loginActivity = {
         username: user.username,
         department: department,
@@ -65,7 +120,7 @@ const User_login = () => {
 
       const existingActivities = JSON.parse(localStorage.getItem("userLoginActivities") || "[]");
       localStorage.setItem(
-        "userLoginActivities", 
+        "userLoginActivities",
         JSON.stringify([...existingActivities, loginActivity])
       );
 
@@ -78,7 +133,7 @@ const User_login = () => {
       setIsLoading(false);
     }
   };
-  
+
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -95,7 +150,6 @@ const User_login = () => {
       return;
     }
 
-    // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
@@ -130,6 +184,7 @@ const User_login = () => {
                   id="user-username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  onBlur={handleUsernameBlur}
                   required
                   placeholder="Enter your username"
                 />
@@ -148,30 +203,32 @@ const User_login = () => {
               </div>
 
               <div className="input-group">
+                <label htmlFor="user-role">Role</label>
+                <select
+                  id="user-role"
+                  value={role}
+                  onChange={handleRoleChange}
+                  required
+                >
+                  <option value="">Select Role</option>
+                  <option value="auditor">Auditor</option>
+                  <option value="auditee">Auditee</option>
+                </select>
+              </div>
+
+              <div className="input-group">
                 <label htmlFor="user-department">Department</label>
                 <select
                   id="user-department"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   required
+                  disabled={role === "auditee" || (role === "auditor" && auditorDepartments.length <= 1)}
                 >
                   <option value="">Select Department</option>
-                  {departments.map((dept, index) => (
-                    <option key={index} value={dept.name}>{dept.name}</option>
+                  {(role === "auditor" ? auditorDepartments : [department]).map((dept, index) => (
+                    <option key={index} value={dept}>{dept}</option>
                   ))}
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="user-role">Role</label>
-                <select
-                  id="user-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                >
-                  <option value="auditor">Auditor</option>
-                  <option value="auditee">Auditee</option>
                 </select>
               </div>
 

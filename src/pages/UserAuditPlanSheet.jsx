@@ -10,6 +10,7 @@ import {
   TableCell,
 } from "@/components/table";
 import { Input } from "../components/input";
+import {  FaPrint } from "react-icons/fa";
 
 const UserAuditPlanSheet = () => {
   const [auditPlans, setAuditPlans] = useState([]);
@@ -22,7 +23,7 @@ const UserAuditPlanSheet = () => {
       const storedDepartments =
         JSON.parse(localStorage.getItem("departments")) || [];
       
-      const selectedDepartment = localStorage.getItem("userDepartment"); // Get selected department
+      const selectedDepartment = localStorage.getItem("userAuditDepartment"); // Get selected department
 
       if (selectedDepartment) {
         const filteredPlans = storedPlans.filter(
@@ -175,8 +176,8 @@ const UserAuditPlanSheet = () => {
 
       {/* Print Button */}
       <div className="mt-4 flex justify-end">
-        <Button className="print-btn" onClick={handlePrint}>
-          🖨️ Print
+        <Button className="print-btn" onClick={handlePrint} title="Print Audit Plan">
+           <FaPrint /> 
         </Button>
       </div>
     </Card>

@@ -3,6 +3,8 @@ import "../assets/styles/Observation.css";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import companylogo from "../assets/images/lls_logo.png";
+import { FiEdit, FiTrash2, FiFileText, FiArrowLeft, FiPlus, FiFolder } from "react-icons/fi";
+
 
 const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
   const [observations, setObservations] = useState([]);
@@ -198,6 +200,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
 
       <div className="observations-table-container p-3">
         <table className="observations-table">
+
           <thead>
             <tr>
               <th>Sl.no.</th>
@@ -220,16 +223,20 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <td>{obs.isoClause}</td>
                   <td>{obs.result}</td>
                   <td className="btns_td">
-                    <button className="edit-btn" onClick={() => handleEdit(obs)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(obs.id)}>Delete</button>
+                    <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
+                      <FiEdit size={20} />
+                    </button>
+
+                    <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
+                      <FiTrash2 size={20} />
+                    </button>
+
                     {obs.result === "NC" && (
-                      <button
-                        className="action-form-btn"
-                        onClick={() => handleOpenActionForm(obs)}
-                      >
-                        Action
+                      <button className="icon-btns" onClick={() => handleOpenActionForm(obs)} title="Open Action Form">
+                        <FiFileText size={20} />
                       </button>
                     )}
+
                   </td>
                 </tr>
               ))
@@ -274,8 +281,8 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       {showForm && (
         <div className="observation-form-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="observation-form-modal">
-            <button 
-              className="close-modal-btn" 
+            <button
+              className="close-modal-btn"
               onClick={() => setShowForm(false)}
               aria-label="Close form"
             >
@@ -490,18 +497,21 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
         </div>
       </div>
 
-      <div className="button-group">
-        <Button onClick={onBack} className="button back-btn" style={{ width: "200px" }}>
-          Back to Dashboard
+      <div className="button-groups">
+        <Button onClick={onBack} className="button back-btn icon-btns" title="Back to Dashboard">
+          <FiArrowLeft size={22} />Back
         </Button>
-        <Button onClick={handleCreate} className="button create-btn" style={{ width: "200px" }}>
-          {observations.length > 0 ? "Add Observation" : "Create Observation"}
+
+        <Button onClick={handleCreate} className="button create-btn icon-btns" title="Add Observation">
+          <FiPlus size={22} />Add
         </Button>
-        <Button className="button open-sheet-btn" style={{ width: "200px" }}
+
+        <Button className="button open-sheet-btn icon-btns" title="Open Record"
           onClick={() => window.open('/audit-report', '_blank')}
         >
-          Open Record
+          <FiFolder size={22} />Open Record
         </Button>
+
       </div>
     </div>
   );

@@ -45,9 +45,9 @@ const UserAuditNcCloser = () => {
     );
   });
 
-  const onView = (report) => {};
-  const onEdit = (index) => {};
-  const onDelete = (index) => {};
+  const onView = (report) => { };
+  const onEdit = (index) => { };
+  const onDelete = (index) => { };
 
   const submittedCount = Object.keys(uploadedFiles).length;
   const approvedCount = Object.values(decisions).filter(d => d === 'approved').length;
@@ -114,14 +114,14 @@ const UserAuditNcCloser = () => {
       )}
 
       <ReportList
-  reports={filteredReports}
-  uploadedFiles={uploadedFiles}
-  onView={onView}
-  onEdit={onEdit}
-  onDelete={onDelete}
-  refreshData={refreshData}
-  decisions={decisions} // Pass decisions here
-/>
+        reports={filteredReports}
+        uploadedFiles={uploadedFiles}
+        onView={onView}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        refreshData={refreshData}
+        decisions={decisions} // Pass decisions here
+      />
 
     </div>
   );

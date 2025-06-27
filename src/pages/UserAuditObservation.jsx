@@ -19,7 +19,7 @@ const UserAuditObservation = () => {
       const storedPlans = JSON.parse(localStorage.getItem('auditPlans')) || [];
       const savedReports = JSON.parse(localStorage.getItem('savedReports')) || [];
       const allObservations = JSON.parse(localStorage.getItem('auditObservations')) || {};
-      const userDepartment = localStorage.getItem('userDepartment');
+      const userAuditDepartment = localStorage.getItem('userAuditDepartment');
 
       const updatedCounts = {};
       const updatedNcCounts = {};
@@ -27,7 +27,7 @@ const UserAuditObservation = () => {
       const updatedOpCounts = {};
 
       // Only process the user's department
-      const userDept = storedDepartments.find(dept => dept.name === userDepartment);
+      const userDept = storedDepartments.find(dept => dept.name === userAuditDepartment);
       if (userDept) {
         const hasPlan = storedPlans.some(plan => plan.department === userDept.name);
 

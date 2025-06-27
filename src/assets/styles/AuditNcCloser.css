@@ -1,10 +1,30 @@
-.top-head-btn{
+.top-head-btn {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px; /* Adds space between buttons if needed */
 }
-.nc-btn{
-    padding:0px 10px;
+
+.nc-btn {
+    padding: 8px 16px;
     background-color: rgb(252, 214, 1);
     color: black;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nc-btn:hover {
+    background-color: rgb(255, 200, 0);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nc-btn:active {
+    transform: scale(0.97);
 }

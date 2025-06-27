@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/card";
-import { Button } from "../components/button";
 import Observations from "./Observations";
 import { FiEye, FiTrash2, FiPlus, FiArrowLeft } from "react-icons/fi";
 import "../assets/styles/ObservationDetails.css";
@@ -15,10 +14,9 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
     setObservations(storedObservations);
 
-    // Load audit cycle data from all observations
     const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
     const cycleData = {};
-    
+
     storedObservations.forEach(obs => {
       if (allObservations[obs.id] && allObservations[obs.id].length > 0) {
         cycleData[obs.id] = allObservations[obs.id][0].auditCycleNo;
@@ -26,7 +24,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
         cycleData[obs.id] = "Not set";
       }
     });
-    
+
     setAuditCycleData(cycleData);
   }, [departmentName]);
 
@@ -48,7 +46,7 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   const handleDeleteObservation = async (id) => {
     setIsDeleting(true);
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     const updatedObservations = observations
       .filter(obs => obs.id !== id)
       .map((obs, index) => ({
@@ -72,10 +70,10 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
 
   if (viewObservationId !== null) {
     return (
-      <Observations 
-        observationId={viewObservationId} 
+      <Observations
+        observationId={viewObservationId}
         departmentName={departmentName}
-        onBack={() => setViewObservationId(null)} 
+        onBack={() => setViewObservationId(null)}
       />
     );
   }
@@ -94,21 +92,12 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
             <p className="department-subtitle">Manage all observations for this department</p>
           </div>
           <div className="action-buttons">
-            <Button
-              variant="outline"
-              onClick={handleBackToDepartments}
-              className="back-btn"
-              icon={<FiArrowLeft size={16} />}
-            >
-              Departments
-            </Button>
-            <Button
-              onClick={handleAddObservation}
-              className="submit-btn primary"
-              icon={<FiPlus size={16} />}
-            >
-              Add Observation
-            </Button>
+            <button className="icon-button" onClick={handleBackToDepartments} title="Back to Departments">
+              <FiArrowLeft size={20} />
+            </button>
+            <button className="icon-button add-buttonss" onClick={handleAddObservation} title="Add Observation">
+              <FiPlus size={50} />
+            </button>
           </div>
         </div>
       </div>
@@ -137,23 +126,21 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                         </span>
                       </td>
                       <td className="action-buttons-cell">
-                        <Button
-                          variant="primary"
+                        <button
+                          className="icon-button view-button"
                           onClick={() => handleGoToObservation(obs.id)}
-                          className="view-btn"
-                          icon={<FiEye size={16} />}
+                          title="View Observation"
                         >
-                          View
-                        </Button>
-                        <Button
-                          variant="danger"
+                          <FiEye size={18} />
+                        </button>
+                        <button
+                          className="icon-button delete-button"
                           onClick={() => handleDeleteObservation(obs.id)}
-                          className="delete-btn"
-                          icon={<FiTrash2 size={16} />}
-                          loading={isDeleting}
+                          title="Delete Observation"
+                          disabled={isDeleting}
                         >
-                          Delete
-                        </Button>
+                          <FiTrash2 size={18} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -165,13 +152,13 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
               <div className="empty-icon">🔍</div>
               <h3>No Observations Found</h3>
               <p>You haven't added any observations for this department yet.</p>
-              <Button
+              <button
+                className="icon-button add-buttons"
                 onClick={handleAddObservation}
-                className="submit-btn primary"
-                icon={<FiPlus size={16} />}
+                title="Add First Observation"
               >
-                Add First Observation
-              </Button>
+                <FiPlus size={20} />
+              </button>
             </div>
           )}
         </CardContent>
@@ -180,4 +167,4 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   );
 };
 
-export default ObservationDetails;  
+export default ObservationDetails;

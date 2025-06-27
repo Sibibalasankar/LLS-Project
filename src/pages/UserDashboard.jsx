@@ -66,8 +66,7 @@ const UserDashboard = () => {
                 <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 18H5V16H8V18ZM8 13H5V11H8V13ZM8 8H5V6H8V8ZM13.5 18H10.5V16H13.5V18ZM13.5 13H10.5V11H13.5V13ZM13.5 8H10.5V6H13.5V8ZM19 18H16V16H19V18ZM19 13H16V11H19V13ZM19 8H16V6H19V8Z" fill="#2e3191" />
               </svg>
               {employeeData.department} {/* Allocated department */}
-              {employeeData.department !== employeeData.loginDepartment &&
-                ` (Logged in as: ${employeeData.loginDepartment})`}
+              {employeeData.department !== employeeData.loginDepartment}
             </span>
           </div>
           <div className="info-card">
@@ -208,8 +207,7 @@ const UserDashboard = () => {
               <h1 className="header-title">LLS Audit Management System</h1>
               <p className="header-subtitle">
                 {employeeData.loginDepartment} {/* Login department shown here */}
-                {employeeData.department !== employeeData.loginDepartment &&
-                  ` (Allocated: ${employeeData.department})`}
+                {employeeData.department !== employeeData.loginDepartment }
                 {employeeData.designation && ` • ${employeeData.designation}`}
               </p>
             </div>

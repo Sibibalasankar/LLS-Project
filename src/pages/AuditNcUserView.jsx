@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const AuditNcUserView = () => {
   const [approvedFiles, setApprovedFiles] = useState({});
-  const [userDepartment, setUserDepartment] = useState('');
+  const [userAuditDepartment, setuserAuditDepartment] = useState('');
   const [filters, setFilters] = useState({
     auditCycleNo: '',
     ncsNumber: '',
@@ -10,8 +10,8 @@ const AuditNcUserView = () => {
 
   useEffect(() => {
     const storedApprovedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
-    const userDept = localStorage.getItem('userDepartment') || '';
-    setUserDepartment(userDept);
+    const userDept = localStorage.getItem('userAuditDepartment') || '';
+    setuserAuditDepartment(userDept);
     
     // Filter files by user's department
     const filteredFiles = {};
@@ -51,7 +51,7 @@ const AuditNcUserView = () => {
     <div className="container p-4">
       <div className="card shadow">
         <div className="card-header bg-white">
-          <h4 className="mb-0">Approved Audit NC Files ({userDepartment})</h4>
+          <h4 className="mb-0">Approved Audit NC Files ({userAuditDepartment})</h4>
         </div>
 
         <div className="card-body">

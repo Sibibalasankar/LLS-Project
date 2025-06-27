@@ -307,3 +307,52 @@
     font-size: 1.5rem;
   }
 }
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.6rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.1);
+}
+
+.icon-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.add-buttons {
+  background-color: #4e73df;
+  color: white;
+  padding: 0.8rem; /* Larger clickable area */
+}
+
+.add-buttons:hover {
+  background-color: #3a5ec2;
+}
+
+.view-button {
+  color: #4e73df;
+  padding: 0.6rem;
+}
+
+.view-button:hover {
+  background-color: #e0e7ff;
+}
+
+.delete-button {
+  color: #e74a3b;
+  padding: 0.6rem;
+}
+
+.delete-button:hover {
+  background-color: #fdecea;
+}

@@ -1204,12 +1204,12 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [decisions, setDecisions] = useState({});
   const [filter, setFilter] = useState('');
-  const [userDepartment, setUserDepartment] = useState('');
+  const [userAuditDepartment, setuserAuditDepartment] = useState('');
 
   useEffect(() => {
-    const dept = localStorage.getItem('userDepartment');
+    const dept = localStorage.getItem('userAuditDepartment');
     if (dept) {
-      setUserDepartment(dept);
+      setuserAuditDepartment(dept);
     }
   }, []);
 
@@ -1284,7 +1284,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   };
 
   const filteredReports = reports.filter(report =>
-    report.dptname === userDepartment && (
+    report.dptname === userAuditDepartment && (
       report.ncsNumber.toLowerCase().includes(filter.toLowerCase()) ||
       report.dptname.toLowerCase().includes(filter.toLowerCase()) ||
       report.auditCycleNo.toString().includes(filter)
