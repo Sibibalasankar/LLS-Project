@@ -19,7 +19,7 @@ const Login = () => {
         <div className="login-background"></div>
         <div className="login-content">
           
-          <h1 className="login-title">Welcome to LSS</h1>
+          <h1 className="login-title">Welcome to LLS</h1>
           <p className="login-subtitle">Please select your role to continue</p>
           <div className="login-buttons">
             <button 

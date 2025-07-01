@@ -162,7 +162,7 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
         </div>
 
         <div className="document-card table-card">
-          <label htmlFor="">CORREACTION</label>
+          <label htmlFor="">CORRECTION</label>
           <table className="document-table">
             <thead>
               <tr>
