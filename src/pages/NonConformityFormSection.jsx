@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const NonConformityFormSection = ({ formData, dispatch }) => {
+const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
   const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
@@ -75,15 +75,22 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
                   <div className="form-field">
                     <select
                       name="dptname"
-                      value={formData.dptname}
+                      value={formData.dptname || departmentName || ''}
                       onChange={handleChange}
+                      disabled={!!departmentName}
                     >
-                      <option value="">Select Department</option>
-                      {departments.map((dept, index) => (
-                        <option key={index} value={dept.name}>
-                          {dept.name}
-                        </option>
-                      ))}
+                      {departmentName ? (
+                        <option value={departmentName}>{departmentName}</option>
+                      ) : (
+                        <>
+                          <option value="">Select Department</option>
+                          {departments.map((dept, index) => (
+                            <option key={index} value={dept.name}>
+                              {dept.name}
+                            </option>
+                          ))}
+                        </>
+                      )}
                     </select>
                   </div>
                 </td>
@@ -206,7 +213,8 @@ const NonConformityFormSection = ({ formData, dispatch }) => {
 
 NonConformityFormSection.propTypes = {
   formData: PropTypes.object.isRequired,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  departmentName: PropTypes.string
 };
 
 export default NonConformityFormSection;

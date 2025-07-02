@@ -42,10 +42,15 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
 
   const navigate = useNavigate();
 
-  const handleOpenActionForm = (observation) => {
-    const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify(observation))}`;
-    window.open(url, "_blank");
-  };
+// In Observations.jsx
+const handleOpenActionForm = (observation) => {
+  const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify({
+    ...observation,
+    department: departmentName,
+    ncsNumber: observation.slNo // Make sure to include ncsNumber
+  }))}`;
+  window.open(url, "_blank");
+};
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);

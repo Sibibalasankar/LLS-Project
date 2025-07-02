@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useReactToPrint } from 'react-to-print';
 
-const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
+const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew, departmentName }) => {
   const [filters, setFilters] = useState({
     dptname: "",
     auditCycleNo: "",
@@ -29,14 +29,15 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
+  // Filter reports by department
   const filteredReports = reports.filter(report => {
-    return (
+    const matchesDepartment = departmentName ? report.dptname === departmentName : true;
+    const matchesFilters =
       (filters.dptname === "" || report.dptname === filters.dptname) &&
-      (filters.auditCycleNo === "" ||
-        report.auditCycleNo?.toLowerCase().includes(filters.auditCycleNo.toLowerCase())) &&
-      (filters.savedDate === "" ||
-        new Date(report.auditDate).toISOString().split('T')[0] === filters.savedDate)
-    );
+      (filters.auditCycleNo === "" || report.auditCycleNo.includes(filters.auditCycleNo)) &&
+      (filters.savedDate === "" || report.auditDate === filters.savedDate);
+
+    return matchesDepartment && matchesFilters;
   });
 
   const getStatus = (ncsNumber) => {
@@ -184,7 +185,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
 
     printWindow.document.write(printHTML);
     printWindow.document.close();
-    
+
     // Wait for content to load before printing
     printWindow.onload = () => {
       setTimeout(() => {
@@ -248,10 +249,11 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   return (
     <div className="saved-reports-container" style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
       <div className="report-list-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ color: '#333', margin: 0 }}>Action Reports Management</h2>
-        <div className="button-group">
-          <button 
-            type="button" 
+<h2>
+    {departmentName ? `Action Reports for ${departmentName}` : 'All Action Reports'}
+  </h2>        <div className="button-group">
+          <button
+            type="button"
             onClick={onAddNew}
             style={{
               backgroundColor: '#007bff',
@@ -265,8 +267,8 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
           >
             Add New Report
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handlePrint}
             style={{
               backgroundColor: '#28a745',
@@ -283,10 +285,10 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
       </div>
 
       {/* Filter Section */}
-      <div className="no-print" style={{ 
-        backgroundColor: '#f8f9fa', 
-        padding: '20px', 
-        borderRadius: '8px', 
+      <div className="no-print" style={{
+        backgroundColor: '#f8f9fa',
+        padding: '20px',
+        borderRadius: '8px',
         marginBottom: '20px',
         border: '1px solid #dee2e6'
       }}>
@@ -357,10 +359,10 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         </div>
 
         {/* Summary Statistics */}
-        <div style={{ 
-          backgroundColor: '#f8f9fa', 
-          padding: '20px', 
-          borderRadius: '8px', 
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          padding: '20px',
+          borderRadius: '8px',
           marginBottom: '20px',
           border: '1px solid #dee2e6',
           width: '100%',
@@ -391,8 +393,8 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         {filteredReports.length > 0 ? (
           <>
             <h3 style={{ color: '#333', fontSize: '16px', marginBottom: '15px' }}>Detailed Report List</h3>
-            <table style={{ 
-              width: '100%', 
+            <table style={{
+              width: '100%',
               borderCollapse: 'collapse',
               marginBottom: '20px',
               fontSize: '12px'
@@ -431,7 +433,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         </span>
                       </td>
                       <td className="no-print" style={{ padding: '8px', border: '1px solid #dee2e6' }}>
-                        <button 
+                        <button
                           onClick={() => onView(report)}
                           style={{
                             backgroundColor: '#007bff',
@@ -446,7 +448,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         >
                           View
                         </button>
-                        <button 
+                        <button
                           onClick={() => onEdit(index)}
                           style={{
                             backgroundColor: '#ffc107',
@@ -461,7 +463,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           onClick={() => onDelete(index)}
                           style={{
                             backgroundColor: '#dc3545',
@@ -483,10 +485,10 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
             </table>
           </>
         ) : (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '40px', 
-            backgroundColor: '#f8f9fa', 
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            backgroundColor: '#f8f9fa',
             borderRadius: '8px',
             border: '1px solid #dee2e6'
           }}>
@@ -497,9 +499,9 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
         )}
 
         {/* Print Footer */}
-        <div style={{ 
-          marginTop: '30px', 
-          paddingTop: '20px', 
+        <div style={{
+          marginTop: '30px',
+          paddingTop: '20px',
           borderTop: '1px solid #dee2e6',
           textAlign: 'center',
           color: '#666',
@@ -524,6 +526,8 @@ ReportList.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onAddNew: PropTypes.func.isRequired,
+  departmentName: PropTypes.string
+
 };
 
 export default ReportList;
