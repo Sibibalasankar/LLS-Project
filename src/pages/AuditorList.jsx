@@ -102,6 +102,7 @@ const AuditorList = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     let updatedAuditors;
+
     if (editingIndex !== null) {
       updatedAuditors = auditors.map((auditor, index) =>
         index === editingIndex ? formData : auditor
@@ -112,8 +113,22 @@ const AuditorList = () => {
       updatedAuditors = [...auditors, formData];
       alert("Auditor added successfully!");
     }
+
     setAuditors(updatedAuditors);
     saveToLocalStorage(updatedAuditors);
+
+    // 👉👉 ADD THESE TWO LINES HERE 👇👇
+    localStorage.setItem("auditorInfo", JSON.stringify({
+      name: formData.name,
+      designation: "Auditor"
+    }));
+
+    localStorage.setItem("auditeeInfo", JSON.stringify({
+      name: formData.certifiedOnName,
+      designation: "Auditee"
+    }));
+    // 👆👆 ADD THESE TWO LINES HERE 👈👈
+
     clearDraft("auditorListDraft");
     setShowForm(false);
     setFormData({
@@ -124,6 +139,7 @@ const AuditorList = () => {
     });
     setAvailableAuditees([]);
   };
+
 
   const handleDelete = (index) => {
     const auditorToDelete = auditors[index];

@@ -273,7 +273,8 @@ const Dashboard = () => {
           {activeComponent === "audit-summary" && <AuditSummary />}
           {activeComponent === "iso-manual" && <ISOManual />}
           {activeComponent === "user-profile" && <UserProfile />}
-          {activeComponent === "action-report" && <ActionReport />}
+          {activeComponent === "action-report" && <ActionReport isAllDepartments={true} />
+}
 
 
           {!activeComponent && !showNotifications && <WelcomeMessage />}

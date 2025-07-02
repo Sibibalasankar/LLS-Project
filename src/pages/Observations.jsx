@@ -13,7 +13,8 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [observationId, setObservationId] = useState(null);
   const [auditorInfo, setAuditorInfo] = useState({ name: "", designation: "" });
   const [auditeeInfo, setAuditeeInfo] = useState({ name: "", designation: "" });
-
+  const [availableAuditors, setAvailableAuditors] = useState([]);
+  const [availableAuditees, setAvailableAuditees] = useState([]);
   // Get current and next year for audit cycle format
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
@@ -41,16 +42,29 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [showActionForm, setShowActionForm] = useState(false);
 
   const navigate = useNavigate();
+  const getNcObservations = () => {
+    return observations.filter(obs => obs.result === "NC");
+  };
 
-// In Observations.jsx
-const handleOpenActionForm = (observation) => {
-  const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify({
-    ...observation,
-    department: departmentName,
-    ncsNumber: observation.slNo // Make sure to include ncsNumber
-  }))}`;
-  window.open(url, "_blank");
-};
+  // In Observations.jsx
+  const handleOpenActionForm = () => {
+    const ncObservations = getNcObservations();
+    if (ncObservations.length === 0) {
+      alert("No NC observations found!");
+      return;
+    }
+
+    const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify({
+      observations: ncObservations,
+      department: departmentName,
+      auditCycleNo: ncObservations[0].auditCycleNo, // Assuming all have same audit cycle
+      auditorName: auditorInfo.name,
+      auditorDesignation: auditorInfo.designation,
+      auditeeName: auditeeInfo.name,
+      auditeeDesignation: auditeeInfo.designation
+    }))}`;
+    window.open(url, "_blank");
+  };
   const handleCloseActionForm = () => {
     setShowActionForm(false);
     setActionObservation(null);
@@ -150,7 +164,7 @@ const handleOpenActionForm = (observation) => {
     saveDraft(draftKey, currentObservation);
     alert('Draft Saved!');
   };
-  
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -198,9 +212,92 @@ const handleOpenActionForm = (observation) => {
       setObservations(observations.filter((obs) => obs.id !== id));
     }
     const draftKey = `observationDraft_${observationId}`;
-  clearDraft(draftKey);
+    clearDraft(draftKey);
   };
+  useEffect(() => {
+    const loadAuditorData = () => {
+      const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
+      const departmentAuditors = storedAuditors.filter(
+        (auditor) => auditor.department === departmentName
+      );
 
+      setAvailableAuditors(departmentAuditors);
+
+      if (departmentAuditors.length > 0) {
+        // Get unique auditees from all auditors in this department
+        const auditees = departmentAuditors.reduce((acc, auditor) => {
+          if (auditor.certifiedOnName && !acc.includes(auditor.certifiedOnName)) {
+            acc.push(auditor.certifiedOnName);
+          }
+          return acc;
+        }, []);
+
+        setAvailableAuditees(auditees);
+
+        // Set default values if not already set
+        if (!auditorInfo.name && departmentAuditors.length === 1) {
+          setAuditorInfo({
+            name: departmentAuditors[0].name,
+            designation: departmentAuditors[0].designation || "Auditor"
+          });
+        }
+
+        if (!auditeeInfo.name && auditees.length === 1) {
+          setAuditeeInfo({
+            name: auditees[0],
+            designation: "Auditee"
+          });
+        }
+      }
+    };
+
+    loadAuditorData();
+  }, [departmentName]);
+  useEffect(() => {
+    const loadUserData = () => {
+      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
+
+      // Get all auditors for this department (users with audit permissions)
+      const departmentAuditors = storedUsers.filter(user =>
+        user.department === departmentName &&
+        user.permissions.includes("auditObservation")
+      );
+
+      // Get all potential auditees for this department
+      const departmentAuditees = storedUsers.filter(
+        user => user.department === departmentName
+      );
+
+      setAvailableAuditors(departmentAuditors.map(auditor => ({
+        name: auditor.empName,
+        employeeNumber: auditor.empId,
+        designation: auditor.designation
+      })));
+
+      setAvailableAuditees(departmentAuditees.map(auditee => ({
+        name: auditee.empName,
+        employeeNumber: auditee.empId,
+        designation: auditee.designation
+      })));
+
+      // Set default values if only one option exists
+      if (departmentAuditors.length === 1) {
+        setAuditorInfo({
+          name: departmentAuditors[0].empName,
+          designation: departmentAuditors[0].designation || "Auditor"
+        });
+      }
+
+      if (departmentAuditees.length === 1) {
+        setAuditeeInfo({
+          name: departmentAuditees[0].empName,
+          designation: departmentAuditees[0].designation || "Auditee"
+        });
+      }
+    };
+
+    loadUserData();
+  }, [departmentName]);
   return (
     <div className="observations-container">
       <div className="header-with-logo">
@@ -254,11 +351,7 @@ const handleOpenActionForm = (observation) => {
                       <FiTrash2 size={20} />
                     </button>
 
-                    {obs.result === "NC" && (
-                      <button className="icon-btns" onClick={() => handleOpenActionForm(obs)} title="Open Action Form">
-                        <FiFileText size={20} />
-                      </button>
-                    )}
+
 
                   </td>
                 </tr>
@@ -452,54 +545,118 @@ const handleOpenActionForm = (observation) => {
                   <div className="form-group">
                     <label>
                       Auditor Name:
-                      <input
-                        type="text"
-                        name="auditorSignature"
-                        value={currentObservation.auditorSignature}
-                        onChange={handleInputChange}
-                        required={observations.length === 0}
-                      />
+                      {availableAuditors.length > 1 ? (
+                        <select
+                          name="auditorSignature"
+                          value={currentObservation.auditorSignature}
+                          onChange={(e) => {
+                            const selectedAuditor = availableAuditors.find(
+                              a => a.name === e.target.value
+                            );
+                            handleInputChange(e);
+                            setAuditorInfo({
+                              name: e.target.value,
+                              designation: selectedAuditor?.designation || "Auditor"
+                            });
+                            setCurrentObservation(prev => ({
+                              ...prev,
+                              auditorDesignation: selectedAuditor?.designation || "Auditor"
+                            }));
+                          }}
+                          required
+                        >
+                          <option value="">Select Auditor</option>
+                          {availableAuditors.map((auditor, index) => (
+                            <option key={index} value={auditor.name}>
+                              {auditor.name} ({auditor.designation})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name="auditorSignature"
+                          value={currentObservation.auditorSignature || auditorInfo.name}
+                          onChange={handleInputChange}
+                          required
+                          readOnly={availableAuditors.length === 1}
+                        />
+                      )}
                     </label>
                   </div>
+
                   <div className="form-group">
                     <label>
                       Auditor Designation:
                       <input
                         type="text"
                         name="auditorDesignation"
-                        value={currentObservation.auditorDesignation}
+                        value={currentObservation.auditorDesignation || auditorInfo.designation}
                         onChange={handleInputChange}
-                        required={observations.length === 0}
+                        required
+                        readOnly
                       />
                     </label>
                   </div>
+
                   <div className="form-group">
                     <label>
                       Auditee Name:
-                      <input
-                        type="text"
-                        name="auditeeSignature"
-                        value={currentObservation.auditeeSignature}
-                        onChange={handleInputChange}
-                        required={observations.length === 0}
-                      />
+                      {availableAuditees.length > 1 ? (
+                        <select
+                          name="auditeeSignature"
+                          value={currentObservation.auditeeSignature}
+                          onChange={(e) => {
+                            const selectedAuditee = availableAuditees.find(
+                              a => a.name === e.target.value
+                            );
+                            handleInputChange(e);
+                            setAuditeeInfo({
+                              name: e.target.value,
+                              designation: selectedAuditee?.designation || "Auditee"
+                            });
+                            setCurrentObservation(prev => ({
+                              ...prev,
+                              auditeeDesignation: selectedAuditee?.designation || "Auditee"
+                            }));
+                          }}
+                          required
+                        >
+                          <option value="">Select Auditee</option>
+                          {availableAuditees.map((auditee, index) => (
+                            <option key={index} value={auditee.name}>
+                              {auditee.name} ({auditee.designation})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name="auditeeSignature"
+                          value={currentObservation.auditeeSignature || auditeeInfo.name}
+                          onChange={handleInputChange}
+                          required
+                          readOnly={availableAuditees.length === 1}
+                        />
+                      )}
                     </label>
                   </div>
+
                   <div className="form-group">
                     <label>
                       Auditee Designation:
                       <input
                         type="text"
                         name="auditeeDesignation"
-                        value={currentObservation.auditeeDesignation}
+                        value={currentObservation.auditeeDesignation || auditeeInfo.designation}
                         onChange={handleInputChange}
-                        required={observations.length === 0}
+                        required
+                        readOnly
                       />
                     </label>
                   </div>
                 </div>
               )}
-
               <div className="form-buttons">
                 <button type="submit" className="save-btn">Save Observation</button>
                 <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
@@ -536,7 +693,16 @@ const handleOpenActionForm = (observation) => {
         >
           <FiFolder size={22} />Open Record
         </Button>
-
+        {getNcObservations().length > 0 && (
+          <div className="nc-action-button-container">
+            <Button
+              onClick={handleOpenActionForm}
+              className="button action-report-btn"
+            >
+              <FiFileText size={20} /> Generate Action Report for NCs
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

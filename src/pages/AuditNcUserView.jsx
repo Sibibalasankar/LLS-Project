@@ -39,6 +39,12 @@ const AuditNcUserView = () => {
     setApprovedFiles(filteredFilesObj);
   }, [filters]);
 
+  const handleViewActionReport = (ncsNumber, department, auditCycle) => {
+    // Directly open the action report with the NC number as parameter
+    const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(ncsNumber)}&department=${encodeURIComponent(department)}&auditCycle=${encodeURIComponent(auditCycle)}`;
+    window.open(url, '_blank');
+  };
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
@@ -58,7 +64,7 @@ const AuditNcUserView = () => {
           {/* Filter section */}
           <div className="mb-3">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <input
                   type="text"
                   className="form-control"
@@ -68,7 +74,7 @@ const AuditNcUserView = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <input
                   type="text"
                   className="form-control"
@@ -94,6 +100,7 @@ const AuditNcUserView = () => {
                     <th>Audit Cycle</th>
                     <th>File Name</th>
                     <th>View File</th>
+                    <th>View Action Report</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -112,6 +119,24 @@ const AuditNcUserView = () => {
                         >
                           View
                         </a>
+                      </td>
+                      <td>
+                        {file.ncsNumber ? (
+                          <button
+                            className="btn btn-sm btn-info"
+                            onClick={() => handleViewActionReport(
+                              file.ncsNumber,
+                              file.department || file.dptname,
+                              file.auditCycleNo
+                            )}
+                          >
+                            View Report
+                          </button>
+                        ) : (
+                          <button className="btn btn-sm btn-secondary" disabled>
+                            N/A
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

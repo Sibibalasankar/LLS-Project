@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import "../assets/styles/AuditNcCloser.css"; // Assuming you have a CSS file for styles
+import "../assets/styles/AuditNcCloser.css";
 import { useNavigate } from 'react-router-dom';
-
 
 const AuditNcCloser = () => {
   const [submittedFiles, setSubmittedFiles] = useState({});
@@ -9,9 +8,14 @@ const AuditNcCloser = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-  window.open('/admin-dashboard/action-report', '_blank');
-};
+    window.open('/admin-dashboard/action-report', '_blank');
+  };
 
+  const handleViewActionReport = (ncsNumber, department, auditCycle) => {
+    // Directly open the action report with the NC number as parameter
+    const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(ncsNumber)}&department=${encodeURIComponent(department)}&auditCycle=${encodeURIComponent(auditCycle)}`;
+    window.open(url, '_blank');
+  };
 
   useEffect(() => {
     const files = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
@@ -98,6 +102,7 @@ const AuditNcCloser = () => {
                     <th>Audit Cycle</th>
                     <th>File Name</th>
                     <th>View File</th>
+                    <th>View Action Report</th>
                     <th>Decision</th>
                     <th>Status</th>
                   </tr>
@@ -122,6 +127,24 @@ const AuditNcCloser = () => {
                         ) : (
                           <button className="btn btn-sm btn-secondary" disabled>
                             View
+                          </button>
+                        )}
+                      </td>
+                      <td>
+                        {fileData.ncsNumber ? (
+                          <button
+                            className="btn btn-sm btn-info"
+                            onClick={() => handleViewActionReport(
+                              fileData.ncsNumber,
+                              fileData.department || fileData.dptname,
+                              fileData.auditCycleNo
+                            )}
+                          >
+                            View Report
+                          </button>
+                        ) : (
+                          <button className="btn btn-sm btn-secondary" disabled>
+                            N/A
                           </button>
                         )}
                       </td>

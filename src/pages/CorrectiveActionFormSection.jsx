@@ -68,21 +68,14 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                   <th width="25%">Activity</th>
                   <th width="15%">Responsible</th>
                   <th width="25%">Changes to be made in FMEA/ROAR/OMS Doc. Info.</th>
-                  <th width="15%">Target/Completion</th>
+                  <th width="15%">Target Date</th>
                   <th width="10%">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {formData.correctiveActions.map((action, index) => (
                   <tr key={index}>
-                    <td>
-                      <input
-                        type="text"
-                        value={action.slNo}
-                        onChange={(e) => handleCorrectiveActionChange(index, 'slNo', e.target.value)}
-                        className="table-input"
-                      />
-                    </td>
+                    <td>{index + 1}</td> {/* Auto-generated Serial Number */}
                     <td>
                       <input
                         type="text"
@@ -109,7 +102,7 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                     </td>
                     <td>
                       <input
-                        type="text"
+                        type="date"
                         value={action.target}
                         onChange={(e) => handleCorrectiveActionChange(index, 'target', e.target.value)}
                         className="table-input"
@@ -124,7 +117,6 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                         <option value="Open">Open</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
-                        <option value="Verified">Verified</option>
                       </select>
                     </td>
                   </tr>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
+const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObservations }) => {
   const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
@@ -35,9 +35,38 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
     return pattern.test(value);
   };
 
+  const mergeObservations = (fieldName) => {
+    if (!ncObservations || ncObservations.length === 0) return '';
+    return ncObservations.map(obs => obs[fieldName]).filter(Boolean).join('\n');
+  };
+
+  // Initialize merged values only once
+  useEffect(() => {
+    if (ncObservations && ncObservations.length > 0) {
+      const fieldsToMerge = [
+        { name: 'process', key: 'processActivity' },
+        { name: 'requirement', key: 'requirement' },
+        { name: 'nonConformityStatement', key: 'findings' },
+        { name: 'objectiveEvidence', key: 'objectiveEvidence' },
+        { name: 'isoClass', key: 'isoClause' },
+        { name: 'potentialRisk', key: 'potentialCauses' },
+        { name: 'auditor', key: 'auditor' },
+        { name: 'auditee', key: 'auditee' }
+      ];
+
+      fieldsToMerge.forEach(field => {
+        if (!formData[field.name]) {
+          handleChange({ target: { name: field.name, value: mergeObservations(field.key) } });
+        }
+      });
+    }
+  }, [ncObservations]);
+
+
   return (
     <div className="audit-form-container">
       <div className="form-section document-format">
+
         <div className="form-header">
           <h1 className="document-title">Internal Audit Non-Conformity and Corrective Action Report</h1>
         </div>
@@ -53,13 +82,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
                       type="text"
                       name="auditCycleNo"
                       value={formData.auditCycleNo}
-                      onChange={(e) => {
-                        dispatch({
-                          type: 'UPDATE_FIELD',
-                          field: e.target.name,
-                          value: e.target.value
-                        });
-                      }}
+                      onChange={handleChange}
                       placeholder="I/2025-26 or II/2026-2027"
                       className={formData.auditCycleNo && !validateAuditCycleNo(formData.auditCycleNo) ? "invalid-input" : ""}
                     />
@@ -111,19 +134,37 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
                 <td>
                   <label>PROCESS</label>
                   <div className="form-field">
-                    <input type="text" name="process" value={formData.process} onChange={handleChange} />
+                    <textarea
+                      name="process"
+                      value={formData.process}
+                      onChange={handleChange}
+                      rows={3}
+                    />
                   </div>
                 </td>
+
                 <td>
                   <label>AUDITOR/DEPT.</label>
                   <div className="form-field">
-                    <input type="text" name="auditor" value={formData.auditor} onChange={handleChange} />
+                    <input
+                      type="text"
+                      name="auditor"
+                      value={formData.auditor}
+                      onChange={handleChange}
+                      readOnly // Make it read-only if you don't want it to be editable
+                    />
                   </div>
                 </td>
                 <td>
                   <label>AUDITEE</label>
                   <div className="form-field">
-                    <input type="text" name="auditee" value={formData.auditee} onChange={handleChange} />
+                    <input
+                      type="text"
+                      name="auditee"
+                      value={formData.auditee}
+                      onChange={handleChange}
+                      readOnly // Make it read-only if you don't want it to be editable
+                    />
                   </div>
                 </td>
               </tr>
@@ -134,21 +175,36 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
         <div className="document-card">
           <div className="document-field">
             <label>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information)</label>
-            <textarea name="requirement" value={formData.requirement} onChange={handleChange} rows={3} />
+            <textarea
+              name="requirement"
+              value={formData.requirement}
+              onChange={handleChange}
+              rows={3}
+            />
           </div>
         </div>
 
         <div className="document-card">
           <div className="document-field">
             <label>NONCONFORMITY STATEMENT</label>
-            <textarea name="nonConformityStatement" value={formData.nonConformityStatement} onChange={handleChange} rows={3} />
+            <textarea
+              name="nonConformityStatement"
+              value={formData.nonConformityStatement}
+              onChange={handleChange}
+              rows={3}
+            />
           </div>
         </div>
 
         <div className="document-card">
           <div className="document-field">
             <label>OBJECTIVE EVIDENCE</label>
-            <textarea name="objectiveEvidence" value={formData.objectiveEvidence} onChange={handleChange} rows={3} />
+            <textarea
+              name="objectiveEvidence"
+              value={formData.objectiveEvidence}
+              onChange={handleChange}
+              rows={3}
+            />
           </div>
         </div>
 
@@ -156,14 +212,24 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
           <div className="document-card form-col">
             <div className="document-field">
               <label>ISO 9001-2018: OVIS CLASS NO. & DISCIPLINE</label>
-              <input type="text" name="isoClass" value={formData.isoClass} onChange={handleChange} />
+              <textarea
+                name="isoClass"
+                value={formData.isoClass}
+                onChange={handleChange}
+                rows={2}
+              />
             </div>
           </div>
 
           <div className="document-card form-col">
             <div className="document-field">
               <label>POTENTIAL RISK</label>
-              <input type="text" name="potentialRisk" value={formData.potentialRisk} onChange={handleChange} />
+              <textarea
+                name="potentialRisk"
+                value={formData.potentialRisk}
+                onChange={handleChange}
+                rows={2}
+              />
             </div>
           </div>
         </div>
@@ -183,20 +249,36 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
               {formData.activities.map((activity, index) => (
                 <tr key={index}>
                   <td>
-                    <input type="text" value={activity.slNo}
-                      onChange={(e) => handleActivityChange(index, 'slNo', e.target.value)} />
+                    <input
+                      type="text"
+                      value={index + 1} // Auto SL No.
+                      readOnly
+                    />
                   </td>
                   <td>
-                    <input type="text" value={activity.activity}
-                      onChange={(e) => handleActivityChange(index, 'activity', e.target.value)} />
+                    <input
+                      type="text"
+                      value={activity.activity}
+                      onChange={(e) => handleActivityChange(index, 'activity', e.target.value)}
+                    />
                   </td>
                   <td>
-                    <input type="text" value={activity.target}
-                      onChange={(e) => handleActivityChange(index, 'target', e.target.value)} />
+                    <input
+                      type="date" // Calendar input
+                      value={activity.target}
+                      onChange={(e) => handleActivityChange(index, 'target', e.target.value)}
+                    />
                   </td>
                   <td>
-                    <input type="text" value={activity.status}
-                      onChange={(e) => handleActivityChange(index, 'status', e.target.value)} />
+                    <select
+                      value={activity.status}
+                      onChange={(e) => handleActivityChange(index, 'status', e.target.value)}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Close">Close</option>
+                    </select>
                   </td>
                 </tr>
               ))}
@@ -206,6 +288,8 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
             <span className="icon">+</span> Add Row
           </button>
         </div>
+
+
       </div>
     </div>
   );
@@ -214,7 +298,8 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName }) => {
 NonConformityFormSection.propTypes = {
   formData: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
-  departmentName: PropTypes.string
+  departmentName: PropTypes.string,
+  ncObservations: PropTypes.array
 };
 
 export default NonConformityFormSection;

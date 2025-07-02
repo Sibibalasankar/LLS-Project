@@ -43,6 +43,12 @@ const AuditNcApproval = () => {
     }
   };
 
+  const handleViewActionReport = (ncsNumber, department, auditCycle) => {
+    // Directly open the action report with the NC number as parameter
+    const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(ncsNumber)}&department=${encodeURIComponent(department)}&auditCycle=${encodeURIComponent(auditCycle)}`;
+    window.open(url, '_blank');
+  };
+
   const renderDecisionStatus = (reportId) => {
     const status = decisions[reportId];
 
@@ -81,7 +87,7 @@ const AuditNcApproval = () => {
         <div className="card-body">
           <div className="mb-3">
             <div className="row">
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <input
                   type="text"
                   className="form-control"
@@ -91,7 +97,7 @@ const AuditNcApproval = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <input
                   type="text"
                   className="form-control"
@@ -101,7 +107,7 @@ const AuditNcApproval = () => {
                   onChange={handleFilterChange}
                 />
               </div>
-              <div className="col-md-4">
+              <div className="col-md-3">
                 <input
                   type="text"
                   className="form-control"
@@ -126,6 +132,7 @@ const AuditNcApproval = () => {
                     <th>Audit Cycle</th>
                     <th>File Name</th>
                     <th>View File</th>
+                    <th>View Action Report</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
@@ -146,6 +153,24 @@ const AuditNcApproval = () => {
                         >
                           View
                         </a>
+                      </td>
+                      <td>
+                        {file.ncsNumber ? (
+                          <button
+                            className="btn btn-sm btn-info"
+                            onClick={() => handleViewActionReport(
+                              file.ncsNumber,
+                              file.department || file.dptname,
+                              file.auditCycleNo
+                            )}
+                          >
+                            View Report
+                          </button>
+                        ) : (
+                          <button className="btn btn-sm btn-secondary" disabled>
+                            N/A
+                          </button>
+                        )}
                       </td>
                       <td>
                         {renderDecisionStatus(reportId)}

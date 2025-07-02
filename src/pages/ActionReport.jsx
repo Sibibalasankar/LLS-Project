@@ -21,18 +21,18 @@ const INITIAL_FORM_DATA = {
   isoClass: "",
   potentialRisk: "",
   connection: "",
-  activities: [{ slNo: "", activity: "", target: "", status: "" }],
+  activities: [{ activity: "", target: "", status: "" }],
   auditorSignature: "",
   auditeeSignature: "",
   rootCauses: ["", "", "", "", ""],
   correctiveActions: [{
-    slNo: "",
-    activity: "",
-    responsible: "",
-    changes: "",
-    target: "",
-    status: ""
-  }],
+  activity: "",
+  responsible: "",
+  changes: "",
+  target: "",
+  status: ""
+}],
+
   followUpObservation: "",
   followUpEvidence: "",
   closingStatus: "",
@@ -74,7 +74,7 @@ const formReducer = (state, action) => {
         ...state,
         activities: [
           ...state.activities,
-          { slNo: "", activity: "", target: "", status: "" }
+          { activity: "", target: "", status: "" }
         ]
       };
     case ACTION_TYPES.ADD_CORRECTIVE_ACTION_ROW:
@@ -82,7 +82,7 @@ const formReducer = (state, action) => {
         ...state,
         correctiveActions: [
           ...state.correctiveActions,
-          { slNo: "", activity: "", responsible: "", changes: "", target: "", status: "" }
+          { activity: "", responsible: "", changes: "", target: "", status: "" }
         ]
       };
     case ACTION_TYPES.RESET_FORM:
@@ -118,80 +118,155 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
-const ActionReport = () => {
+const ActionReport = ({ isAllDepartments = false }) => {
   // Get data from URL query parameters
   const queryParams = new URLSearchParams(window.location.search);
   const dataParam = queryParams.get('data');
+  const ncsNumberParam = queryParams.get('ncsNumber');
+  const departmentParam = queryParams.get('department');
+  const auditCycleParam = queryParams.get('auditCycle');
+    const readOnly = queryParams.get('readOnly') === 'true';
+
   const observationData = dataParam ? JSON.parse(decodeURIComponent(dataParam)) : null;
-  
-  // Extract needed fields from observation data with consistent naming
-  const departmentName = observationData?.department || '';
-  const auditCycleNo = observationData?.auditCycleNo || '';
-  const ncsNumber = observationData?.ncsNumber || ''; // Changed from ncsNumberParam to ncsNumber
-  const slNo = observationData?.slNo || '';
-  const processActivity = observationData?.processActivity || '';
-  const potentialCauses = observationData?.potentialCauses || '';
-  const findings = observationData?.findings || '';
-  const isoClause = observationData?.isoClause || '';
-  const result = observationData?.result || '';
-  const auditorSignature = observationData?.auditorSignature || '';
-  const auditeeSignature = observationData?.auditeeSignature || '';
-  const auditDate = observationData?.auditDate || new Date().toISOString().split('T')[0];
 
-
-const [formData, dispatch] = useReducer(formReducer, {
-  ...INITIAL_FORM_DATA,
-  dptname: departmentName,
-  auditCycleNo: auditCycleNo,
-  ncsNumber: '',
-  auditDate: auditDate,
-  process: processActivity,
-  nonConformityStatement: findings,
-  objectiveEvidence: potentialCauses,
-  isoClass: isoClause,
-  auditor: auditorSignature,
-  auditee: auditeeSignature
-});
+  // First, declare all variables and hooks
   const [savedReports, setSavedReports] = useLocalStorage('savedReports', []);
   const [showForms, setShowForms] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [viewingReport, setViewingReport] = useState(null);
   const [autoOpened, setAutoOpened] = useState(false);
   const navigate = useNavigate();
-const generateNcNumber = () => {
-  const year = new Date().getFullYear();
+ useEffect(() => {
+    if (autoOpened) return;
 
-  const existingNcs = savedReports
-    .filter(report => typeof report.ncsNumber === 'string' && report.ncsNumber.startsWith(year.toString()))
-    .map(report => parseInt(report.ncsNumber.replace(year.toString(), '')))
-    .filter(num => !isNaN(num));
+    // Case 1: Direct NC number access
+    if (ncsNumberParam && !observationData) {
+      const matchingReport = savedReports.find(report => 
+        report.ncsNumber === ncsNumberParam &&
+        (!departmentParam || report.dptname === departmentParam) &&
+        (!auditCycleParam || report.auditCycleNo === auditCycleParam)
+      );
 
-  const nextSequence = existingNcs.length > 0 ? Math.max(...existingNcs) + 1 : 1;
+      if (matchingReport) {
+        setViewingReport(matchingReport);
+        setAutoOpened(true);
+      } else {
+        // If no matching report found, create a new one with the provided NC number
+        handleAddNewWithNCNumber(ncsNumberParam, departmentParam, auditCycleParam);
+      }
+    }
+    // Case 2: Observation data from audit
+    else if (!isAllDepartments && !autoOpened && departmentName && auditCycleNo && ncObservations.length > 0) {
+      setAutoOpened(true);
+      const matchingReports = savedReports.filter(report =>
+        report.dptname === departmentName &&
+        report.auditCycleNo === auditCycleNo
+      );
 
-  return `${year}${nextSequence.toString().padStart(3, '0')}`;
-};
+      if (matchingReports.length > 0) {
+        handleViewReport(matchingReports[0]);
+      } else {
+        handleAddNew();
+      }
+    }
+  }, [ncsNumberParam, departmentParam, auditCycleParam, observationData, savedReports, autoOpened]);
 
+  // Helper function to add new report with predefined NC number
+  const handleAddNewWithNCNumber = (ncsNumber, department, auditCycle) => {
+    clearDraft(draftKey);
+    dispatch({
+      type: ACTION_TYPES.RESET_FORM,
+      payload: {
+        ...INITIAL_FORM_DATA,
+        dptname: department || '',
+        auditCycleNo: auditCycle || '',
+        ncsNumber: ncsNumber,
+        auditDate: new Date().toISOString().split('T')[0]
+      }
+    });
+    setEditingIndex(null);
+    setViewingReport(null);
+    setShowForms(true);
+  };
+  const mergeObservations = (fieldName) => {
+    if (!ncObservations || ncObservations.length === 0) return '';
+    return ncObservations.map(obs => obs[fieldName]).filter(Boolean).join('\n');
+  };
+  // Then define helper functions
+  const generateNcNumber = () => {
+    const year = new Date().getFullYear();
+    const existingNcs = savedReports
+      .filter(report => typeof report.ncsNumber === 'string' && report.ncsNumber.startsWith(year.toString()))
+      .map(report => parseInt(report.ncsNumber.replace(year.toString(), '')))
+      .filter(num => !isNaN(num));
+
+    const nextSequence = existingNcs.length > 0 ? Math.max(...existingNcs) + 1 : 1;
+    return `${year}${nextSequence.toString().padStart(3, '0')}`;
+  };
+
+  // Extract data from observationData
+  // Extract data from observationData
+const ncObservations = observationData?.observations || [];
+const departmentName = observationData?.department || '';
+const auditCycleNo = observationData?.auditCycleNo || '';
+const ncsNumber = observationData?.ncsNumber || '';
+const auditDate = observationData?.auditDate || new Date().toISOString().split('T')[0];
+
+// Get values from the first NC observation if available
+const firstObservation = ncObservations.length > 0 ? ncObservations[0] : {};
+const processActivity = firstObservation.processActivity || '';
+const potentialCauses = firstObservation.potentialCauses || '';
+const findings = firstObservation.findings || '';
+const isoClause = firstObservation.isoClause || '';
+const result = firstObservation.result || '';
+const auditorSignature = firstObservation.auditorSignature || '';
+const auditeeSignature = firstObservation.auditeeSignature || '';
+const auditorDesignation = firstObservation.auditorDesignation || '';
+const auditeeDesignation = firstObservation.auditeeDesignation || '';
+
+// Now initialize formData with all variables available
+const [formData, dispatch] = useReducer(formReducer, {
+  ...INITIAL_FORM_DATA,
+  dptname: departmentName,
+  auditCycleNo: auditCycleNo,
+  ncsNumber: generateNcNumber(),
+  auditDate: auditDate,
+  process: processActivity,
+  nonConformityStatement: findings,
+  objectiveEvidence: potentialCauses,
+  isoClass: isoClause,
+  auditor: auditorSignature,
+  auditee: auditeeSignature,
+  auditorDesignation: auditorDesignation,
+  auditeeDesignation: auditeeDesignation
+});
+  // Rest of your component code...
   // Filter reports by department and audit cycle
-  const matchingReports = savedReports.filter(report => 
-    report.dptname === departmentName && 
+  const matchingReports = savedReports.filter(report =>
+    report.dptname === departmentName &&
     report.auditCycleNo === auditCycleNo &&
     report.ncsNumber === ncsNumber
   );
 
   // Auto-open logic
+  // Modify the auto-open logic
   useEffect(() => {
-    if (!autoOpened && departmentName && auditCycleNo && ncsNumber) {
+    if (!isAllDepartments && !autoOpened && departmentName && auditCycleNo && ncObservations.length > 0) {
       setAutoOpened(true);
-      
+
+      // Find reports that match any of the NC observations
+      const matchingReports = savedReports.filter(report =>
+        report.dptname === departmentName &&
+        report.auditCycleNo === auditCycleNo
+      );
+
       if (matchingReports.length > 0) {
-        // If matching report exists, view it
         handleViewReport(matchingReports[0]);
       } else {
-        // If no matching report, create new one with observation data
         handleAddNew();
       }
     }
-  }, [departmentName, auditCycleNo, ncsNumber, savedReports, autoOpened]);
+  }, [departmentName, auditCycleNo, ncObservations, savedReports, autoOpened]);
 
 const handleAddNew = () => {
   const savedDraft = loadDraft(draftKey);
@@ -208,14 +283,18 @@ const handleAddNew = () => {
           ...INITIAL_FORM_DATA,
           dptname: departmentName,
           auditCycleNo: auditCycleNo,
-          ncsNumber: newNcNumber, // ✅ Correctly added here
+          ncsNumber: newNcNumber,
           auditDate: auditDate,
-          process: processActivity,
-          nonConformityStatement: findings,
-          objectiveEvidence: potentialCauses,
-          isoClass: isoClause,
+          process: processActivity + '\n' + mergeObservations('processActivity'),
+          requirement: mergeObservations('requirement'),
+          nonConformityStatement: findings + '\n' + mergeObservations('findings'),
+          objectiveEvidence: potentialCauses + '\n' + mergeObservations('objectiveEvidence'),
+          isoClass: isoClause + '\n' + mergeObservations('isoClause'),
+          potentialRisk: mergeObservations('potentialCauses'),
           auditor: auditorSignature,
-          auditee: auditeeSignature
+          auditee: auditeeSignature,
+          auditorDesignation: auditorDesignation,
+          auditeeDesignation: auditeeDesignation
         }
       });
     }
@@ -226,14 +305,18 @@ const handleAddNew = () => {
         ...INITIAL_FORM_DATA,
         dptname: departmentName,
         auditCycleNo: auditCycleNo,
-        ncsNumber: newNcNumber, // ✅ Correctly added here
+        ncsNumber: newNcNumber,
         auditDate: auditDate,
-        process: processActivity,
-        nonConformityStatement: findings,
-        objectiveEvidence: potentialCauses,
-        isoClass: isoClause,
+        process: processActivity + '\n' + mergeObservations('processActivity'),
+        requirement: mergeObservations('requirement'),
+        nonConformityStatement: findings + '\n' + mergeObservations('findings'),
+        objectiveEvidence: potentialCauses + '\n' + mergeObservations('objectiveEvidence'),
+        isoClass: isoClause + '\n' + mergeObservations('isoClause'),
+        potentialRisk: mergeObservations('potentialCauses'),
         auditor: auditorSignature,
-        auditee: auditeeSignature
+        auditee: auditeeSignature,
+        auditorDesignation: auditorDesignation,
+        auditeeDesignation: auditeeDesignation
       }
     });
   }
@@ -242,6 +325,7 @@ const handleAddNew = () => {
   setViewingReport(null);
   setShowForms(true);
 };
+
 
   const validateAuditCycleNo = (value) => {
     const pattern = /^(I|II|III|IV)\/\d{4}-(\d{2}|\d{4})$/;
@@ -257,7 +341,7 @@ const handleAddNew = () => {
     return null;
   };
 
-   const handleSave = () => {
+  const handleSave = () => {
     const validationError = validateForm();
     if (validationError) {
       alert(validationError);
@@ -305,16 +389,16 @@ const handleAddNew = () => {
   };
 
   const handleDelete = (index) => {
-  if (window.confirm("Are you sure you want to delete this report?")) {
-    const updatedReports = savedReports.filter((_, i) => i !== index);
-    setSavedReports(updatedReports);
+    if (window.confirm("Are you sure you want to delete this report?")) {
+      const updatedReports = savedReports.filter((_, i) => i !== index);
+      setSavedReports(updatedReports);
 
-    // If the deleted report is currently being viewed, clear it
-    if (viewingReport && savedReports[index].id === viewingReport.id) {
-      setViewingReport(null);
+      // If the deleted report is currently being viewed, clear it
+      if (viewingReport && savedReports[index].id === viewingReport.id) {
+        setViewingReport(null);
+      }
     }
-  }
-};
+  };
 
   const handleSaveDraft = () => {
     saveDraft(draftKey, formData);
@@ -330,7 +414,7 @@ const handleAddNew = () => {
     setViewingReport(null);
   };
 
- return (
+  return (
     <div className="action-report-container">
       {showForms ? (
         <>
@@ -338,7 +422,9 @@ const handleAddNew = () => {
             formData={formData}
             dispatch={dispatch}
             departmentName={departmentName}
+            ncObservations={ncObservations} // ✅ Pass the observations list here
           />
+
           <CorrectiveActionFormSection formData={formData} dispatch={dispatch} />
           <div className="form-buttons">
             <button type="button" className="save-btn" onClick={handleSave}>
@@ -363,9 +449,10 @@ const handleAddNew = () => {
         />
       ) : (
         <ReportList
-          reports={savedReports.filter(report => 
+          reports={isAllDepartments ? savedReports : savedReports.filter(report =>
             departmentName ? report.dptname === departmentName : true
           )}
+
           onView={handleViewReport}
           onEdit={handleEdit}
           onDelete={handleDelete}

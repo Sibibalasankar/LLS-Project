@@ -538,3 +538,27 @@
 .open-sheet-btn:hover {
   background-color: #e0a800;
 }
+/* Add to your Observation.css */
+.nc-action-button-container {
+  margin-top: 20px;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.action-report-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-report-btn:hover {
+  background-color: #45a049;
+}

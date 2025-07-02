@@ -286,13 +286,14 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                     <tbody>
                       {report.activities.map((activity, index) => (
                         <tr key={index}>
-                          <td>{activity.slNo}</td>
+                          <td>{index + 1}</td> {/* Show serial number */}
                           <td>{activity.activity}</td>
                           <td>{activity.target}</td>
                           <td>{activity.status}</td>
                         </tr>
                       ))}
                     </tbody>
+
                   </table>
                 </td>
               </tr>
@@ -375,7 +376,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                     <tbody>
                       {report.correctiveActions.map((action, index) => (
                         <tr key={index}>
-                          <td>{action.slNo}</td>
+                          <td>{index + 1}</td> {/* Show serial number */}
                           <td>{action.activity}</td>
                           <td>{action.responsible}</td>
                           <td>{action.changes}</td>
@@ -384,6 +385,7 @@ const ReportViewer = ({ report, onEdit, onBack }) => {
                         </tr>
                       ))}
                     </tbody>
+
                   </table>
                 </td>
               </tr>
