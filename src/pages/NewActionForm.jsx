@@ -373,32 +373,38 @@ const NewActionForm = () => {
     setShowForms(true);
   };
 
-  const handleSave = () => {
-    if (!validateAuditCycleNo(formData.auditCycleNo)) {
-      alert('Please enter a valid Audit Cycle Number in format I/2025-26 or II/2026-2027');
-      return;
-    }
+const handleSave = () => {
+  if (!validateAuditCycleNo(formData.auditCycleNo)) {
+    alert('Please enter a valid Audit Cycle Number in format I/2025-26 or II/2026-2027');
+    return;
+  }
 
-    const newReport = {
-      ...formData,
-      id: Date.now(),
-      savedDate: new Date().toLocaleString()
-    };
-
-    let updatedReports;
-
-    if (editingIndex !== null) {
-      updatedReports = [...savedReports];
-      updatedReports[editingIndex] = newReport;
-      setSavedReports(updatedReports);
-    } else {
-      updatedReports = [...savedReports, newReport];
-      setSavedReports(updatedReports);
-    }
-
-    localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
-    setShowForms(false);
+  const newReport = {
+    ...formData,
+    id: editingIndex !== null ? savedReports[editingIndex].id : Date.now(),
+    savedDate: new Date().toLocaleString()
   };
+
+  let updatedReports;
+
+  if (editingIndex !== null) {
+    updatedReports = [...savedReports];
+    updatedReports[editingIndex] = newReport;
+    setSavedReports(updatedReports);
+  } else {
+    updatedReports = [...savedReports, newReport];
+    setSavedReports(updatedReports);
+  }
+
+  localStorage.setItem('latestAuditReport', JSON.stringify(newReport));
+
+  // 👉 Set the report to view
+  setViewingReport(newReport);
+
+  // 👉 Hide the form
+  setShowForms(false);
+};
+
 
   const handleEdit = (index) => {
     dispatch({
