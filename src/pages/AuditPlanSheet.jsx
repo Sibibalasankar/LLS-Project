@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/card";
 import { Button } from "../components/button";
-import {  FaPrint } from "react-icons/fa";
+import { FaPrint } from "react-icons/fa";
 
 import {
   Table,
@@ -89,17 +89,18 @@ const AuditPlanSheet = () => {
     printWindow.document.close();
     printWindow.print();
   };
+  const getCycle = (formattedCycle) => {
+    return formattedCycle.split('/')[0].trim().toUpperCase(); // Example: 'I/2025-2026' => 'I'
+  };
+ const filteredPlans = auditPlans.filter((plan) =>
+  (selectedDepartment === "" || plan.department === selectedDepartment) &&
+  (auditCycleFilter === "" || plan.formattedCycle?.toLowerCase().startsWith(auditCycleFilter.trim().toLowerCase())) &&
+  (plan.department.toLowerCase().includes(filter.toLowerCase()) ||
+    plan.auditor.toLowerCase().includes(filter.toLowerCase()))
+);
 
-  const filteredPlans = auditPlans.filter((plan) =>
-    (selectedDepartment === "" ||
-      plan.department === selectedDepartment) &&
-    (auditCycleFilter === "" ||
-      plan.formattedCycle
-        ?.toLowerCase()
-        .includes(auditCycleFilter.toLowerCase())) &&
-    (plan.department.toLowerCase().includes(filter.toLowerCase()) ||
-      plan.auditor.toLowerCase().includes(filter.toLowerCase()))
-  );
+
+
 
   return (
     <Card className="p-4">

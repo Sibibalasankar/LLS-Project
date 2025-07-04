@@ -26,12 +26,12 @@ const INITIAL_FORM_DATA = {
   auditeeSignature: "",
   rootCauses: ["", "", "", "", ""],
   correctiveActions: [{
-  activity: "",
-  responsible: "",
-  changes: "",
-  target: "",
-  status: ""
-}],
+    activity: "",
+    responsible: "",
+    changes: "",
+    target: "",
+    status: ""
+  }],
 
   followUpObservation: "",
   followUpEvidence: "",
@@ -125,9 +125,10 @@ const ActionReport = ({ isAllDepartments = false }) => {
   const ncsNumberParam = queryParams.get('ncsNumber');
   const departmentParam = queryParams.get('department');
   const auditCycleParam = queryParams.get('auditCycle');
-    const readOnly = queryParams.get('readOnly') === 'true';
+  const readOnly = queryParams.get('readOnly') === 'true';
 
   const observationData = dataParam ? JSON.parse(decodeURIComponent(dataParam)) : null;
+  const userView = queryParams.get('userView') === 'true';
 
   // First, declare all variables and hooks
   const [savedReports, setSavedReports] = useLocalStorage('savedReports', []);
@@ -136,12 +137,12 @@ const ActionReport = ({ isAllDepartments = false }) => {
   const [viewingReport, setViewingReport] = useState(null);
   const [autoOpened, setAutoOpened] = useState(false);
   const navigate = useNavigate();
- useEffect(() => {
+  useEffect(() => {
     if (autoOpened) return;
 
     // Case 1: Direct NC number access
     if (ncsNumberParam && !observationData) {
-      const matchingReport = savedReports.find(report => 
+      const matchingReport = savedReports.find(report =>
         report.ncsNumber === ncsNumberParam &&
         (!departmentParam || report.dptname === departmentParam) &&
         (!auditCycleParam || report.auditCycleNo === auditCycleParam)
@@ -206,40 +207,40 @@ const ActionReport = ({ isAllDepartments = false }) => {
 
   // Extract data from observationData
   // Extract data from observationData
-const ncObservations = observationData?.observations || [];
-const departmentName = observationData?.department || '';
-const auditCycleNo = observationData?.auditCycleNo || '';
-const ncsNumber = observationData?.ncsNumber || '';
-const auditDate = observationData?.auditDate || new Date().toISOString().split('T')[0];
+  const ncObservations = observationData?.observations || [];
+  const departmentName = observationData?.department || '';
+  const auditCycleNo = observationData?.auditCycleNo || '';
+  const ncsNumber = observationData?.ncsNumber || '';
+  const auditDate = observationData?.auditDate || new Date().toISOString().split('T')[0];
 
-// Get values from the first NC observation if available
-const firstObservation = ncObservations.length > 0 ? ncObservations[0] : {};
-const processActivity = firstObservation.processActivity || '';
-const potentialCauses = firstObservation.potentialCauses || '';
-const findings = firstObservation.findings || '';
-const isoClause = firstObservation.isoClause || '';
-const result = firstObservation.result || '';
-const auditorSignature = firstObservation.auditorSignature || '';
-const auditeeSignature = firstObservation.auditeeSignature || '';
-const auditorDesignation = firstObservation.auditorDesignation || '';
-const auditeeDesignation = firstObservation.auditeeDesignation || '';
+  // Get values from the first NC observation if available
+  const firstObservation = ncObservations.length > 0 ? ncObservations[0] : {};
+  const processActivity = firstObservation.processActivity || '';
+  const potentialCauses = firstObservation.potentialCauses || '';
+  const findings = firstObservation.findings || '';
+  const isoClause = firstObservation.isoClause || '';
+  const result = firstObservation.result || '';
+  const auditorSignature = firstObservation.auditorSignature || '';
+  const auditeeSignature = firstObservation.auditeeSignature || '';
+  const auditorDesignation = firstObservation.auditorDesignation || '';
+  const auditeeDesignation = firstObservation.auditeeDesignation || '';
 
-// Now initialize formData with all variables available
-const [formData, dispatch] = useReducer(formReducer, {
-  ...INITIAL_FORM_DATA,
-  dptname: departmentName,
-  auditCycleNo: auditCycleNo,
-  ncsNumber: generateNcNumber(),
-  auditDate: auditDate,
-  process: processActivity,
-  nonConformityStatement: findings,
-  objectiveEvidence: potentialCauses,
-  isoClass: isoClause,
-  auditor: auditorSignature,
-  auditee: auditeeSignature,
-  auditorDesignation: auditorDesignation,
-  auditeeDesignation: auditeeDesignation
-});
+  // Now initialize formData with all variables available
+  const [formData, dispatch] = useReducer(formReducer, {
+    ...INITIAL_FORM_DATA,
+    dptname: departmentName,
+    auditCycleNo: auditCycleNo,
+    ncsNumber: generateNcNumber(),
+    auditDate: auditDate,
+    process: processActivity,
+    nonConformityStatement: findings,
+    objectiveEvidence: potentialCauses,
+    isoClass: isoClause,
+    auditor: auditorSignature,
+    auditee: auditeeSignature,
+    auditorDesignation: auditorDesignation,
+    auditeeDesignation: auditeeDesignation
+  });
   // Rest of your component code...
   // Filter reports by department and audit cycle
   const matchingReports = savedReports.filter(report =>
@@ -268,15 +269,37 @@ const [formData, dispatch] = useReducer(formReducer, {
     }
   }, [departmentName, auditCycleNo, ncObservations, savedReports, autoOpened]);
 
-const handleAddNew = () => {
-  const savedDraft = loadDraft(draftKey);
-  const newNcNumber = generateNcNumber();
+  const handleAddNew = () => {
+    const savedDraft = loadDraft(draftKey);
+    const newNcNumber = generateNcNumber();
 
-  if (savedDraft) {
-    if (window.confirm('A draft was found. Do you want to continue editing the draft?')) {
-      dispatch({ type: ACTION_TYPES.LOAD_FORM, payload: savedDraft });
+    if (savedDraft) {
+      if (window.confirm('A draft was found. Do you want to continue editing the draft?')) {
+        dispatch({ type: ACTION_TYPES.LOAD_FORM, payload: savedDraft });
+      } else {
+        clearDraft(draftKey);
+        dispatch({
+          type: ACTION_TYPES.RESET_FORM,
+          payload: {
+            ...INITIAL_FORM_DATA,
+            dptname: departmentName,
+            auditCycleNo: auditCycleNo,
+            ncsNumber: newNcNumber,
+            auditDate: auditDate,
+            process: processActivity + '\n' + mergeObservations('processActivity'),
+            requirement: mergeObservations('requirement'),
+            nonConformityStatement: findings + '\n' + mergeObservations('findings'),
+            objectiveEvidence: potentialCauses + '\n' + mergeObservations('objectiveEvidence'),
+            isoClass: isoClause + '\n' + mergeObservations('isoClause'),
+            potentialRisk: mergeObservations('potentialCauses'),
+            auditor: auditorSignature,
+            auditee: auditeeSignature,
+            auditorDesignation: auditorDesignation,
+            auditeeDesignation: auditeeDesignation
+          }
+        });
+      }
     } else {
-      clearDraft(draftKey);
       dispatch({
         type: ACTION_TYPES.RESET_FORM,
         payload: {
@@ -298,33 +321,11 @@ const handleAddNew = () => {
         }
       });
     }
-  } else {
-    dispatch({
-      type: ACTION_TYPES.RESET_FORM,
-      payload: {
-        ...INITIAL_FORM_DATA,
-        dptname: departmentName,
-        auditCycleNo: auditCycleNo,
-        ncsNumber: newNcNumber,
-        auditDate: auditDate,
-        process: processActivity + '\n' + mergeObservations('processActivity'),
-        requirement: mergeObservations('requirement'),
-        nonConformityStatement: findings + '\n' + mergeObservations('findings'),
-        objectiveEvidence: potentialCauses + '\n' + mergeObservations('objectiveEvidence'),
-        isoClass: isoClause + '\n' + mergeObservations('isoClause'),
-        potentialRisk: mergeObservations('potentialCauses'),
-        auditor: auditorSignature,
-        auditee: auditeeSignature,
-        auditorDesignation: auditorDesignation,
-        auditeeDesignation: auditeeDesignation
-      }
-    });
-  }
 
-  setEditingIndex(null);
-  setViewingReport(null);
-  setShowForms(true);
-};
+    setEditingIndex(null);
+    setViewingReport(null);
+    setShowForms(true);
+  };
 
 
   const validateAuditCycleNo = (value) => {
@@ -446,7 +447,10 @@ const handleAddNew = () => {
             handleEdit(index);
           }}
           onBack={handleBackToList}
+          hideBackButton={userView} // ✅ Correct prop name
         />
+
+
       ) : (
         <ReportList
           reports={isAllDepartments ? savedReports : savedReports.filter(report =>

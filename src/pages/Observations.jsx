@@ -6,7 +6,7 @@ import companylogo from "../assets/images/lls_logo.png";
 import { FiEdit, FiTrash2, FiFileText, FiArrowLeft, FiPlus, FiFolder } from "react-icons/fi";
 import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 
-const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
+const Observations = ({ observationId: propObservationId, departmentName, auditCycleNo: propAuditCycleNo, onBack }) => {
   const [observations, setObservations] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [observationId, setObservationId] = useState(null);
@@ -40,6 +40,9 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const auditCycleOptions = ["I", "II", "III", "IV", "V"];
   const [actionObservation, setActionObservation] = useState(null);
   const [showActionForm, setShowActionForm] = useState(false);
+  const firstObservation = observations[0] || null;
+  const isFirstObservation = observations.length === 0;
+  const [auditCycleNo, setAuditCycleNo] = useState(propAuditCycleNo || "");
 
   const navigate = useNavigate();
 
@@ -84,13 +87,25 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   }, [propObservationId]);
 
   // Load observations from localStorage when observationId is set
-  useEffect(() => {
-    if (observationId) {
-      const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
-      const obs = storedObservations[observationId] || [];
-      setObservations(obs);
+useEffect(() => {
+  if (observationId) {
+    const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
+    const obs = storedObservations[observationId] || [];
+    setObservations(obs);
+
+    const departmentObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
+    const matched = departmentObservations.find(o => o.id.toString() === observationId.toString());
+
+    if (matched && matched.auditCycleNo) {
+      setAuditCycleNo(matched.auditCycleNo);
+      setCurrentObservation(prev => ({
+        ...prev,
+        auditCycleNo: matched.auditCycleNo
+      }));
     }
-  }, [observationId]);
+  }
+}, [observationId, departmentName]);
+
 
   // Save observations to localStorage whenever they change
   useEffect(() => {
@@ -140,6 +155,22 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   }, [departmentName]);
 
   const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
+  const getNextAuditCycleNo = () => {
+    const cycles = ["I", "II", "III", "IV", "V"];
+    // Get all used cycles from current observations
+    const usedCycles = observations.map(obs => obs.auditCycleNo.split('/')[0]);
+
+    // Find the first unused cycle
+    for (let cycle of cycles) {
+      if (!usedCycles.includes(cycle)) {
+        return `${cycle}/${yearFormat}`;
+      }
+    }
+
+    // Fallback if all cycles are used
+    return `I/${yearFormat}`;
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -157,36 +188,36 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   };
 
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
+const handleCreate = () => {
+  const draftKey = `observationDraft_${observationId}`;
+  const savedDraft = loadDraft(draftKey);
 
-  const handleCreate = () => {
-    const draftKey = `observationDraft_${observationId}`;
-    const savedDraft = loadDraft(draftKey);
+  if (savedDraft) {
+    setCurrentObservation(savedDraft);
+  } else {
+    const newObservation = {
+      id: "",
+      slNo: getNextSlNo(),
+      processActivity: "",
+      potentialCauses: "",
+      findings: "",
+      isoClause: "",
+      result: "",
+      auditCycleNo: auditCycleNo, // ✅ use the correct cycle passed from parent
+      auditDate: observations.length > 0 ? observations[0].auditDate : new Date().toISOString().split("T")[0],
+      auditorSignature: availableAuditors.length === 1 ? availableAuditors[0].name : "",
+      auditorDesignation: "Auditor",
+      auditeeSignature: availableAuditees.length === 1 ? availableAuditees[0].name : "",
+      auditeeDesignation: "Auditee",
+      department: departmentName || "",
+    };
 
-    if (savedDraft) {
-      setCurrentObservation(savedDraft);
-    } else {
-      const newObservation = {
-        id: "",
-        slNo: getNextSlNo(),
-        processActivity: "",
-        potentialCauses: "",
-        findings: "",
-        isoClause: "",
-        result: "",
-        auditCycleNo: `I/${yearFormat}`,
-        auditDate: new Date().toISOString().split("T")[0],
-        auditorSignature: availableAuditors.length === 1 ? availableAuditors[0].name : "",
-        auditorDesignation: "Auditor",
-        auditeeSignature: availableAuditees.length === 1 ? availableAuditees[0].name : "",
-        auditeeDesignation: "Auditee",
-        department: departmentName || "",
-      };
+    setCurrentObservation(newObservation);
+  }
 
-      setCurrentObservation(newObservation);
-    }
+  setShowForm(true);
+};
 
-    setShowForm(true);
-  };
 
   const handleSaveDraft = () => {
     const draftKey = `observationDraft_${observationId}`;
@@ -239,11 +270,10 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           <strong>Dept.:</strong> {currentObservation.department}
         </div>
         <div className="audit-info-item">
-          <strong>Audit Cycle no.:</strong> {observations.length > 0 ? currentObservation.auditCycleNo : "-"}
+          <strong>Audit Cycle no.:</strong> {auditCycleNo}
         </div>
         <div className="audit-info-item">
-          <strong>Audit Date:</strong> {observations.length > 0 ? currentObservation.auditDate : "-"}
-        </div>
+          <strong>Audit Date:</strong> {observations.length > 0 ? observations[0].auditDate : "-"}        </div>
       </div>
 
       <div className="observations-table-container p-3">
@@ -271,14 +301,14 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <td>{obs.result}</td>
                   {canEdit && (
                     <td className="btns_td">
-                    <td className="btns_td">
-                      <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
-                        <FiEdit size={20} />
-                      </button>
-                      <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
-                        <FiTrash2 size={20} />
-                      </button>
-                    </td>
+                      <td className="btns_td">
+                        <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
+                          <FiEdit size={20} />
+                        </button>
+                        <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
+                          <FiTrash2 size={20} />
+                        </button>
+                      </td>
                     </td>
                   )}
                 </tr>
@@ -337,23 +367,14 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                 <div className="form-group">
                   <label>
                     Audit Cycle No:
-                    <select
+                    <input
+                      type="text"
                       name="auditCycleNo"
-                      value={currentObservation.auditCycleNo.split('/')[0]}
-                      onChange={(e) => {
-                        const cyclePrefix = e.target.value;
-                        setCurrentObservation(prev => ({
-                          ...prev,
-                          auditCycleNo: `${cyclePrefix}/${yearFormat}`
-                        }));
-                      }}
-                      required
-                    >
-                      {auditCycleOptions.map(option => (
-                        <option key={option} value={option}>{option}/{yearFormat}</option>
-                      ))}
-                    </select>
+                      value={currentObservation.auditCycleNo}
+                      readOnly
+                    />
                   </label>
+
                 </div>
                 <div className="form-group">
                   <label>
@@ -364,7 +385,9 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                       value={currentObservation.auditDate}
                       onChange={handleInputChange}
                       required
+                      readOnly={!isFirstObservation} // Lock after first observation
                     />
+
                   </label>
                 </div>
 
@@ -378,6 +401,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                       onChange={handleInputChange}
                       readOnly
                     />
+
                   </label>
                 </div>
               </div>
@@ -588,7 +612,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       <div className="signatures-summary">
         <div className="signature-info">
           <div className="audit-info-item">
-            <strong>Auditor:</strong> {observations.length > 0 ? `${observations[0].auditorSignature} (${observations[0].auditorDesignation})` : "-"}
+            <strong>Auditee:</strong> {observations.length > 0 ? `${observations[0].auditeeSignature} (${observations[0].auditeeDesignation})` : "-"}
           </div>
           <div className="audit-info-item">
             <strong>Auditee:</strong> {observations.length > 0 ? `${observations[0].auditeeSignature} (${observations[0].auditeeDesignation})` : "-"}

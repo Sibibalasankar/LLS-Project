@@ -137,7 +137,7 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
   useEffect(() => {
     const storedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
     const storedDecisions = JSON.parse(localStorage.getItem('adminDecisions')) || {};
-    
+
     const filteredFiles = {};
     for (const [reportId, file] of Object.entries(storedFiles)) {
       if (storedDecisions[reportId] !== 'approved' && storedDecisions[reportId] !== 'redo') {
@@ -255,11 +255,15 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew }) => {
                         <td className="align-middle">
                           <button
                             className="btn btn-outline-primary btn-sm"
-                            onClick={() => onView(report)}
+                            onClick={() => {
+                              const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(report.ncsNumber)}&department=${encodeURIComponent(report.dptname)}&auditCycle=${encodeURIComponent(report.auditCycleNo)}&userView=true`;
+                              window.open(url, '_blank'); // 👉 This will open in a new tab
+                            }}
                             title="View details"
                           >
                             <i className="bi bi-eye-fill me-1"></i> View
                           </button>
+
                         </td>
                         <td className="align-middle">
                           <div className="input-group-sm int-box">
@@ -356,7 +360,7 @@ const NewActionForm = () => {
   };
 
   const handleAddNew = () => {
-    dispatch({ 
+    dispatch({
       type: ACTION_TYPES.RESET_FORM,
       payload: {
         ...INITIAL_FORM_DATA,
@@ -449,7 +453,9 @@ const NewActionForm = () => {
             handleEdit(index);
           }}
           onBack={handleBackToList}
+          hideBackButton={true} // Pass this to hide the button
         />
+
       ) : (
         <ReportList
           reports={savedReports}

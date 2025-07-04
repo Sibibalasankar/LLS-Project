@@ -29,7 +29,7 @@
   
   .document-title {
     color: #2c3e50;
-    font-size: 24px;
+    font-size: 20px;
     margin-bottom: 5px;
   }
   
@@ -400,7 +400,7 @@
 }
 .head_title_logo{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
     padding: 5px;
     border: 1px solid black;
@@ -489,7 +489,6 @@
    
     width: 100%;
     text-align: center;
-    text-decoration: underline;
     padding: 5px;
 }
 .follow_split_left{
@@ -794,4 +793,7 @@
 }
 .table-card label{
   color: #000;
+}
+.nonconformity-list{
+  text-align: start;
 }

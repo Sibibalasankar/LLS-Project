@@ -39,11 +39,10 @@ const AuditNcUserView = () => {
     setApprovedFiles(filteredFilesObj);
   }, [filters]);
 
-  const handleViewActionReport = (ncsNumber, department, auditCycle) => {
-    // Directly open the action report with the NC number as parameter
-    const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(ncsNumber)}&department=${encodeURIComponent(department)}&auditCycle=${encodeURIComponent(auditCycle)}`;
-    window.open(url, '_blank');
-  };
+ const handleViewActionReport = (ncsNumber, department, auditCycle) => {
+  const url = `/admin-dashboard/action-report?ncsNumber=${encodeURIComponent(ncsNumber)}&department=${encodeURIComponent(department)}&auditCycle=${encodeURIComponent(auditCycle)}&userView=true`;
+  window.open(url, '_blank');
+};
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;

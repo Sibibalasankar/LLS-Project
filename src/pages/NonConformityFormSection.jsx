@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObservations }) => {
   const [departments, setDepartments] = useState([]);
+  const [isMerged, setIsMerged] = useState(false); // Add this flag
 
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
@@ -36,12 +37,13 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
   };
 
   const mergeObservations = (fieldName) => {
-    if (!ncObservations || ncObservations.length === 0) return '';
-    return ncObservations.map(obs => obs[fieldName]).filter(Boolean).join('\n');
+    if (!ncObservations || ncObservations.length === 0) return [];
+    return Array.from(new Set(ncObservations.map(obs => obs[fieldName]).filter(Boolean)));
   };
 
+
   useEffect(() => {
-    if (ncObservations && ncObservations.length > 0) {
+    if (ncObservations && ncObservations.length > 0 && !isMerged) { // Run only if not merged yet
       const fieldsToMerge = [
         { name: 'process', key: 'processActivity' },
         { name: 'requirement', key: 'requirement' },
@@ -54,15 +56,15 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
       ];
 
       fieldsToMerge.forEach(field => {
-        if (!formData[field.name]) {
-          // For auditor, we'll take the first unique value if there are multiple observations
-          const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
-          const uniqueValue = [...new Set(allValues)].join(' / '); // Join multiple values with slash
-          handleChange({ target: { name: field.name, value: uniqueValue } });
-        }
+        const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
+        const uniqueValues = [...new Set(allValues)];
+        handleChange({ target: { name: field.name, value: uniqueValues } });
+
       });
+
+      setIsMerged(true); // Mark as merged
     }
-  }, [ncObservations]);
+  }, [ncObservations, isMerged]); // Make sure this doesn't trigger again unnecessarily
 
   return (
     <div className="audit-form-container">
@@ -137,10 +139,11 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
                   <div className="form-field">
                     <textarea
                       name="process"
-                      value={formData.process}
+                      value={Array.isArray(formData.process) ? formData.process.join('\n') : formData.process}
                       onChange={handleChange}
                       rows={3}
                     />
+
                   </div>
                 </td>
 
