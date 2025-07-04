@@ -9,6 +9,8 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
   const [viewObservationId, setViewObservationId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [auditCycleData, setAuditCycleData] = useState({});
+const userRole = localStorage.getItem('userRole');
+const isAuditee = userRole === 'auditee';
 
   useEffect(() => {
     const storedObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
@@ -42,23 +44,33 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
     setObservations(updated);
     onObservationUpdate(departmentName, updated.length);
   };
+const handleDeleteObservation = async (id) => {
+  setIsDeleting(true);
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-  const handleDeleteObservation = async (id) => {
-    setIsDeleting(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
+  const updatedObservations = observations
+    .filter(obs => obs.id !== id)
+    .map((obs, index) => ({
+      ...obs,
+      number: index + 1,
+    }));
 
-    const updatedObservations = observations
-      .filter(obs => obs.id !== id)
-      .map((obs, index) => ({
-        ...obs,
-        number: index + 1,
-      }));
+  localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
+  setObservations(updatedObservations);
+  onObservationUpdate(departmentName, updatedObservations.length);
 
-    localStorage.setItem(`observations_${departmentName}`, JSON.stringify(updatedObservations));
-    setObservations(updatedObservations);
-    onObservationUpdate(departmentName, updatedObservations.length);
-    setIsDeleting(false);
-  };
+  const allObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
+  delete allObservations[id];
+  localStorage.setItem("auditObservations", JSON.stringify(allObservations));
+
+  // ✅ Trigger a global refresh
+  if (typeof onDataChanged === 'function') {
+    onDataChanged();
+  }
+
+  setIsDeleting(false);
+};
+
 
   const handleGoToObservation = (id) => {
     setViewObservationId(id);
@@ -95,9 +107,12 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
             <button className="icon-button" onClick={handleBackToDepartments} title="Back to Departments">
               <FiArrowLeft size={20} />
             </button>
-            <button className="icon-button add-buttonss" onClick={handleAddObservation} title="Add Observation">
-              <FiPlus size={50} />
-            </button>
+           {!isAuditee && (
+  <button className="icon-button add-buttonss" onClick={handleAddObservation} title="Add Observation">
+    <FiPlus size={50} />
+  </button>
+)}
+
           </div>
         </div>
       </div>
@@ -133,14 +148,17 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
                         >
                           <FiEye size={18} />
                         </button>
-                        <button
-                          className="icon-button delete-button"
-                          onClick={() => handleDeleteObservation(obs.id)}
-                          title="Delete Observation"
-                          disabled={isDeleting}
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
+                       {!isAuditee && (
+  <button
+    className="icon-button delete-button"
+    onClick={() => handleDeleteObservation(obs.id)}
+    title="Delete Observation"
+    disabled={isDeleting}
+  >
+    <FiTrash2 size={18} />
+  </button>
+)}
+
                       </td>
                     </tr>
                   ))}
@@ -152,13 +170,16 @@ const ObservationDetails = ({ departmentName, onClose, onObservationUpdate }) =>
               <div className="empty-icon">🔍</div>
               <h3>No Observations Found</h3>
               <p>You haven't added any observations for this department yet.</p>
-              <button
-                className="icon-button add-buttons"
-                onClick={handleAddObservation}
-                title="Add First Observation"
-              >
-                <FiPlus size={20} />
-              </button>
+              {!isAuditee && (
+  <button
+    className="icon-button add-buttons"
+    onClick={handleAddObservation}
+    title="Add First Observation"
+  >
+    <FiPlus size={20} />
+  </button>
+)}
+
             </div>
           )}
         </CardContent>

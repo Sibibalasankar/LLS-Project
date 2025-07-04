@@ -99,6 +99,7 @@ const AuditorList = () => {
     }
   };
 
+  // In AuditorList.jsx, modify the handleSubmit function:
   const handleSubmit = (e) => {
     e.preventDefault();
     let updatedAuditors;
@@ -117,17 +118,27 @@ const AuditorList = () => {
     setAuditors(updatedAuditors);
     saveToLocalStorage(updatedAuditors);
 
-    // 👉👉 ADD THESE TWO LINES HERE 👇👇
+    // Store both auditor and auditee information with department mapping
     localStorage.setItem("auditorInfo", JSON.stringify({
       name: formData.name,
+      employeeNumber: formData.employeeNumber,
+      department: formData.department,
       designation: "Auditor"
     }));
 
     localStorage.setItem("auditeeInfo", JSON.stringify({
       name: formData.certifiedOnName,
+      department: formData.department,
       designation: "Auditee"
     }));
-    // 👆👆 ADD THESE TWO LINES HERE 👈👈
+
+    // Also store department mapping
+    const departmentMapping = JSON.parse(localStorage.getItem("departmentMapping")) || {};
+    departmentMapping[formData.department] = {
+      auditor: formData.name,
+      auditee: formData.certifiedOnName
+    };
+    localStorage.setItem("departmentMapping", JSON.stringify(departmentMapping));
 
     clearDraft("auditorListDraft");
     setShowForm(false);
@@ -139,7 +150,6 @@ const AuditorList = () => {
     });
     setAvailableAuditees([]);
   };
-
 
   const handleDelete = (index) => {
     const auditorToDelete = auditors[index];

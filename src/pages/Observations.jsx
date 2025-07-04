@@ -6,15 +6,15 @@ import companylogo from "../assets/images/lls_logo.png";
 import { FiEdit, FiTrash2, FiFileText, FiArrowLeft, FiPlus, FiFolder } from "react-icons/fi";
 import { saveDraft, loadDraft, clearDraft } from "../utils/draftUtils";
 
-
 const Observations = ({ observationId: propObservationId, departmentName, onBack }) => {
   const [observations, setObservations] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [observationId, setObservationId] = useState(null);
-  const [auditorInfo, setAuditorInfo] = useState({ name: "", designation: "" });
-  const [auditeeInfo, setAuditeeInfo] = useState({ name: "", designation: "" });
   const [availableAuditors, setAvailableAuditors] = useState([]);
   const [availableAuditees, setAvailableAuditees] = useState([]);
+  const userRole = localStorage.getItem('userRole');
+  const canEdit = userRole === 'admin' || userRole === 'auditor';
+
   // Get current and next year for audit cycle format
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
@@ -42,11 +42,11 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
   const [showActionForm, setShowActionForm] = useState(false);
 
   const navigate = useNavigate();
+
   const getNcObservations = () => {
     return observations.filter(obs => obs.result === "NC");
   };
 
-  // In Observations.jsx
   const handleOpenActionForm = () => {
     const ncObservations = getNcObservations();
     if (ncObservations.length === 0) {
@@ -57,11 +57,11 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify({
       observations: ncObservations,
       department: departmentName,
-      auditCycleNo: ncObservations[0].auditCycleNo, // Assuming all have same audit cycle
-      auditorName: auditorInfo.name,
-      auditorDesignation: auditorInfo.designation,
-      auditeeName: auditeeInfo.name,
-      auditeeDesignation: auditeeInfo.designation
+      auditCycleNo: ncObservations[0].auditCycleNo,
+      auditorName: ncObservations[0].auditorSignature,
+      auditorDesignation: ncObservations[0].auditorDesignation,
+      auditeeName: ncObservations[0].auditeeSignature,
+      auditeeDesignation: ncObservations[0].auditeeDesignation
     }))}`;
     window.open(url, "_blank");
   };
@@ -89,18 +89,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
       const obs = storedObservations[observationId] || [];
       setObservations(obs);
-
-      // If there are existing observations, set the auditor and auditee info from the first one
-      if (obs.length > 0) {
-        setAuditorInfo({
-          name: obs[0].auditorSignature,
-          designation: obs[0].auditorDesignation
-        });
-        setAuditeeInfo({
-          name: obs[0].auditeeSignature,
-          designation: obs[0].auditeeDesignation
-        });
-      }
     }
   }, [observationId]);
 
@@ -113,11 +101,52 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     }
   }, [observations, observationId]);
 
+  // Load auditors and auditees for the current department
+  useEffect(() => {
+    if (departmentName) {
+      // Load from department mapping first
+      const departmentMapping = JSON.parse(localStorage.getItem("departmentMapping")) || {};
+      const mappedData = departmentMapping[departmentName];
+
+      if (mappedData) {
+        setAvailableAuditors([{ name: mappedData.auditor, designation: "Auditor" }]);
+        setAvailableAuditees([{ name: mappedData.auditee, designation: "Auditee" }]);
+        return;
+      }
+
+      // Fallback to auditor list if no mapping found
+      const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
+      const departmentAuditors = storedAuditors.filter(
+        (auditor) => auditor.department === departmentName
+      );
+
+      if (departmentAuditors.length > 0) {
+        setAvailableAuditors(departmentAuditors.map(a => ({
+          name: a.name,
+          designation: "Auditor"
+        })));
+
+        // Get unique auditees from the auditors' certifiedOnName field
+        const auditees = departmentAuditors.reduce((acc, auditor) => {
+          if (auditor.certifiedOnName && !acc.some(a => a.name === auditor.certifiedOnName)) {
+            acc.push({ name: auditor.certifiedOnName, designation: "Auditee" });
+          }
+          return acc;
+        }, []);
+
+        setAvailableAuditees(auditees);
+      }
+    }
+  }, [departmentName]);
+
   const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentObservation((prev) => ({ ...prev, [name]: value }));
+    setCurrentObservation((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleResultChange = (e) => {
@@ -146,10 +175,10 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
         result: "",
         auditCycleNo: `I/${yearFormat}`,
         auditDate: new Date().toISOString().split("T")[0],
-        auditorSignature: auditorInfo.name || "",
-        auditorDesignation: auditorInfo.designation || "",
-        auditeeSignature: auditeeInfo.name || "",
-        auditeeDesignation: auditeeInfo.designation || "",
+        auditorSignature: availableAuditors.length === 1 ? availableAuditors[0].name : "",
+        auditorDesignation: "Auditor",
+        auditeeSignature: availableAuditees.length === 1 ? availableAuditees[0].name : "",
+        auditeeDesignation: "Auditee",
         department: departmentName || "",
       };
 
@@ -165,33 +194,15 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     alert('Draft Saved!');
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Update auditor and auditee info if this is the first observation
-    if (observations.length === 0) {
-      setAuditorInfo({
-        name: currentObservation.auditorSignature,
-        designation: currentObservation.auditorDesignation
-      });
-      setAuditeeInfo({
-        name: currentObservation.auditeeSignature,
-        designation: currentObservation.auditeeDesignation
-      });
-    }
-
-    // For subsequent observations, use the stored auditor and auditee info
     const observationToSave = currentObservation.id
       ? currentObservation
       : {
         ...currentObservation,
         id: generateId(),
-        slNo: currentObservation.slNo || getNextSlNo(),
-        auditorSignature: observations.length > 0 ? auditorInfo.name : currentObservation.auditorSignature,
-        auditorDesignation: observations.length > 0 ? auditorInfo.designation : currentObservation.auditorDesignation,
-        auditeeSignature: observations.length > 0 ? auditeeInfo.name : currentObservation.auditeeSignature,
-        auditeeDesignation: observations.length > 0 ? auditeeInfo.designation : currentObservation.auditeeDesignation,
+        slNo: currentObservation.slNo || getNextSlNo()
       };
 
     const updatedObservations = currentObservation.id
@@ -214,90 +225,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
     const draftKey = `observationDraft_${observationId}`;
     clearDraft(draftKey);
   };
-  useEffect(() => {
-    const loadAuditorData = () => {
-      const storedAuditors = JSON.parse(localStorage.getItem("auditors")) || [];
-      const departmentAuditors = storedAuditors.filter(
-        (auditor) => auditor.department === departmentName
-      );
 
-      setAvailableAuditors(departmentAuditors);
-
-      if (departmentAuditors.length > 0) {
-        // Get unique auditees from all auditors in this department
-        const auditees = departmentAuditors.reduce((acc, auditor) => {
-          if (auditor.certifiedOnName && !acc.includes(auditor.certifiedOnName)) {
-            acc.push(auditor.certifiedOnName);
-          }
-          return acc;
-        }, []);
-
-        setAvailableAuditees(auditees);
-
-        // Set default values if not already set
-        if (!auditorInfo.name && departmentAuditors.length === 1) {
-          setAuditorInfo({
-            name: departmentAuditors[0].name,
-            designation: departmentAuditors[0].designation || "Auditor"
-          });
-        }
-
-        if (!auditeeInfo.name && auditees.length === 1) {
-          setAuditeeInfo({
-            name: auditees[0],
-            designation: "Auditee"
-          });
-        }
-      }
-    };
-
-    loadAuditorData();
-  }, [departmentName]);
-  useEffect(() => {
-    const loadUserData = () => {
-      const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
-
-      // Get all auditors for this department (users with audit permissions)
-      const departmentAuditors = storedUsers.filter(user =>
-        user.department === departmentName &&
-        user.permissions.includes("auditObservation")
-      );
-
-      // Get all potential auditees for this department
-      const departmentAuditees = storedUsers.filter(
-        user => user.department === departmentName
-      );
-
-      setAvailableAuditors(departmentAuditors.map(auditor => ({
-        name: auditor.empName,
-        employeeNumber: auditor.empId,
-        designation: auditor.designation
-      })));
-
-      setAvailableAuditees(departmentAuditees.map(auditee => ({
-        name: auditee.empName,
-        employeeNumber: auditee.empId,
-        designation: auditee.designation
-      })));
-
-      // Set default values if only one option exists
-      if (departmentAuditors.length === 1) {
-        setAuditorInfo({
-          name: departmentAuditors[0].empName,
-          designation: departmentAuditors[0].designation || "Auditor"
-        });
-      }
-
-      if (departmentAuditees.length === 1) {
-        setAuditeeInfo({
-          name: departmentAuditees[0].empName,
-          designation: departmentAuditees[0].designation || "Auditee"
-        });
-      }
-    };
-
-    loadUserData();
-  }, [departmentName]);
   return (
     <div className="observations-container">
       <div className="header-with-logo">
@@ -320,7 +248,6 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
 
       <div className="observations-table-container p-3">
         <table className="observations-table">
-
           <thead>
             <tr>
               <th>Sl.no.</th>
@@ -329,7 +256,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
               <th>Findings and Supporting Objective evidence(s)</th>
               <th>ISO 9001 Clause</th>
               <th>Result * (0+/ NC / OFI)</th>
-              <th>Actions</th>
+              {canEdit && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -342,23 +269,23 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <td>{obs.findings}</td>
                   <td>{obs.isoClause}</td>
                   <td>{obs.result}</td>
-                  <td className="btns_td">
-                    <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
-                      <FiEdit size={20} />
-                    </button>
-
-                    <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
-                      <FiTrash2 size={20} />
-                    </button>
-
-
-
-                  </td>
+                  {canEdit && (
+                    <td className="btns_td">
+                    <td className="btns_td">
+                      <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
+                        <FiEdit size={20} />
+                      </button>
+                      <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
+                        <FiTrash2 size={20} />
+                      </button>
+                    </td>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr className="empty-table-message">
-                <td colSpan="7">No observations found for this audit. Create a new one.</td>
+                <td colSpan={userRole !== 'auditee' ? "7" : "6"}>No observations found for this audit. Create a new one.</td>
               </tr>
             )}
           </tbody>
@@ -549,26 +476,13 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                         <select
                           name="auditorSignature"
                           value={currentObservation.auditorSignature}
-                          onChange={(e) => {
-                            const selectedAuditor = availableAuditors.find(
-                              a => a.name === e.target.value
-                            );
-                            handleInputChange(e);
-                            setAuditorInfo({
-                              name: e.target.value,
-                              designation: selectedAuditor?.designation || "Auditor"
-                            });
-                            setCurrentObservation(prev => ({
-                              ...prev,
-                              auditorDesignation: selectedAuditor?.designation || "Auditor"
-                            }));
-                          }}
+                          onChange={handleInputChange}
                           required
                         >
                           <option value="">Select Auditor</option>
                           {availableAuditors.map((auditor, index) => (
                             <option key={index} value={auditor.name}>
-                              {auditor.name} ({auditor.designation})
+                              {auditor.name}
                             </option>
                           ))}
                         </select>
@@ -576,7 +490,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                         <input
                           type="text"
                           name="auditorSignature"
-                          value={currentObservation.auditorSignature || auditorInfo.name}
+                          value={currentObservation.auditorSignature || (availableAuditors.length === 1 ? availableAuditors[0].name : "")}
                           onChange={handleInputChange}
                           required
                           readOnly={availableAuditors.length === 1}
@@ -588,14 +502,21 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <div className="form-group">
                     <label>
                       Auditor Designation:
-                      <input
-                        type="text"
+                      <select
                         name="auditorDesignation"
-                        value={currentObservation.auditorDesignation || auditorInfo.designation}
+                        value={currentObservation.auditorDesignation}
                         onChange={handleInputChange}
                         required
-                        readOnly
-                      />
+                      >
+                        <option value="">Select Designation</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Engineer">Engineer</option>
+                        <option value="Technician">Technician</option>
+                        <option value="Supervisor">Supervisor</option>
+                        <option value="Analyst">Analyst</option>
+                        <option value="Executive">Executive</option>
+                      </select>
+
                     </label>
                   </div>
 
@@ -606,26 +527,13 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                         <select
                           name="auditeeSignature"
                           value={currentObservation.auditeeSignature}
-                          onChange={(e) => {
-                            const selectedAuditee = availableAuditees.find(
-                              a => a.name === e.target.value
-                            );
-                            handleInputChange(e);
-                            setAuditeeInfo({
-                              name: e.target.value,
-                              designation: selectedAuditee?.designation || "Auditee"
-                            });
-                            setCurrentObservation(prev => ({
-                              ...prev,
-                              auditeeDesignation: selectedAuditee?.designation || "Auditee"
-                            }));
-                          }}
+                          onChange={handleInputChange}
                           required
                         >
                           <option value="">Select Auditee</option>
                           {availableAuditees.map((auditee, index) => (
                             <option key={index} value={auditee.name}>
-                              {auditee.name} ({auditee.designation})
+                              {auditee.name}
                             </option>
                           ))}
                         </select>
@@ -633,7 +541,7 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                         <input
                           type="text"
                           name="auditeeSignature"
-                          value={currentObservation.auditeeSignature || auditeeInfo.name}
+                          value={currentObservation.auditeeSignature || (availableAuditees.length === 1 ? availableAuditees[0].name : "")}
                           onChange={handleInputChange}
                           required
                           readOnly={availableAuditees.length === 1}
@@ -645,23 +553,32 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
                   <div className="form-group">
                     <label>
                       Auditee Designation:
-                      <input
-                        type="text"
+                      <select
                         name="auditeeDesignation"
-                        value={currentObservation.auditeeDesignation || auditeeInfo.designation}
+                        value={currentObservation.auditeeDesignation}
                         onChange={handleInputChange}
                         required
-                        readOnly
-                      />
+                      >
+                        <option value="">Select Designation</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Engineer">Engineer</option>
+                        <option value="Technician">Technician</option>
+                        <option value="Supervisor">Supervisor</option>
+                        <option value="Analyst">Analyst</option>
+                        <option value="Executive">Executive</option>
+                      </select>
+
                     </label>
                   </div>
                 </div>
               )}
-              <div className="form-buttons">
-                <button type="submit" className="save-btn">Save Observation</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
-                <button type="button" className="nc-btn" onClick={handleSaveDraft}>Save Draft</button>
-              </div>
+              {canEdit && (
+                <div className="form-buttons">
+                  <button type="submit" className="save-btn">Save Observation</button>
+                  <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button type="button" className="nc-btn" onClick={handleSaveDraft}>Save Draft</button>
+                </div>
+              )}
 
             </form>
           </div>
@@ -671,10 +588,10 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
       <div className="signatures-summary">
         <div className="signature-info">
           <div className="audit-info-item">
-            <strong>Auditor:</strong> {auditorInfo.name ? `${auditorInfo.name} (${auditorInfo.designation})` : "-"}
+            <strong>Auditor:</strong> {observations.length > 0 ? `${observations[0].auditorSignature} (${observations[0].auditorDesignation})` : "-"}
           </div>
           <div className="audit-info-item">
-            <strong>Auditee:</strong> {auditeeInfo.name ? `${auditeeInfo.name} (${auditeeInfo.designation})` : "-"}
+            <strong>Auditee:</strong> {observations.length > 0 ? `${observations[0].auditeeSignature} (${observations[0].auditeeDesignation})` : "-"}
           </div>
         </div>
       </div>
@@ -684,9 +601,12 @@ const Observations = ({ observationId: propObservationId, departmentName, onBack
           <FiArrowLeft size={22} />Back
         </Button>
 
-        <Button onClick={handleCreate} className="button create-btn icon-btns" title="Add Observation">
-          <FiPlus size={22} />Add
-        </Button>
+        {canEdit && (
+          <Button onClick={handleCreate} className="button create-btn icon-btns" title="Add Observation">
+            <FiPlus size={22} />Add
+          </Button>
+        )}
+
 
         <Button className="button open-sheet-btn icon-btns" title="Open Record"
           onClick={() => window.open('/audit-report', '_blank')}

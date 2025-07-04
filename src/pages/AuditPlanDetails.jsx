@@ -34,12 +34,18 @@ const AuditPlanDetails = ({ department, onClose }) => {
   useEffect(() => {
     if (department) {
       const auditorList = JSON.parse(localStorage.getItem("auditors")) || [];
+
       const assignedAuditor = auditorList.find(
         (aud) => aud.department === department.name
       );
+
       if (assignedAuditor) {
         setAuditor(assignedAuditor.name);
-        setFormData((prev) => ({ ...prev, auditor: assignedAuditor.name }));
+        setFormData((prev) => ({
+          ...prev,
+          auditor: assignedAuditor.name,
+          auditees: assignedAuditor.certifiedOnName,
+        }));
         setIsAuditorAssigned(true);
         setErrorMessage("");
       } else {
@@ -78,15 +84,20 @@ const AuditPlanDetails = ({ department, onClose }) => {
     }));
   };
 
-  const handleFormOpen = () => {
-    const draft = loadDraft("auditPlanDraft");
-    if (draft) {
-      if (window.confirm("A draft is available. Do you want to load it?")) {
-        setFormData(draft);
-      }
+ const handleFormOpen = () => {
+  const draft = loadDraft("auditPlanDraft");
+  if (draft) {
+    if (window.confirm("A draft is available. Do you want to load it?")) {
+      setFormData(draft);
+    } else {
+      resetForm(); // Open a fresh form if user cancels
     }
-    setShowForm(true);
-  };
+  } else {
+    resetForm(); // No draft exists, open fresh form
+  }
+  setShowForm(true); // Always open form
+};
+
 
   const handleSaveDraft = () => {
     saveDraft("auditPlanDraft", formData);
@@ -140,6 +151,15 @@ const AuditPlanDetails = ({ department, onClose }) => {
     setShowForm(true);
   };
 
+  const handleDelete = (index) => {
+    if (window.confirm("Are you sure you want to delete this audit plan?")) {
+      const updatedPlans = [...auditPlans];
+      updatedPlans.splice(index, 1);
+      setAuditPlans(updatedPlans);
+      localStorage.setItem("auditPlans", JSON.stringify(updatedPlans));
+    }
+  };
+
   const handlePrint = () => {
     const printContent = document.getElementById("audit-plan-table");
     if (!printContent) {
@@ -191,14 +211,13 @@ const AuditPlanDetails = ({ department, onClose }) => {
   };
 
   const resetForm = () => {
-    setFormData({
+    setFormData((prev) => ({
+      ...prev,
       auditCycle: "I",
       date: "",
       timeDuration: "",
       processes: [],
-      auditor: auditor,
-      auditees: "",
-    });
+    }));
     setNewProcess("");
     setEditIndex(null);
   };
@@ -255,9 +274,10 @@ const AuditPlanDetails = ({ department, onClose }) => {
         </thead>
         <tbody>
           {auditPlans
-            .filter((plan) => plan.department === department?.name)
-            .map((plan, index) => (
-              <tr key={index}>
+            .map((plan, originalIndex) => ({ plan, originalIndex }))
+            .filter(({ plan }) => plan.department === department?.name)
+            .map(({ plan, originalIndex }) => (
+              <tr key={originalIndex}>
                 <td>{plan.formattedCycle}</td>
                 <td>{plan.department}</td>
                 <td>{plan.date}</td>
@@ -273,18 +293,14 @@ const AuditPlanDetails = ({ department, onClose }) => {
                 <td>{plan.auditees}</td>
                 <td>
                   <button
-                    onClick={() => handleEdit(index)}
+                    onClick={() => handleEdit(originalIndex)}
                     className="auditdetail-edit-btns styled-btn"
                     title="Edit Audit Plan"
                   >
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => {
-                      if (window.confirm("Are you sure you want to delete this audit plan?")) {
-                        setAuditPlans(auditPlans.filter((_, i) => i !== index));
-                      }
-                    }}
+                    onClick={() => handleDelete(originalIndex)}
                     className="auditdetail-delete-btns styled-btn"
                     title="Delete Audit Plan"
                   >

@@ -21,6 +21,7 @@ const Admin_login = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      localStorage.setItem('userRole', 'admin'); 
       setError("");
       setIsLoading(false);
       navigate("/admin-dashboard", { replace: true });

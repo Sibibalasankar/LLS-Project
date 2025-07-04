@@ -114,10 +114,12 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                         onChange={(e) => handleCorrectiveActionChange(index, 'status', e.target.value)}
                         className="status-select"
                       >
+                        <option value="">Select Status</option> {/* Blank initial option */}
                         <option value="Open">Open</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
                       </select>
+
                     </td>
                   </tr>
                 ))}

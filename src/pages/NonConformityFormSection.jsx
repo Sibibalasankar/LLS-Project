@@ -40,7 +40,6 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
     return ncObservations.map(obs => obs[fieldName]).filter(Boolean).join('\n');
   };
 
-  // Initialize merged values only once
   useEffect(() => {
     if (ncObservations && ncObservations.length > 0) {
       const fieldsToMerge = [
@@ -50,18 +49,20 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
         { name: 'objectiveEvidence', key: 'objectiveEvidence' },
         { name: 'isoClass', key: 'isoClause' },
         { name: 'potentialRisk', key: 'potentialCauses' },
-        { name: 'auditor', key: 'auditor' },
-        { name: 'auditee', key: 'auditee' }
+        { name: 'auditor', key: 'auditorSignature' },
+        { name: 'auditee', key: 'auditeeSignature' }
       ];
 
       fieldsToMerge.forEach(field => {
         if (!formData[field.name]) {
-          handleChange({ target: { name: field.name, value: mergeObservations(field.key) } });
+          // For auditor, we'll take the first unique value if there are multiple observations
+          const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
+          const uniqueValue = [...new Set(allValues)].join(' / '); // Join multiple values with slash
+          handleChange({ target: { name: field.name, value: uniqueValue } });
         }
       });
     }
   }, [ncObservations]);
-
 
   return (
     <div className="audit-form-container">
@@ -151,7 +152,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
                       name="auditor"
                       value={formData.auditor}
                       onChange={handleChange}
-                      readOnly // Make it read-only if you don't want it to be editable
+                      readOnly
                     />
                   </div>
                 </td>

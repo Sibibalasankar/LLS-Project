@@ -17,53 +17,53 @@ const AuditObservation = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [planFilter, setPlanFilter] = useState('All'); // All, Assigned, NotAssigned
 
-  useEffect(() => {
-    const loadData = () => {
-      const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
-      const storedPlans = JSON.parse(localStorage.getItem('auditPlans')) || [];
-      const savedReports = JSON.parse(localStorage.getItem('savedReports')) || [];
-      const allObservations = JSON.parse(localStorage.getItem('auditObservations')) || {};
+  const loadData = () => {
+  const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
+  const storedPlans = JSON.parse(localStorage.getItem('auditPlans')) || [];
+  const savedReports = JSON.parse(localStorage.getItem('savedReports')) || [];
+  const allObservations = JSON.parse(localStorage.getItem('auditObservations')) || {};
 
-      const updatedCounts = {};
-      const updatedNcCounts = {};
-      const updatedOfiCounts = {};
-      const updatedOpCounts = {};
+  const updatedCounts = {};
+  const updatedNcCounts = {};
+  const updatedOfiCounts = {};
+  const updatedOpCounts = {};
 
-      storedDepartments.forEach(dept => {
-        const hasPlan = storedPlans.some(plan => plan.department === dept.name);
+  storedDepartments.forEach(dept => {
+    const hasPlan = storedPlans.some(plan => plan.department === dept.name);
 
-        if (!hasPlan) {
-          localStorage.removeItem(`observations_${dept.name}`);
-        }
+    if (!hasPlan) {
+      localStorage.removeItem(`observations_${dept.name}`);
+    }
 
-        const deptObservations = Object.values(allObservations).flat().filter(obs =>
-          obs.department === dept.name
-        );
-        updatedCounts[dept.name] = deptObservations.length;
+    const deptObservations = Object.values(allObservations).flat().filter(obs =>
+      obs.department === dept.name
+    );
 
-        const deptNcCount = savedReports.filter(report =>
-          report.dptname === dept.name
-        ).length;
-        updatedNcCounts[dept.name] = deptNcCount;
+    updatedCounts[dept.name] = deptObservations.length;
 
-        const ofiCount = deptObservations.filter(obs => obs.result === "OFI").length;
-        const opCount = deptObservations.filter(obs => obs.result === "O+").length;
-        updatedOfiCounts[dept.name] = ofiCount;
-        updatedOpCounts[dept.name] = opCount;
-      });
+    const deptNcCount = deptObservations.filter(obs => obs.result === "NC").length;
+    updatedNcCounts[dept.name] = deptNcCount;
 
-      setDepartments(storedDepartments);
-      setAuditPlans(storedPlans);
-      setObservationsCount(updatedCounts);
-      setNcCount(updatedNcCounts);
-      setOfiCount(updatedOfiCounts);
-      setOpCount(updatedOpCounts);
-    };
+    const ofiCount = deptObservations.filter(obs => obs.result === "OFI").length;
+    const opCount = deptObservations.filter(obs => obs.result === "O+").length;
 
-    loadData();
-    window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
-  }, []);
+    updatedOfiCounts[dept.name] = ofiCount;
+    updatedOpCounts[dept.name] = opCount;
+  });
+
+  setDepartments(storedDepartments);
+  setAuditPlans(storedPlans);
+  setObservationsCount(updatedCounts);
+  setNcCount(updatedNcCounts);
+  setOfiCount(updatedOfiCounts);
+  setOpCount(updatedOpCounts);
+};
+
+useEffect(() => {
+  loadData();
+  window.addEventListener('storage', loadData);
+  return () => window.removeEventListener('storage', loadData);
+}, []);
 
   const handleObservationUpdate = (deptName, count) => {
     setObservationsCount(prevCounts => ({
@@ -113,10 +113,12 @@ const AuditObservation = () => {
 
       {selectedDepartment ? (
         <ObservationDetails
-          departmentName={selectedDepartment}
-          onClose={() => setSelectedDepartment(null)}
-          onObservationUpdate={handleObservationUpdate}
-        />
+  departmentName={selectedDepartment}
+  onClose={() => setSelectedDepartment(null)}
+  onObservationUpdate={handleObservationUpdate}
+  onDataChanged={loadData} // Pass this new prop
+/>
+
       ) : (
         <div className="department-grid">
           {filteredDepartments.map((dept) => {
