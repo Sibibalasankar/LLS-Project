@@ -6,7 +6,8 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew, departmentNam
   const [filters, setFilters] = useState({
     dptname: "",
     auditCycleNo: "",
-    savedDate: ""
+    savedDate: "",
+     status: ""
   });
 
   const [departments, setDepartments] = useState([]);
@@ -28,21 +29,24 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew, departmentNam
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
-
-  // Filter reports by department
-  const filteredReports = reports.filter(report => {
-    const matchesDepartment = departmentName ? report.dptname === departmentName : true;
-    const matchesFilters =
-      (filters.dptname === "" || report.dptname === filters.dptname) &&
-      (filters.auditCycleNo === "" || report.auditCycleNo.includes(filters.auditCycleNo)) &&
-      (filters.savedDate === "" || report.auditDate === filters.savedDate);
-
-    return matchesDepartment && matchesFilters;
-  });
-
   const getStatus = (ncsNumber) => {
     return approvedNcrNumbers.includes(ncsNumber) ? 'Approved' : 'Pending';
   };
+  // Filter reports by department
+const filteredReports = reports.filter(report => {
+  const matchesDepartment = departmentName ? report.dptname === departmentName : true;
+  const status = getStatus(report.ncsNumber);
+  const matchesFilters =
+    (filters.dptname === "" || report.dptname === filters.dptname) &&
+    (filters.auditCycleNo === "" || report.auditCycleNo.includes(filters.auditCycleNo)) &&
+    (filters.savedDate === "" || report.auditDate === filters.savedDate) &&
+    (filters.status === "" || status === filters.status); // ✅ Status filter added here
+
+  return matchesDepartment && matchesFilters;
+});
+
+
+
 
   const getStatusColor = (status) => {
     return status === 'Approved' ? '#28a745' : '#ffc107';
@@ -315,6 +319,25 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew, departmentNam
               ))}
             </select>
           </div>
+          <div>
+  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Status</label>
+  <select
+    name="status"
+    value={filters.status}
+    onChange={handleFilterChange}
+    style={{
+      width: '100%',
+      padding: '8px',
+      borderRadius: '4px',
+      border: '1px solid #ced4da'
+    }}
+  >
+    <option value="">All Status</option>
+    <option value="Pending">Pending</option>
+    <option value="Approved">Approved</option>
+  </select>
+</div>
+
           <div>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Audit Cycle No.</label>
             <input

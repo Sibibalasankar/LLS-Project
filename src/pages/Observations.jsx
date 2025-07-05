@@ -19,6 +19,46 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
   const yearFormat = `${currentYear}-${nextYear}`;
+  const isoClauseOptions = [
+  { value: "1", label: "1 – Scope" },
+  { value: "2", label: "2 – Normative references" },
+  { value: "3", label: "3 – Terms and definitions" },
+  { value: "4", label: "4 – Context of the organization" },
+  { value: "4.1", label: "4.1 – Understanding the organization and its context" },
+  { value: "4.2", label: "4.2 – Understanding the needs and expectations of interested parties" },
+  { value: "4.3", label: "4.3 – Determining the scope of the quality management system" },
+  { value: "4.4", label: "4.4 – Quality management system and its processes" },
+  { value: "5", label: "5 – Leadership" },
+  { value: "5.1", label: "5.1 – Leadership and commitment" },
+  { value: "5.2", label: "5.2 – Policy" },
+  { value: "5.3", label: "5.3 – Organizational roles, responsibilities and authorities" },
+  { value: "6", label: "6 – Planning" },
+  { value: "6.1", label: "6.1 – Actions to address risks and opportunities" },
+  { value: "6.2", label: "6.2 – Quality objectives and planning to achieve them" },
+  { value: "6.3", label: "6.3 – Planning of changes" },
+  { value: "7", label: "7 – Support" },
+  { value: "7.1", label: "7.1 – Resources" },
+  { value: "7.2", label: "7.2 – Competence" },
+  { value: "7.3", label: "7.3 – Awareness" },
+  { value: "7.4", label: "7.4 – Communication" },
+  { value: "7.5", label: "7.5 – Documented information" },
+  { value: "8", label: "8 – Operation" },
+  { value: "8.1", label: "8.1 – Operational planning and control" },
+  { value: "8.2", label: "8.2 – Requirements for products and services" },
+  { value: "8.3", label: "8.3 – Design and development" },
+  { value: "8.4", label: "8.4 – Control of externally provided processes, products and services" },
+  { value: "8.5", label: "8.5 – Production and service provision" },
+  { value: "8.6", label: "8.6 – Release of products and services" },
+  { value: "8.7", label: "8.7 – Control of nonconforming outputs" },
+  { value: "9", label: "9 – Performance evaluation" },
+  { value: "9.1", label: "9.1 – Monitoring, measurement, analysis and evaluation" },
+  { value: "9.2", label: "9.2 – Internal audit" },
+  { value: "9.3", label: "9.3 – Management review" },
+  { value: "10", label: "10 – Improvement" },
+  { value: "10.1", label: "10.1 – General" },
+  { value: "10.2", label: "10.2 – Nonconformity and corrective action" },
+  { value: "10.3", label: "10.3 – Continual improvement" },
+];
 
   const [currentObservation, setCurrentObservation] = useState({
     id: "",
@@ -87,24 +127,24 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
   }, [propObservationId]);
 
   // Load observations from localStorage when observationId is set
-useEffect(() => {
-  if (observationId) {
-    const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
-    const obs = storedObservations[observationId] || [];
-    setObservations(obs);
+  useEffect(() => {
+    if (observationId) {
+      const storedObservations = JSON.parse(localStorage.getItem("auditObservations")) || {};
+      const obs = storedObservations[observationId] || [];
+      setObservations(obs);
 
-    const departmentObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
-    const matched = departmentObservations.find(o => o.id.toString() === observationId.toString());
+      const departmentObservations = JSON.parse(localStorage.getItem(`observations_${departmentName}`)) || [];
+      const matched = departmentObservations.find(o => o.id.toString() === observationId.toString());
 
-    if (matched && matched.auditCycleNo) {
-      setAuditCycleNo(matched.auditCycleNo);
-      setCurrentObservation(prev => ({
-        ...prev,
-        auditCycleNo: matched.auditCycleNo
-      }));
+      if (matched && matched.auditCycleNo) {
+        setAuditCycleNo(matched.auditCycleNo);
+        setCurrentObservation(prev => ({
+          ...prev,
+          auditCycleNo: matched.auditCycleNo
+        }));
+      }
     }
-  }
-}, [observationId, departmentName]);
+  }, [observationId, departmentName]);
 
 
   // Save observations to localStorage whenever they change
@@ -188,35 +228,35 @@ useEffect(() => {
   };
 
   const getNextSlNo = () => (observations.length === 0 ? 1 : Math.max(...observations.map((o) => Number(o.slNo) || 0)) + 1);
-const handleCreate = () => {
-  const draftKey = `observationDraft_${observationId}`;
-  const savedDraft = loadDraft(draftKey);
+  const handleCreate = () => {
+    const draftKey = `observationDraft_${observationId}`;
+    const savedDraft = loadDraft(draftKey);
 
-  if (savedDraft) {
-    setCurrentObservation(savedDraft);
-  } else {
-    const newObservation = {
-      id: "",
-      slNo: getNextSlNo(),
-      processActivity: "",
-      potentialCauses: "",
-      findings: "",
-      isoClause: "",
-      result: "",
-      auditCycleNo: auditCycleNo, // ✅ use the correct cycle passed from parent
-      auditDate: observations.length > 0 ? observations[0].auditDate : new Date().toISOString().split("T")[0],
-      auditorSignature: availableAuditors.length === 1 ? availableAuditors[0].name : "",
-      auditorDesignation: "Auditor",
-      auditeeSignature: availableAuditees.length === 1 ? availableAuditees[0].name : "",
-      auditeeDesignation: "Auditee",
-      department: departmentName || "",
-    };
+    if (savedDraft) {
+      setCurrentObservation(savedDraft);
+    } else {
+      const newObservation = {
+        id: "",
+        slNo: getNextSlNo(),
+        processActivity: "",
+        potentialCauses: "",
+        findings: "",
+        isoClause: "",
+        result: "",
+        auditCycleNo: auditCycleNo, // ✅ use the correct cycle passed from parent
+        auditDate: observations.length > 0 ? observations[0].auditDate : new Date().toISOString().split("T")[0],
+        auditorSignature: availableAuditors.length === 1 ? availableAuditors[0].name : "",
+        auditorDesignation: "Auditor",
+        auditeeSignature: availableAuditees.length === 1 ? availableAuditees[0].name : "",
+        auditeeDesignation: "Auditee",
+        department: departmentName || "",
+      };
 
-    setCurrentObservation(newObservation);
-  }
+      setCurrentObservation(newObservation);
+    }
 
-  setShowForm(true);
-};
+    setShowForm(true);
+  };
 
 
   const handleSaveDraft = () => {
@@ -440,20 +480,26 @@ const handleCreate = () => {
                   />
                 </label>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>
-                    ISO 9001 Clause:
-                    <input
-                      type="text"
-                      name="isoClause"
-                      value={currentObservation.isoClause}
-                      onChange={handleInputChange}
-                      placeholder="Enter ISO 9001 Clause"
-                    />
-                  </label>
-                </div>
+              <div className="form-group">
+                <label>
+                  ISO 9001 Clause:
+                  <select
+                    name="isoClause"
+                    value={currentObservation.isoClause}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">-- Select Clause --</option>
+                    {isoClauseOptions.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
+
+
               <div className="form-group">
                 <label>Result:</label>
                 <div className="radio-group">
