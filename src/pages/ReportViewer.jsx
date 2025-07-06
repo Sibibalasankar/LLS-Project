@@ -345,15 +345,8 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               </tr>
               <tr>
                 <td><strong>PROCESS</strong>:
-                  <ul>
-                    {Array.isArray(report.process) ? (
-                      report.process.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))
-                    ) : (
-                      <li>{report.process}</li>
-                    )}
-                  </ul>
+                 <span> {report.process}</span>
+
                 </td>
                 <td><strong>AUDITOR/DEPT.</strong>: {report.auditor}</td>
                 <td><strong>AUDITEE</strong>: {report.auditee}</td>
@@ -361,14 +354,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               <tr>
                 <td colSpan={3}>
                   <p><strong>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information):</strong></p>
-                  <ul>
-                    {Array.isArray(report.requirement)
-                      ? report.requirement.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))
-                      : <li>{report.requirement}</li>
-                    }
-                  </ul>
+                 <span>{report.requirement}</span>
                 </td>
               </tr>
               <tr>
@@ -376,23 +362,11 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                   <div className='follow_split'>
                     <div className='follow_split_left'>
                       <p><strong>NONCONFORMITY STATEMENT</strong></p>
-                      <ul>
-                        {Array.isArray(report.nonConformityStatement)
-                          ? report.nonConformityStatement.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))
-                          : <li>{report.nonConformityStatement}</li>}
-                      </ul>
+                      <span>{report.nonConformityStatement}</span>
                     </div>
                     <div className='follow_split_right'>
                       <p><strong>OBJECTIVE EVIDENCE</strong></p>
-                      <ul>
-                        {Array.isArray(report.objectiveEvidence)
-                          ? report.objectiveEvidence.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))
-                          : <li>{report.objectiveEvidence}</li>}
-                      </ul>
+                      <span>{report.objectiveEvidence}</span>
                     </div>
                   </div>
                 </td>
@@ -402,13 +376,8 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                   <p><strong>ISO 9001-2018: OVIS CLASS NO. & DISCIPLINE</strong></p>
                 </td>
                 <td colSpan={2}>
-                  <ul>
-                    {Array.isArray(report.isoClass)
-                      ? report.isoClass.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))
-                      : <li>{report.isoClass}</li>}
-                  </ul>
+                <span>{report.isoClass}</span>
+
                 </td>
               </tr>
               <tr>
@@ -427,13 +396,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               <tr>
                 <td>
                   <p><strong>POTENTIAL RISK</strong></p>
-                  <ul>
-                    {Array.isArray(report.potentialRisk)
-                      ? report.potentialRisk.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))
-                      : <li>{report.potentialRisk}</li>}
-                  </ul>
+                 <span>{report.potentialRisk}</span>
                 </td>
                 <td colSpan={2}>
                   <p><strong>CORRECTION</strong></p>
