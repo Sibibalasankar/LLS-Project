@@ -35,12 +35,11 @@ const ReportList = ({ reports, onView, onEdit, onDelete, onAddNew, departmentNam
   // Filter reports by department
 const filteredReports = reports.filter(report => {
   const matchesDepartment = departmentName ? report.dptname === departmentName : true;
-  const status = getStatus(report.ncsNumber);
   const matchesFilters =
     (filters.dptname === "" || report.dptname === filters.dptname) &&
     (filters.auditCycleNo === "" || report.auditCycleNo.includes(filters.auditCycleNo)) &&
     (filters.savedDate === "" || report.auditDate === filters.savedDate) &&
-    (filters.status === "" || status === filters.status); // ✅ Status filter added here
+    (filters.status === "" || getStatus(report.ncsNumber) === filters.status);
 
   return matchesDepartment && matchesFilters;
 });

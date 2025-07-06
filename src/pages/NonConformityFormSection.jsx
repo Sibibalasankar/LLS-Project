@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObservations }) => {
+const NonConformityFormSection = ({ formData, dispatch, departmentName, singleObservation }) => {
   const [departments, setDepartments] = useState([]);
-  const [isMerged, setIsMerged] = useState(false); // Add this flag
 
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
@@ -36,35 +35,35 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, ncObserv
     return pattern.test(value);
   };
 
-  const mergeObservations = (fieldName) => {
-    if (!ncObservations || ncObservations.length === 0) return [];
-    return Array.from(new Set(ncObservations.map(obs => obs[fieldName]).filter(Boolean)));
-  };
+  // const mergeObservations = (fieldName) => {
+  //   if (!ncObservations || ncObservations.length === 0) return [];
+  //   return Array.from(new Set(ncObservations.map(obs => obs[fieldName]).filter(Boolean)));
+  // };
 
 
-  useEffect(() => {
-    if (ncObservations && ncObservations.length > 0 && !isMerged) { // Run only if not merged yet
-      const fieldsToMerge = [
-        { name: 'process', key: 'processActivity' },
-        { name: 'requirement', key: 'requirement' },
-        { name: 'nonConformityStatement', key: 'findings' },
-        { name: 'objectiveEvidence', key: 'objectiveEvidence' },
-        { name: 'isoClass', key: 'isoClause' },
-        { name: 'potentialRisk', key: 'potentialCauses' },
-        { name: 'auditor', key: 'auditorSignature' },
-        { name: 'auditee', key: 'auditeeSignature' }
-      ];
+  // useEffect(() => {
+  //   if (ncObservations && ncObservations.length > 0 && !isMerged) { // Run only if not merged yet
+  //     const fieldsToMerge = [
+  //       { name: 'process', key: 'processActivity' },
+  //       { name: 'requirement', key: 'requirement' },
+  //       { name: 'nonConformityStatement', key: 'findings' },
+  //       { name: 'objectiveEvidence', key: 'objectiveEvidence' },
+  //       { name: 'isoClass', key: 'isoClause' },
+  //       { name: 'potentialRisk', key: 'potentialCauses' },
+  //       { name: 'auditor', key: 'auditorSignature' },
+  //       { name: 'auditee', key: 'auditeeSignature' }
+  //     ];
 
-      fieldsToMerge.forEach(field => {
-        const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
-        const uniqueValues = [...new Set(allValues)];
-        handleChange({ target: { name: field.name, value: uniqueValues } });
+  //     fieldsToMerge.forEach(field => {
+  //       const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
+  //       const uniqueValues = [...new Set(allValues)];
+  //       handleChange({ target: { name: field.name, value: uniqueValues } });
 
-      });
+  //     });
 
-      setIsMerged(true); // Mark as merged
-    }
-  }, [ncObservations, isMerged]); // Make sure this doesn't trigger again unnecessarily
+  //     setIsMerged(true); // Mark as merged
+  //   }
+  // }, [ncObservations, isMerged]); // Make sure this doesn't trigger again unnecessarily
 
   return (
     <div className="audit-form-container">
@@ -303,7 +302,6 @@ NonConformityFormSection.propTypes = {
   formData: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   departmentName: PropTypes.string,
-  ncObservations: PropTypes.array
+  singleObservation: PropTypes.object
 };
-
 export default NonConformityFormSection;

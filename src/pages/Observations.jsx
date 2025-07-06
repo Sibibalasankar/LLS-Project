@@ -20,45 +20,45 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
   const nextYear = currentYear + 1;
   const yearFormat = `${currentYear}-${nextYear}`;
   const isoClauseOptions = [
-  { value: "1", label: "1 – Scope" },
-  { value: "2", label: "2 – Normative references" },
-  { value: "3", label: "3 – Terms and definitions" },
-  { value: "4", label: "4 – Context of the organization" },
-  { value: "4.1", label: "4.1 – Understanding the organization and its context" },
-  { value: "4.2", label: "4.2 – Understanding the needs and expectations of interested parties" },
-  { value: "4.3", label: "4.3 – Determining the scope of the quality management system" },
-  { value: "4.4", label: "4.4 – Quality management system and its processes" },
-  { value: "5", label: "5 – Leadership" },
-  { value: "5.1", label: "5.1 – Leadership and commitment" },
-  { value: "5.2", label: "5.2 – Policy" },
-  { value: "5.3", label: "5.3 – Organizational roles, responsibilities and authorities" },
-  { value: "6", label: "6 – Planning" },
-  { value: "6.1", label: "6.1 – Actions to address risks and opportunities" },
-  { value: "6.2", label: "6.2 – Quality objectives and planning to achieve them" },
-  { value: "6.3", label: "6.3 – Planning of changes" },
-  { value: "7", label: "7 – Support" },
-  { value: "7.1", label: "7.1 – Resources" },
-  { value: "7.2", label: "7.2 – Competence" },
-  { value: "7.3", label: "7.3 – Awareness" },
-  { value: "7.4", label: "7.4 – Communication" },
-  { value: "7.5", label: "7.5 – Documented information" },
-  { value: "8", label: "8 – Operation" },
-  { value: "8.1", label: "8.1 – Operational planning and control" },
-  { value: "8.2", label: "8.2 – Requirements for products and services" },
-  { value: "8.3", label: "8.3 – Design and development" },
-  { value: "8.4", label: "8.4 – Control of externally provided processes, products and services" },
-  { value: "8.5", label: "8.5 – Production and service provision" },
-  { value: "8.6", label: "8.6 – Release of products and services" },
-  { value: "8.7", label: "8.7 – Control of nonconforming outputs" },
-  { value: "9", label: "9 – Performance evaluation" },
-  { value: "9.1", label: "9.1 – Monitoring, measurement, analysis and evaluation" },
-  { value: "9.2", label: "9.2 – Internal audit" },
-  { value: "9.3", label: "9.3 – Management review" },
-  { value: "10", label: "10 – Improvement" },
-  { value: "10.1", label: "10.1 – General" },
-  { value: "10.2", label: "10.2 – Nonconformity and corrective action" },
-  { value: "10.3", label: "10.3 – Continual improvement" },
-];
+    { value: "1", label: "1 – Scope" },
+    { value: "2", label: "2 – Normative references" },
+    { value: "3", label: "3 – Terms and definitions" },
+    { value: "4", label: "4 – Context of the organization" },
+    { value: "4.1", label: "4.1 – Understanding the organization and its context" },
+    { value: "4.2", label: "4.2 – Understanding the needs and expectations of interested parties" },
+    { value: "4.3", label: "4.3 – Determining the scope of the quality management system" },
+    { value: "4.4", label: "4.4 – Quality management system and its processes" },
+    { value: "5", label: "5 – Leadership" },
+    { value: "5.1", label: "5.1 – Leadership and commitment" },
+    { value: "5.2", label: "5.2 – Policy" },
+    { value: "5.3", label: "5.3 – Organizational roles, responsibilities and authorities" },
+    { value: "6", label: "6 – Planning" },
+    { value: "6.1", label: "6.1 – Actions to address risks and opportunities" },
+    { value: "6.2", label: "6.2 – Quality objectives and planning to achieve them" },
+    { value: "6.3", label: "6.3 – Planning of changes" },
+    { value: "7", label: "7 – Support" },
+    { value: "7.1", label: "7.1 – Resources" },
+    { value: "7.2", label: "7.2 – Competence" },
+    { value: "7.3", label: "7.3 – Awareness" },
+    { value: "7.4", label: "7.4 – Communication" },
+    { value: "7.5", label: "7.5 – Documented information" },
+    { value: "8", label: "8 – Operation" },
+    { value: "8.1", label: "8.1 – Operational planning and control" },
+    { value: "8.2", label: "8.2 – Requirements for products and services" },
+    { value: "8.3", label: "8.3 – Design and development" },
+    { value: "8.4", label: "8.4 – Control of externally provided processes, products and services" },
+    { value: "8.5", label: "8.5 – Production and service provision" },
+    { value: "8.6", label: "8.6 – Release of products and services" },
+    { value: "8.7", label: "8.7 – Control of nonconforming outputs" },
+    { value: "9", label: "9 – Performance evaluation" },
+    { value: "9.1", label: "9.1 – Monitoring, measurement, analysis and evaluation" },
+    { value: "9.2", label: "9.2 – Internal audit" },
+    { value: "9.3", label: "9.3 – Management review" },
+    { value: "10", label: "10 – Improvement" },
+    { value: "10.1", label: "10.1 – General" },
+    { value: "10.2", label: "10.2 – Nonconformity and corrective action" },
+    { value: "10.3", label: "10.3 – Continual improvement" },
+  ];
 
   const [currentObservation, setCurrentObservation] = useState({
     id: "",
@@ -90,21 +90,16 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
     return observations.filter(obs => obs.result === "NC");
   };
 
-  const handleOpenActionForm = () => {
-    const ncObservations = getNcObservations();
-    if (ncObservations.length === 0) {
-      alert("No NC observations found!");
+  const handleOpenActionForm = (observation) => {
+    if (observation.result !== "NC") {
+      alert("This observation is not marked as NC!");
       return;
     }
 
     const url = `/admin-dashboard/action-report?data=${encodeURIComponent(JSON.stringify({
-      observations: ncObservations,
+      observation: observation,
       department: departmentName,
-      auditCycleNo: ncObservations[0].auditCycleNo,
-      auditorName: ncObservations[0].auditorSignature,
-      auditorDesignation: ncObservations[0].auditorDesignation,
-      auditeeName: ncObservations[0].auditeeSignature,
-      auditeeDesignation: ncObservations[0].auditeeDesignation
+      auditCycleNo: observation.auditCycleNo
     }))}`;
     window.open(url, "_blank");
   };
@@ -341,14 +336,21 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
                   <td>{obs.result}</td>
                   {canEdit && (
                     <td className="btns_td">
-                      <td className="btns_td">
-                        <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
-                          <FiEdit size={20} />
+                      <button className="icon-btns" onClick={() => handleEdit(obs)} title="Edit Observation">
+                        <FiEdit size={20} />
+                      </button>
+                      <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
+                        <FiTrash2 size={20} />
+                      </button>
+                      {obs.result === "NC" && (
+                        <button
+                          className={`icon-btns ${obs.hasReport ? 'has-report' : ''}`}
+                          onClick={() => handleOpenActionForm(obs)}
+                          title={obs.hasReport ? 'View NC Report' : 'Generate NC Report'}
+                        >
+                          <FiFileText size={20} />
                         </button>
-                        <button className="icon-btns" onClick={() => handleDelete(obs.id)} title="Delete Observation">
-                          <FiTrash2 size={20} />
-                        </button>
-                      </td>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -683,16 +685,7 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
         >
           <FiFolder size={22} />Open Record
         </Button>
-        {getNcObservations().length > 0 && (
-          <div className="nc-action-button-container">
-            <Button
-              onClick={handleOpenActionForm}
-              className="button action-report-btn"
-            >
-              <FiFileText size={20} /> Generate Action Report for NCs
-            </Button>
-          </div>
-        )}
+
       </div>
     </div>
   );
