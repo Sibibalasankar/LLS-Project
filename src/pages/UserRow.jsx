@@ -24,7 +24,7 @@ const UserRow = ({
   return (
     <tr className="table-row">
       <td className="table-cell">
-        {editingUser === user.username ? (
+        {editingUser === user.empId ? (
           <input
             className="edit-input"
             value={editForm.empId}
@@ -35,7 +35,7 @@ const UserRow = ({
         )}
       </td>
       <td className="table-cell">
-        {editingUser === user.username ? (
+        {editingUser === user.empId ? (
           <input
             className="edit-input"
             value={editForm.empName}
@@ -46,7 +46,7 @@ const UserRow = ({
         )}
       </td>
       <td className="table-cell">
-        {editingUser === user.username ? (
+        {editingUser === user.empId ? (
           <select
             className="edit-input"
             value={editForm.department}
@@ -62,7 +62,7 @@ const UserRow = ({
         )}
       </td>
       <td className="table-cell">
-        {editingUser === user.username ? (
+        {editingUser === user.empId ? (
           <select
             className="edit-input"
             value={editForm.designation}
@@ -78,7 +78,7 @@ const UserRow = ({
         )}
       </td>
       <td className="table-cell">
-        {editingUser === user.username ? (
+        {editingUser === user.empId ? (
           <input
             className="edit-input"
             type="date"
@@ -89,56 +89,45 @@ const UserRow = ({
           <span className="cell-text">{formatShortDate(user.certifiedDate)}</span>
         )}
       </td>
-      <td className="table-cell">
-        {editingUser === user.username ? (
-          <input
-            className="edit-input"
-            value={editForm.username}
-            onChange={(e) => setEditForm({...editForm, username: e.target.value})}
-          />
-        ) : (
-          <span className="cell-text">{user.username}</span>
-        )}
-      </td>
       
       {activeTab === "credentials" && (
         <>
           <td className="table-cell password-cell">
-            {editingUser === user.username ? (
+            {editingUser === user.empId ? (
               <div className="password-input-container">
                 <input
                   className="edit-input"
-                  type={showPasswords[user.username] ? "text" : "password"}
+                  type={showPasswords[user.empId] ? "text" : "password"}
                   value={editForm.password}
                   onChange={(e) => setEditForm({...editForm, password: e.target.value})}
                 />
                 <button 
                   className="password-toggle"
-                  onClick={() => toggleUserPasswordVisibility(user.username)}
+                  onClick={() => toggleUserPasswordVisibility(user.empId)}
                   type="button"
-                  aria-label={showPasswords[user.username] ? "Hide password" : "Show password"}
+                  aria-label={showPasswords[user.empId] ? "Hide password" : "Show password"}
                 >
-                  {showPasswords[user.username] ? <FaEyeSlash /> : <FaEye />}
+                  {showPasswords[user.empId] ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             ) : (
               <div className="password-display">
                 <span className="password-text">
-                  {showPasswords[user.username] ? user.password : "••••••••"}
+                  {showPasswords[user.empId] ? user.password : "••••••••"}
                 </span>
                 <button 
                   className="password-toggle"
-                  onClick={() => toggleUserPasswordVisibility(user.username)}
+                  onClick={() => toggleUserPasswordVisibility(user.empId)}
                   type="button"
-                  aria-label={showPasswords[user.username] ? "Hide password" : "Show password"}
+                  aria-label={showPasswords[user.empId] ? "Hide password" : "Show password"}
                 >
-                  {showPasswords[user.username] ? <FaEyeSlash /> : <FaEye />}
+                  {showPasswords[user.empId] ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             )}
           </td>
           <td className="table-cell permissions-cell">
-            {editingUser === user.username ? (
+            {editingUser === user.empId ? (
               <div className="edit-permissions-grid">
                 {permissionOptions.map(permission => (
                   <label key={permission} className="checkbox-label">
@@ -170,7 +159,7 @@ const UserRow = ({
       </td>
       <td className="table-cell actions-cell">
         <div className="action-buttons">
-          {editingUser === user.username ? (
+          {editingUser === user.empId ? (
             <>
               <button 
                 className="icon-button success-button"
@@ -198,7 +187,7 @@ const UserRow = ({
               </button>
               <button 
                 className="icon-button danger-button"
-                onClick={() => handleDeleteUser(user.username)}
+                onClick={() => handleDeleteUser(user.empId)}
                 title="Delete"
               >
                 <FaTrash />

@@ -100,19 +100,6 @@ const UserTable = ({
                   )}
                 </div>
               </th>
-              <th 
-                className="table-header sortable" 
-                onClick={() => handleSort("username")}
-              >
-                <div className="header-content">
-                  Username
-                  {sortConfig.key === "username" && (
-                    <span className={`sort-icon ${sortConfig.direction}`}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
-              </th>
               {activeTab === "credentials" && (
                 <>
                   <th className="table-header">Password</th>
@@ -154,7 +141,7 @@ const UserTable = ({
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <UserRow
-                  key={user.username}
+                  key={user.empId}
                   user={user}
                   activeTab={activeTab}
                   editingUser={editingUser}
@@ -177,7 +164,7 @@ const UserTable = ({
               ))
             ) : (
               <tr className="empty-row">
-                <td colSpan={activeTab === "credentials" ? 10 : 8} className="empty-cell">
+                <td colSpan={activeTab === "credentials" ? 9 : 7} className="empty-cell">
                   <div className="empty-state">
                     <div className="empty-image">📭</div>
                     <p className="empty-text">No employees found</p>

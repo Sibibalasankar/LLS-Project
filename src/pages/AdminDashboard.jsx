@@ -17,6 +17,7 @@ import ISOManual from "./IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import NotificationsPage from "./NotificationsPage";
 import UserProfile from "./UserProfile";
+import Credits from "./Credits";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
@@ -227,11 +228,11 @@ const Dashboard = () => {
             >
               Audit Summary Report
             </button>
-             <button
+            <button
               className={`menu-btn ${activeComponent === "action-report" ? "active" : ""}`}
               onClick={() => handleMenuItemClick("action-report")}
             >
-             All Department NC
+              All Department NC
             </button>
             <button
               className={`menu-btn ${activeComponent === "iso-manual" ? "active" : ""}`}
@@ -239,7 +240,7 @@ const Dashboard = () => {
             >
               ISO 9001-2015 Manual
             </button>
-           
+
 
             <div className="mobile-menu-items">
               <div className="mobile-menu-item" onClick={() => handleMenuItemClick("user-profile")}>
@@ -258,6 +259,12 @@ const Dashboard = () => {
                 <span>Logout</span>
               </div>
             </div>
+
+
+          </div>
+          <div className="sidebar-footer" onClick={() => handleMenuItemClick("credits")}>
+            <i className="bi bi-info-circle-fill" title="Developer Credits"></i>
+            <span className="credits-label">Developer Credits</span>
           </div>
         </nav>
 
@@ -274,7 +281,8 @@ const Dashboard = () => {
           {activeComponent === "iso-manual" && <ISOManual />}
           {activeComponent === "user-profile" && <UserProfile />}
           {activeComponent === "action-report" && <ActionReport isAllDepartments={true} />
-}
+          }
+          {activeComponent === "credits" && <Credits />}
 
 
           {!activeComponent && !showNotifications && <WelcomeMessage />}

@@ -22,69 +22,54 @@ const UserForm = ({
   return (
     <div className="card add-user-card">
       <h3 className="card-title">
-        {activeTab === "credentials" ? "Add New User" : "Add Employee Details"}
+        {activeTab === "credentials" ? "Add New Employee" : "Add Employee Details"}
       </h3>
       
       <div className="form-grid">
-        {activeTab === "credentials" ? (
-          <>
-            <div className="form-group">
-              <label className="form-label">Username</label>
+       
+        
+        <div className="form-group">
+          <label className="form-label">Employee ID</label>
+          <input
+            className="form-input"
+            type="text"
+            placeholder="Enter employee ID"
+            value={newUser.empId}
+            onChange={(e) => setNewUser({ ...newUser, empId: e.target.value })}
+          />
+        </div>
+         {activeTab === "credentials" && (
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <div className="password-input-container">
               <input
                 className="form-input"
-                type="text"
-                placeholder="Enter username"
-                value={newUser.username}
-                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
               />
+              <button 
+                className="password-toggle"
+                onClick={togglePasswordVisibility}
+                type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
-            
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <div className="password-input-container">
-                <input
-                  className="form-input"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                />
-                <button 
-                  className="password-toggle"
-                  onClick={togglePasswordVisibility}
-                  type="button"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="form-group">
-              <label className="form-label">Employee ID</label>
-              <input
-                className="form-input"
-                type="text"
-                placeholder="Enter employee ID"
-                value={newUser.empId}
-                onChange={(e) => setNewUser({ ...newUser, empId: e.target.value })}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Employee Name</label>
-              <input
-                className="form-input"
-                type="text"
-                placeholder="Enter employee name"
-                value={newUser.empName}
-                onChange={(e) => setNewUser({ ...newUser, empName: e.target.value })}
-              />
-            </div>
-          </>
+          </div>
         )}
+        <div className="form-group">
+          <label className="form-label">Employee Name</label>
+          <input
+            className="form-input"
+            type="text"
+            placeholder="Enter employee name"
+            value={newUser.empName}
+            onChange={(e) => setNewUser({ ...newUser, empName: e.target.value })}
+          />
+        </div>
         
         <div className="form-group">
           <label className="form-label">Department</label>
@@ -159,7 +144,7 @@ const UserForm = ({
       
       <button className="primary-button add-button" onClick={handleAddUser}>
         <FaUserPlus className="button-icon" />
-        {activeTab === "credentials" ? "Add User" : "Add Employee"}
+        {activeTab === "credentials" ? "Add Employee" : "Add Employee Details"}
       </button>
     </div>
   );

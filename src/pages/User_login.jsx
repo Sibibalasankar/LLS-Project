@@ -6,13 +6,12 @@ const User_login = () => {
   const navigate = useNavigate();
 
   const [stage, setStage] = useState("login");
-
-  const [username, setUsername] = useState("");
+  const [empId, setEmpId] = useState("");
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState("");
   const [role, setRole] = useState("");
   const [auditorDepartments, setAuditorDepartments] = useState([]);
-  const [forgotUsername, setForgotUsername] = useState("");
+  const [forgotEmpId, setForgotEmpId] = useState("");
   const [error, setError] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,11 +20,11 @@ const User_login = () => {
 
   const departments = JSON.parse(localStorage.getItem("departments") || "[]");
 
-  const handleUsernameBlur = () => {
-    if (!username) return;
+  const handleEmpIdBlur = () => {
+    if (!empId) return;
 
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
-    const user = storedUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+    const user = storedUsers.find(u => u.empId.toLowerCase() === empId.toLowerCase());
 
     if (user) {
       if (role === "auditor") {
@@ -55,7 +54,7 @@ const User_login = () => {
     setRole(selectedRole);
 
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
-    const user = storedUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+    const user = storedUsers.find(u => u.empId.toLowerCase() === empId.toLowerCase());
 
     if (user) {
       if (selectedRole === "auditor") {
@@ -87,17 +86,16 @@ const User_login = () => {
     try {
       const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
       const user = storedUsers.find(u =>
-        u.username.toLowerCase() === username.toLowerCase() &&
+        u.empId.toLowerCase() === empId.toLowerCase() &&
         u.password === password
       );
 
       if (!user) {
-        setError("Invalid username or password!");
+        setError("Invalid employee ID or password!");
         return;
       }
 
       localStorage.setItem("currentUser", JSON.stringify({
-        username: user.username,
         empId: user.empId,
         empName: user.empName,
         department: user.department,
@@ -111,7 +109,7 @@ const User_login = () => {
       localStorage.setItem("userRole", role);
 
       const loginActivity = {
-        username: user.username,
+        empId: user.empId,
         department: department,
         role: role,
         timestamp: Date.now(),
@@ -154,7 +152,7 @@ const User_login = () => {
 
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
     const updatedUsers = storedUsers.map(user =>
-      user.username === forgotUsername ? { ...user, password: newPassword } : user
+      user.empId === forgotEmpId ? { ...user, password: newPassword } : user
     );
 
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
@@ -172,21 +170,21 @@ const User_login = () => {
         {stage === "login" && (
           <>
             <div className="login-header">
-              <h2>User Login</h2>
+              <h2>Employee Login</h2>
               <p>Welcome back! Please enter your details</p>
             </div>
 
             <form className="login-form" onSubmit={handleLogin}>
               <div className="input-group">
-                <label htmlFor="user-username">Username</label>
+                <label htmlFor="emp-id">Employee ID</label>
                 <input
                   type="text"
-                  id="user-username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onBlur={handleUsernameBlur}
+                  id="emp-id"
+                  value={empId}
+                  onChange={(e) => setEmpId(e.target.value)}
+                  onBlur={handleEmpIdBlur}
                   required
-                  placeholder="Enter your username"
+                  placeholder="Enter your employee ID"
                 />
               </div>
 
@@ -258,18 +256,18 @@ const User_login = () => {
           <div className="forgot-password-card">
             <div className="login-header">
               <h2>Forgot Password</h2>
-              <p>Enter your username to reset your password</p>
+              <p>Enter your employee ID to reset your password</p>
             </div>
 
             <div className="input-group">
-              <label htmlFor="forgot-username">Username</label>
+              <label htmlFor="forgot-emp-id">Employee ID</label>
               <input
                 type="text"
-                id="forgot-username"
-                value={forgotUsername}
-                onChange={(e) => setForgotUsername(e.target.value)}
+                id="forgot-emp-id"
+                value={forgotEmpId}
+                onChange={(e) => setForgotEmpId(e.target.value)}
                 required
-                placeholder="Enter your username"
+                placeholder="Enter your employee ID"
               />
             </div>
 
@@ -277,7 +275,7 @@ const User_login = () => {
               <button
                 className="primary-button"
                 onClick={() => setStage("resetPassword")}
-                disabled={!forgotUsername}
+                disabled={!forgotEmpId}
               >
                 Continue
               </button>

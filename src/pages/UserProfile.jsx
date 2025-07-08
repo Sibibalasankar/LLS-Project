@@ -7,7 +7,6 @@ import "../assets/styles/UserProfile.css";
 const UserProfile = () => {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({
-    username: "",
     password: "",
     empId: "",
     empName: "",
@@ -19,7 +18,6 @@ const UserProfile = () => {
   const [showPasswords, setShowPasswords] = useState({});
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({
-    username: "",
     password: "",
     empId: "",
     empName: "",
@@ -50,7 +48,7 @@ const UserProfile = () => {
 
     const initialShowPasswords = {};
     storedUsers.forEach(user => {
-      initialShowPasswords[user.username] = false;
+      initialShowPasswords[user.empId] = false;
     });
     setShowPasswords(initialShowPasswords);
 
@@ -107,12 +105,8 @@ const UserProfile = () => {
   };
 
   const handleAddUser = () => {
-    if (!newUser.username || !newUser.password || !newUser.empId || !newUser.empName) {
-      return alert("Username, password, Employee ID and Name are required!");
-    }
-
-    if (users.some(user => user.username === newUser.username)) {
-      return alert("Username already exists!");
+    if (!newUser.password || !newUser.empId || !newUser.empName) {
+      return alert("Password, Employee ID and Name are required!");
     }
 
     if (users.some(user => user.empId === newUser.empId)) {
@@ -130,7 +124,6 @@ const UserProfile = () => {
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
     setNewUser({
-      username: "",
       password: "",
       empId: "",
       empName: "",
@@ -139,25 +132,24 @@ const UserProfile = () => {
       certifiedDate: "",
       permissions: []
     });
-    setShowPasswords({ ...showPasswords, [userToAdd.username]: false });
+    setShowPasswords({ ...showPasswords, [userToAdd.empId]: false });
   };
 
-  const handleDeleteUser = (usernameToDelete) => {
-    if (!window.confirm(`Are you sure you want to delete ${usernameToDelete}?`)) return;
+  const handleDeleteUser = (empIdToDelete) => {
+    if (!window.confirm(`Are you sure you want to delete employee ${empIdToDelete}?`)) return;
 
-    const updatedUsers = users.filter((user) => user.username !== usernameToDelete);
+    const updatedUsers = users.filter((user) => user.empId !== empIdToDelete);
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
 
     const newShowPasswords = { ...showPasswords };
-    delete newShowPasswords[usernameToDelete];
+    delete newShowPasswords[empIdToDelete];
     setShowPasswords(newShowPasswords);
   };
 
   const startEditing = (user) => {
-    setEditingUser(user.username);
+    setEditingUser(user.empId);
     setEditForm({
-      username: user.username,
       password: user.password,
       empId: user.empId,
       empName: user.empName,
@@ -171,7 +163,6 @@ const UserProfile = () => {
   const cancelEditing = () => {
     setEditingUser(null);
     setEditForm({
-      username: "",
       password: "",
       empId: "",
       empName: "",
@@ -183,24 +174,18 @@ const UserProfile = () => {
   };
 
   const handleEditUser = () => {
-    if (!editForm.username || !editForm.password || !editForm.empId || !editForm.empName) {
-      return alert("Username, password, Employee ID and Name are required!");
+    if (!editForm.password || !editForm.empId || !editForm.empName) {
+      return alert("Password, Employee ID and Name are required!");
     }
 
-    if (editForm.username !== editingUser && users.some(user => user.username === editForm.username)) {
-      return alert("Username already exists!");
-    }
-
-    if (editForm.empId !== users.find(u => u.username === editingUser).empId &&
-      users.some(user => user.empId === editForm.empId)) {
+    if (editForm.empId !== editingUser && users.some(user => user.empId === editForm.empId)) {
       return alert("Employee ID already exists!");
     }
 
     const updatedUsers = users.map(user => {
-      if (user.username === editingUser) {
+      if (user.empId === editingUser) {
         return {
           ...user,
-          username: editForm.username,
           password: editForm.password,
           empId: editForm.empId,
           empName: editForm.empName,
@@ -218,7 +203,6 @@ const UserProfile = () => {
     setUsers(updatedUsers);
     setEditingUser(null);
     setEditForm({
-      username: "",
       password: "",
       empId: "",
       empName: "",
@@ -228,18 +212,18 @@ const UserProfile = () => {
       permissions: []
     });
 
-    if (editForm.username !== editingUser) {
+    if (editForm.empId !== editingUser) {
       const newShowPasswords = { ...showPasswords };
-      newShowPasswords[editForm.username] = newShowPasswords[editingUser];
+      newShowPasswords[editForm.empId] = newShowPasswords[editingUser];
       delete newShowPasswords[editingUser];
       setShowPasswords(newShowPasswords);
     }
   };
 
-  const toggleUserPasswordVisibility = (username) => {
+  const toggleUserPasswordVisibility = (empId) => {
     setShowPasswords({
       ...showPasswords,
-      [username]: !showPasswords[username]
+      [empId]: !showPasswords[empId]
     });
   };
 
@@ -262,7 +246,6 @@ const UserProfile = () => {
   });
 
   const filteredUsers = sortedUsers.filter(user =>
-    user.username.toLowerCase().includes(filter.toLowerCase()) ||
     user.empId.toLowerCase().includes(filter.toLowerCase()) ||
     user.empName.toLowerCase().includes(filter.toLowerCase()) ||
     user.department.toLowerCase().includes(filter.toLowerCase()) ||
