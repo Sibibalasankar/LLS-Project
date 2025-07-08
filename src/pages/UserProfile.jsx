@@ -6,8 +6,8 @@ import "../assets/styles/UserProfile.css";
 
 const UserProfile = () => {
   const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({ 
-    username: "", 
+  const [newUser, setNewUser] = useState({
+    username: "",
     password: "",
     empId: "",
     empName: "",
@@ -18,15 +18,15 @@ const UserProfile = () => {
   });
   const [showPasswords, setShowPasswords] = useState({});
   const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({ 
-    username: "", 
+  const [editForm, setEditForm] = useState({
+    username: "",
     password: "",
     empId: "",
     empName: "",
     department: "",
     designation: "",
     certifiedDate: "",
-    permissions: [] 
+    permissions: []
   });
   const [filter, setFilter] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdAt", direction: "desc" });
@@ -47,7 +47,7 @@ const UserProfile = () => {
     // Load users
     const storedUsers = JSON.parse(localStorage.getItem("userCredentials")) || [];
     setUsers(storedUsers);
-    
+
     const initialShowPasswords = {};
     storedUsers.forEach(user => {
       initialShowPasswords[user.username] = false;
@@ -58,10 +58,22 @@ const UserProfile = () => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments")) || [];
     setDepartments(storedDepartments.map(dept => dept.name));
 
-    // Load designations from localStorage or use defaults
     const storedDesignations = JSON.parse(localStorage.getItem("designations")) || [
-      "Manager", "Engineer", "Technician", "Supervisor", "Analyst", "Executive"
+      "GET (Graduate Engineering Training)",
+      "Junior Engineer",
+      "Assistant Engineer",
+      "Engineer",
+      "Senior Engineer",
+      "Assistant Manager",
+      "Deputy Manager",
+      "Manager",
+      "Senior Manager",
+      "Assistant General Manager",
+      "Deputy General Manager",
+      "General Manager",
+      "Senior General Manager"
     ];
+
     setDesignations(storedDesignations);
   }, []);
 
@@ -69,8 +81,8 @@ const UserProfile = () => {
     const { name, checked } = e.target;
     setNewUser(prev => ({
       ...prev,
-      permissions: checked 
-        ? [...prev.permissions, name] 
+      permissions: checked
+        ? [...prev.permissions, name]
         : prev.permissions.filter(p => p !== name)
     }));
   };
@@ -79,8 +91,8 @@ const UserProfile = () => {
     const { name, checked } = e.target;
     setEditForm(prev => ({
       ...prev,
-      permissions: checked 
-        ? [...prev.permissions, name] 
+      permissions: checked
+        ? [...prev.permissions, name]
         : prev.permissions.filter(p => p !== name)
     }));
   };
@@ -117,35 +129,35 @@ const UserProfile = () => {
     const updatedUsers = [...users, userToAdd];
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
-    setNewUser({ 
-      username: "", 
+    setNewUser({
+      username: "",
       password: "",
       empId: "",
       empName: "",
       department: "",
       designation: "",
       certifiedDate: "",
-      permissions: [] 
+      permissions: []
     });
-    setShowPasswords({...showPasswords, [userToAdd.username]: false});
+    setShowPasswords({ ...showPasswords, [userToAdd.username]: false });
   };
 
   const handleDeleteUser = (usernameToDelete) => {
     if (!window.confirm(`Are you sure you want to delete ${usernameToDelete}?`)) return;
-    
+
     const updatedUsers = users.filter((user) => user.username !== usernameToDelete);
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
-    
-    const newShowPasswords = {...showPasswords};
+
+    const newShowPasswords = { ...showPasswords };
     delete newShowPasswords[usernameToDelete];
     setShowPasswords(newShowPasswords);
   };
 
   const startEditing = (user) => {
     setEditingUser(user.username);
-    setEditForm({ 
-      username: user.username, 
+    setEditForm({
+      username: user.username,
       password: user.password,
       empId: user.empId,
       empName: user.empName,
@@ -158,15 +170,15 @@ const UserProfile = () => {
 
   const cancelEditing = () => {
     setEditingUser(null);
-    setEditForm({ 
-      username: "", 
+    setEditForm({
+      username: "",
       password: "",
       empId: "",
       empName: "",
       department: "",
       designation: "",
       certifiedDate: "",
-      permissions: [] 
+      permissions: []
     });
   };
 
@@ -179,8 +191,8 @@ const UserProfile = () => {
       return alert("Username already exists!");
     }
 
-    if (editForm.empId !== users.find(u => u.username === editingUser).empId && 
-        users.some(user => user.empId === editForm.empId)) {
+    if (editForm.empId !== users.find(u => u.username === editingUser).empId &&
+      users.some(user => user.empId === editForm.empId)) {
       return alert("Employee ID already exists!");
     }
 
@@ -205,19 +217,19 @@ const UserProfile = () => {
     localStorage.setItem("userCredentials", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
     setEditingUser(null);
-    setEditForm({ 
-      username: "", 
+    setEditForm({
+      username: "",
       password: "",
       empId: "",
       empName: "",
       department: "",
       designation: "",
       certifiedDate: "",
-      permissions: [] 
+      permissions: []
     });
 
     if (editForm.username !== editingUser) {
-      const newShowPasswords = {...showPasswords};
+      const newShowPasswords = { ...showPasswords };
       newShowPasswords[editForm.username] = newShowPasswords[editingUser];
       delete newShowPasswords[editingUser];
       setShowPasswords(newShowPasswords);
@@ -249,7 +261,7 @@ const UserProfile = () => {
     return 0;
   });
 
-  const filteredUsers = sortedUsers.filter(user => 
+  const filteredUsers = sortedUsers.filter(user =>
     user.username.toLowerCase().includes(filter.toLowerCase()) ||
     user.empId.toLowerCase().includes(filter.toLowerCase()) ||
     user.empName.toLowerCase().includes(filter.toLowerCase()) ||
@@ -262,9 +274,9 @@ const UserProfile = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    const options = { 
-      year: 'numeric', 
-      month: 'short', 
+    const options = {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -274,9 +286,9 @@ const UserProfile = () => {
 
   const formatShortDate = (dateString) => {
     if (!dateString) return "N/A";
-    const options = { 
-      year: 'numeric', 
-      month: 'short', 
+    const options = {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric'
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -293,13 +305,13 @@ const UserProfile = () => {
         <h2 className="title">Employee Management System</h2>
         <div className="header-actions">
           <div className="tabs">
-            <button 
+            <button
               className={`tab-button ${activeTab === "credentials" ? "active" : ""}`}
               onClick={() => setActiveTab("credentials")}
             >
               Credentials
             </button>
-            <button 
+            <button
               className={`tab-button ${activeTab === "details" ? "active" : ""}`}
               onClick={() => setActiveTab("details")}
             >

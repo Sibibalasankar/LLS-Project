@@ -35,36 +35,6 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
     return pattern.test(value);
   };
 
-  // const mergeObservations = (fieldName) => {
-  //   if (!ncObservations || ncObservations.length === 0) return [];
-  //   return Array.from(new Set(ncObservations.map(obs => obs[fieldName]).filter(Boolean)));
-  // };
-
-
-  // useEffect(() => {
-  //   if (ncObservations && ncObservations.length > 0 && !isMerged) { // Run only if not merged yet
-  //     const fieldsToMerge = [
-  //       { name: 'process', key: 'processActivity' },
-  //       { name: 'requirement', key: 'requirement' },
-  //       { name: 'nonConformityStatement', key: 'findings' },
-  //       { name: 'objectiveEvidence', key: 'objectiveEvidence' },
-  //       { name: 'isoClass', key: 'isoClause' },
-  //       { name: 'potentialRisk', key: 'potentialCauses' },
-  //       { name: 'auditor', key: 'auditorSignature' },
-  //       { name: 'auditee', key: 'auditeeSignature' }
-  //     ];
-
-  //     fieldsToMerge.forEach(field => {
-  //       const allValues = ncObservations.map(obs => obs[field.key]).filter(Boolean);
-  //       const uniqueValues = [...new Set(allValues)];
-  //       handleChange({ target: { name: field.name, value: uniqueValues } });
-
-  //     });
-
-  //     setIsMerged(true); // Mark as merged
-  //   }
-  // }, [ncObservations, isMerged]); // Make sure this doesn't trigger again unnecessarily
-
   return (
     <div className="audit-form-container">
       <div className="form-section document-format">

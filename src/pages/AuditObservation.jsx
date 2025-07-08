@@ -143,7 +143,7 @@ useEffect(() => {
                         <span className="stat-value">{obsCount}</span>
                       </div>
                       <div className="stat-item">
-                        <span className="stat-label">NC Count:</span>
+                        <span className="stat-label">NC Count (No of Reports):</span>
                         <span className="stat-value">{deptNcCount}</span>
                       </div>
                       <div className="stat-item">

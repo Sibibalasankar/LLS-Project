@@ -78,6 +78,22 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
   });
 
   const auditCycleOptions = ["I", "II", "III", "IV", "V"];
+  const designationOptions = [
+    "GET (Graduate Engineering Training)",
+    "Junior Engineer",
+    "Assistant Engineer",
+    "Engineer",
+    "Senior Engineer",
+    "Assistant Manager",
+    "Deputy Manager",
+    "Manager",
+    "Senior Manager",
+    "Assistant General Manager",
+    "Deputy General Manager",
+    "General Manager",
+    "Senior General Manager"
+  ];
+
   const [actionObservation, setActionObservation] = useState(null);
   const [showActionForm, setShowActionForm] = useState(false);
   const firstObservation = observations[0] || null;
@@ -425,10 +441,9 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
                       type="date"
                       name="auditDate"
                       value={currentObservation.auditDate}
-                      onChange={handleInputChange}
-                      required
-                      readOnly={!isFirstObservation} // Lock after first observation
+                      readOnly
                     />
+
 
                   </label>
                 </div>
@@ -581,13 +596,13 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
                         required
                       >
                         <option value="">Select Designation</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Engineer">Engineer</option>
-                        <option value="Technician">Technician</option>
-                        <option value="Supervisor">Supervisor</option>
-                        <option value="Analyst">Analyst</option>
-                        <option value="Executive">Executive</option>
+                        {designationOptions.map((designation, index) => (
+                          <option key={index} value={designation}>
+                            {designation}
+                          </option>
+                        ))}
                       </select>
+
 
                     </label>
                   </div>
@@ -632,13 +647,13 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
                         required
                       >
                         <option value="">Select Designation</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Engineer">Engineer</option>
-                        <option value="Technician">Technician</option>
-                        <option value="Supervisor">Supervisor</option>
-                        <option value="Analyst">Analyst</option>
-                        <option value="Executive">Executive</option>
+                        {designationOptions.map((designation, index) => (
+                          <option key={index} value={designation}>
+                            {designation}
+                          </option>
+                        ))}
                       </select>
+
 
                     </label>
                   </div>
@@ -660,7 +675,7 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
       <div className="signatures-summary">
         <div className="signature-info">
           <div className="audit-info-item">
-            <strong>Auditee:</strong> {observations.length > 0 ? `${observations[0].auditeeSignature} (${observations[0].auditeeDesignation})` : "-"}
+            <strong>Auditor:</strong> {observations.length > 0 ? `${observations[0].auditorSignature} (${observations[0].auditorDesignation})` : "-"}
           </div>
           <div className="audit-info-item">
             <strong>Auditee:</strong> {observations.length > 0 ? `${observations[0].auditeeSignature} (${observations[0].auditeeDesignation})` : "-"}
