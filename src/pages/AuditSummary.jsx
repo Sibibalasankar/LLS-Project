@@ -314,7 +314,7 @@ const AuditSummary = () => {
   const getTrendData = () => {
     const monthlyData = {};
     const months = [];
-    
+
     for (let i = 11; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
@@ -520,8 +520,8 @@ const AuditSummary = () => {
       borderWidth: 1
     }]
   };
-
   const chartOptions = {
+    indexAxis: "y", // ✅ This makes the bar chart horizontal
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -529,7 +529,7 @@ const AuditSummary = () => {
         position: "top",
         labels: {
           color: chartColors.primary,
-          font: { size: 12, weight: '600' }
+          font: { size: 12, weight: "600" }
         }
       },
       title: {
@@ -538,17 +538,73 @@ const AuditSummary = () => {
     },
     scales: {
       x: {
+        stacked: true,
         ticks: { color: chartColors.secondary },
-        grid: { color: '#e9ecef' }
+        grid: { color: "#e9ecef" }
       },
       y: {
+        stacked: true,
         beginAtZero: true,
-        ticks: { 
+        ticks: {
           color: chartColors.secondary,
           stepSize: 1,
           precision: 0
         },
-        grid: { color: '#e9ecef' }
+        grid: { color: "#e9ecef" }
+      }
+    }
+  };
+  const horizontalStackedOptions = {
+    indexAxis: "y", // Only for horizontal bar
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          color: chartColors.primary,
+          font: { size: 12, weight: "600" }
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        ticks: { color: chartColors.secondary },
+        grid: { color: "#e9ecef" }
+      },
+      y: {
+        stacked: true,
+        ticks: { color: chartColors.secondary },
+        grid: { color: "#e9ecef" }
+      }
+    }
+  };
+  const lineChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          color: chartColors.primary,
+          font: { size: 12, weight: "600" }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: chartColors.secondary },
+        grid: { color: "#e9ecef" }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: chartColors.secondary,
+          stepSize: 1,
+          precision: 0
+        },
+        grid: { color: "#e9ecef" }
       }
     }
   };
@@ -705,19 +761,19 @@ const AuditSummary = () => {
       {/* Key Metrics */}
       <div style={styles.metricsContainer}>
         <div style={styles.metricCard}>
-          <div style={{...styles.metricValue, color: chartColors.primary}}>{totalObservations}</div>
+          <div style={{ ...styles.metricValue, color: chartColors.primary }}>{totalObservations}</div>
           <div style={styles.metricLabel}>Total Observations</div>
         </div>
         <div style={styles.metricCard}>
-          <div style={{...styles.metricValue, color: chartColors.NC}}>{totalNC}</div>
+          <div style={{ ...styles.metricValue, color: chartColors.NC }}>{totalNC}</div>
           <div style={styles.metricLabel}>Non-Conformities</div>
         </div>
         <div style={styles.metricCard}>
-          <div style={{...styles.metricValue, color: chartColors.NC}}>{ncRate}%</div>
+          <div style={{ ...styles.metricValue, color: chartColors.NC }}>{ncRate}%</div>
           <div style={styles.metricLabel}>NC Rate</div>
         </div>
         <div style={styles.metricCard}>
-          <div style={{...styles.metricValue, color: chartColors.OP}}>{complianceRate}%</div>
+          <div style={{ ...styles.metricValue, color: chartColors.OP }}>{complianceRate}%</div>
           <div style={styles.metricLabel}>Compliance Rate</div>
         </div>
       </div>
@@ -748,20 +804,20 @@ const AuditSummary = () => {
       <div style={styles.downloadContainer}>
         <button
           onClick={downloadDepartmentData}
-          style={{...styles.downloadButton, backgroundColor: "#27ae60"}}
+          style={{ ...styles.downloadButton, backgroundColor: "#27ae60" }}
         >
           Download Department Data
         </button>
         <button
           onClick={downloadConsolidatedData}
-          style={{...styles.downloadButton, backgroundColor: "#3498db"}}
+          style={{ ...styles.downloadButton, backgroundColor: "#3498db" }}
         >
           Download Consolidated Data
         </button>
         {timePeriod === "financialYear" && (
           <button
             onClick={downloadFinancialYearData}
-            style={{...styles.downloadButton, backgroundColor: "#8e44ad"}}
+            style={{ ...styles.downloadButton, backgroundColor: "#8e44ad" }}
           >
             Download FY {financialYear} Data
           </button>
@@ -777,10 +833,11 @@ const AuditSummary = () => {
               {activeTab === "department" ? "Department-wise Analysis" : "Audit Cycle Analysis"}
             </h3>
             <div style={{ height: "400px" }}>
-              <Bar 
-                data={activeTab === "department" ? departmentChartData : cycleChartData} 
-                options={chartOptions} 
+              <Bar
+                data={activeTab === "department" ? departmentChartData : cycleChartData}
+                options={horizontalStackedOptions}
               />
+
             </div>
           </div>
 
@@ -788,7 +845,10 @@ const AuditSummary = () => {
           <div style={styles.chartContainer}>
             <h3 style={styles.chartTitle}>Monthly Trend Analysis</h3>
             <div style={{ height: "300px" }}>
-              <Line data={trendChartData} options={chartOptions} />
+              <Line
+                data={trendChartData}
+                options={lineChartOptions}
+              />
             </div>
           </div>
 
@@ -844,14 +904,14 @@ const AuditSummary = () => {
                     Object.entries(departmentCounts).map(([dept, counts]) => (
                       <tr key={dept}>
                         <td style={styles.tableCell}>{dept}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.NC, fontWeight: "600"}}>{counts.NC}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.OP, fontWeight: "600"}}>{counts.op}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.OFI, fontWeight: "600"}}>{counts.OFI}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", fontWeight: "600"}}>{counts.total}</td>
-                        <td style={{...styles.tableCell, textAlign: "center"}}>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.NC, fontWeight: "600" }}>{counts.NC}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.OP, fontWeight: "600" }}>{counts.op}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.OFI, fontWeight: "600" }}>{counts.OFI}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", fontWeight: "600" }}>{counts.total}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center" }}>
                           {counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) : 0}%
                         </td>
-                        <td style={{...styles.tableCell, textAlign: "center"}}>
+                        <td style={{ ...styles.tableCell, textAlign: "center" }}>
                           {counts.total > 0 ? (((counts.op + counts.OFI) / counts.total) * 100).toFixed(2) : 0}%
                         </td>
                       </tr>
@@ -860,14 +920,14 @@ const AuditSummary = () => {
                     Object.entries(cycleCounts).map(([cycle, counts]) => (
                       <tr key={cycle}>
                         <td style={styles.tableCell}>{cycle}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.NC, fontWeight: "600"}}>{counts.NC}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.OP, fontWeight: "600"}}>{counts.op}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", color: chartColors.OFI, fontWeight: "600"}}>{counts.OFI}</td>
-                        <td style={{...styles.tableCell, textAlign: "center", fontWeight: "600"}}>{counts.total}</td>
-                        <td style={{...styles.tableCell, textAlign: "center"}}>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.NC, fontWeight: "600" }}>{counts.NC}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.OP, fontWeight: "600" }}>{counts.op}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", color: chartColors.OFI, fontWeight: "600" }}>{counts.OFI}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center", fontWeight: "600" }}>{counts.total}</td>
+                        <td style={{ ...styles.tableCell, textAlign: "center" }}>
                           {counts.total > 0 ? ((counts.NC / counts.total) * 100).toFixed(2) : 0}%
                         </td>
-                        <td style={{...styles.tableCell, textAlign: "center"}}>
+                        <td style={{ ...styles.tableCell, textAlign: "center" }}>
                           {counts.total > 0 ? (((counts.op + counts.OFI) / counts.total) * 100).toFixed(2) : 0}%
                         </td>
                       </tr>
@@ -885,17 +945,17 @@ const AuditSummary = () => {
               <div style={{ padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #e9ecef" }}>
                 <h4 style={{ color: chartColors.primary, marginBottom: "10px" }}>Best Performing Department</h4>
                 <p style={{ color: chartColors.secondary, fontSize: "14px", marginBottom: "5px" }}>
-                  {topDepartments.length > 0 
+                  {topDepartments.length > 0
                     ? `${topDepartments[topDepartments.length - 1].department} (${topDepartments[topDepartments.length - 1].ncRate.toFixed(2)}% NC Rate)`
                     : "No data available"
                   }
                 </p>
               </div>
-              
+
               <div style={{ padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #e9ecef" }}>
                 <h4 style={{ color: chartColors.primary, marginBottom: "10px" }}>Needs Attention</h4>
                 <p style={{ color: chartColors.secondary, fontSize: "14px", marginBottom: "5px" }}>
-                  {topDepartments.length > 0 
+                  {topDepartments.length > 0
                     ? `${topDepartments[0].department} (${topDepartments[0].ncRate.toFixed(2)}% NC Rate)`
                     : "No data available"
                   }
@@ -905,7 +965,7 @@ const AuditSummary = () => {
               <div style={{ padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #e9ecef" }}>
                 <h4 style={{ color: chartColors.primary, marginBottom: "10px" }}>Average NC Rate</h4>
                 <p style={{ color: chartColors.secondary, fontSize: "14px", marginBottom: "5px" }}>
-                  {topDepartments.length > 0 
+                  {topDepartments.length > 0
                     ? `${(topDepartments.reduce((sum, dept) => sum + dept.ncRate, 0) / topDepartments.length).toFixed(2)}%`
                     : "No data available"
                   }
@@ -915,7 +975,7 @@ const AuditSummary = () => {
               <div style={{ padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #e9ecef" }}>
                 <h4 style={{ color: chartColors.primary, marginBottom: "10px" }}>Most Active Month</h4>
                 <p style={{ color: chartColors.secondary, fontSize: "14px", marginBottom: "5px" }}>
-                  {Object.keys(auditFrequency).length > 0 
+                  {Object.keys(auditFrequency).length > 0
                     ? Object.entries(auditFrequency).reduce((a, b) => auditFrequency[a[0]] > auditFrequency[b[0]] ? a : b)[0]
                     : "No data available"
                   }
@@ -936,7 +996,7 @@ const AuditSummary = () => {
                   </p>
                 </div>
               )}
-              
+
               {totalObservations > 0 && totalOP / totalObservations > 0.6 && (
                 <div style={{ padding: "15px", backgroundColor: "#d4edda", borderRadius: "8px", border: "1px solid #c3e6cb" }}>
                   <h4 style={{ color: "#155724", marginBottom: "8px", fontSize: "16px" }}>✅ Good Performance</h4>
