@@ -345,7 +345,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               </tr>
               <tr>
                 <td><strong>PROCESS</strong>:
-                 <span> {report.process}</span>
+                  <span> {report.process}</span>
 
                 </td>
                 <td><strong>AUDITOR/DEPT.</strong>: {report.auditor}</td>
@@ -354,7 +354,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               <tr>
                 <td colSpan={3}>
                   <p><strong>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information):</strong></p>
-                 <span>{report.requirement}</span>
+                  <span>{report.requirement}</span>
                 </td>
               </tr>
               <tr>
@@ -376,7 +376,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                   <p><strong>ISO 9001-2018: OVIS CLASS NO. & DISCIPLINE</strong></p>
                 </td>
                 <td colSpan={2}>
-                <span>{report.isoClass}</span>
+                  <span>{report.isoClass}</span>
 
                 </td>
               </tr>
@@ -384,8 +384,9 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                 <td colSpan={3}>
                   <div className='signature_line'>
                     <p>DATE: {report.auditDate}</p>
-                    <p className="signature-field">SIGNATURE OF AUDITOR:</p>
+                    <p className="signature-field">SIGNATURE OF AUDITOR: {report.auditor || '-'}</p>
                   </div>
+
                 </td>
               </tr>
               <tr>
@@ -396,7 +397,7 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               <tr>
                 <td>
                   <p><strong>POTENTIAL RISK</strong></p>
-                 <span>{report.potentialRisk}</span>
+                  <span>{report.potentialRisk}</span>
                 </td>
                 <td colSpan={2}>
                   <p><strong>CORRECTION</strong></p>
@@ -426,8 +427,9 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                 <td colSpan={3}>
                   <div className='signature_line'>
                     <p>DATE: {report.auditDate}</p>
-                    <p className="signature-field">SIGNATURE OF AUDITEE: </p>
+                    <p className="signature-field">SIGNATURE OF AUDITEE: {report.auditee || '-'}</p>
                   </div>
+
                 </td>
               </tr>
             </tbody>
@@ -517,8 +519,9 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                 <td>
                   <div className='signature_line'>
                     <p>DATE: {report.auditDate}</p>
-                    <p className="signature-field">SIGNATURE OF AUDITEE: </p>
+                    <p className="signature-field">SIGNATURE OF AUDITEE: {report.auditee || '-'}</p>
                   </div>
+
                 </td>
               </tr>
               <tr>
@@ -544,16 +547,20 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
                 <td>
                   <div className='signature_line'>
                     <p>DATE: {report.auditDate}</p>
-                    <p className="signature-field">SIGNATURE OF AUDITOR:</p>
+                    <p className="signature-field">SIGNATURE OF AUDITOR: {report.auditor || '-'}</p>
                   </div>
+
                 </td>
               </tr>
               <tr>
                 <td>
                   <p><strong>NCR. CLOSING STATUS</strong></p>
-                  <p>a) Closed / Mixed Re-Action:<br />
-                    b) Amid similar nonconformity exist, could potentially occur at:</p>
+                  <p><b>a) Closed / Mixed Re-Action:</b> {report.closingType || '-'}</p>
+
+                  <p style={{ marginTop: "0.5rem" }}>
+                    <b> b) Amid similar nonconformity exist, could potentially occur at:</b> {report.similarNcLocation || '-'}</p>
                 </td>
+
               </tr>
               <tr>
                 <td>

@@ -32,6 +32,8 @@ const INITIAL_FORM_DATA = {
     target: "",
     status: ""
   }],
+  closingType: "",         // for radio button a)
+  similarNcLocation: "",   // for text input b)
 
   followUpObservation: "",
   followUpEvidence: "",
@@ -137,7 +139,7 @@ const ActionReport = ({ isAllDepartments = false }) => {
   const [viewingReport, setViewingReport] = useState(null);
   const [autoOpened, setAutoOpened] = useState(false);
   const navigate = useNavigate();
-    // Extract data from observationData
+  // Extract data from observationData
   // Extract data from observationData
   const departmentName = observationData?.department || '';
   const auditCycleNo = observationData?.auditCycleNo || '';
@@ -219,48 +221,50 @@ const ActionReport = ({ isAllDepartments = false }) => {
 
 
 
-const getInitialFormData = () => ({
-  ...INITIAL_FORM_DATA,
-  dptname: departmentName,
-  auditCycleNo: auditCycleNo,
-  ncsNumber: generateNcNumber(),
-  auditDate: singleObservation.auditDate || auditDate,
-  process: singleObservation.processActivity || '',
-  requirement: '',
-  nonConformityStatement: singleObservation.findings || '',
-  objectiveEvidence: singleObservation.potentialCauses || '',
-  isoClass: singleObservation.isoClause || '',
-  potentialRisk: singleObservation.potentialCauses || '',
-  auditor: singleObservation.auditorSignature || '',
-  auditee: singleObservation.auditeeSignature || '',
-  auditorDesignation: singleObservation.auditorDesignation || '',
-  auditeeDesignation: singleObservation.auditeeDesignation || '',
-  observationId: singleObservation.id || ''
-});
+  const getInitialFormData = () => ({
+    ...INITIAL_FORM_DATA,
+    dptname: departmentName,
+    auditCycleNo: auditCycleNo,
+    ncsNumber: generateNcNumber(),
+    auditDate: singleObservation.auditDate || auditDate,
+    process: singleObservation.processActivity || '',
+    requirement: '',
+    nonConformityStatement: singleObservation.findings || '',
+    objectiveEvidence: singleObservation.potentialCauses || '',
+    isoClass: singleObservation.isoClause || '',
+    potentialRisk: singleObservation.potentialCauses || '',
+    auditor: singleObservation.auditorSignature || '',
+    auditee: singleObservation.auditeeSignature || '',
+    auditorDesignation: singleObservation.auditorDesignation || '',
+    auditeeDesignation: singleObservation.auditeeDesignation || '',
+    observationId: singleObservation.id || ''
+  });
 
-const [formData, dispatch] = useReducer(formReducer, INITIAL_FORM_DATA);
-useEffect(() => {
-  if (singleObservation?.id && !autoOpened) {
-    dispatch({ type: "SET_FORM", payload: {
-      ...INITIAL_FORM_DATA,
-      dptname: departmentName,
-      auditCycleNo: auditCycleNo,
-      ncsNumber: generateNcNumber(),
-      auditDate: singleObservation.auditDate || auditDate,
-      process: singleObservation.processActivity || '',
-      requirement: '',
-      nonConformityStatement: singleObservation.findings || '',
-      objectiveEvidence: singleObservation.potentialCauses || '',
-      isoClass: singleObservation.isoClause || '',
-      potentialRisk: singleObservation.potentialCauses || '',
-      auditor: singleObservation.auditorSignature || '',
-      auditee: singleObservation.auditeeSignature || '',
-      auditorDesignation: singleObservation.auditorDesignation || '',
-      auditeeDesignation: singleObservation.auditeeDesignation || '',
-      observationId: singleObservation.id || ''
-    }});
-  }
-}, [singleObservation, autoOpened]);
+  const [formData, dispatch] = useReducer(formReducer, INITIAL_FORM_DATA);
+  useEffect(() => {
+    if (singleObservation?.id && !autoOpened) {
+      dispatch({
+        type: "SET_FORM", payload: {
+          ...INITIAL_FORM_DATA,
+          dptname: departmentName,
+          auditCycleNo: auditCycleNo,
+          ncsNumber: generateNcNumber(),
+          auditDate: singleObservation.auditDate || auditDate,
+          process: singleObservation.processActivity || '',
+          requirement: '',
+          nonConformityStatement: singleObservation.findings || '',
+          objectiveEvidence: singleObservation.potentialCauses || '',
+          isoClass: singleObservation.isoClause || '',
+          potentialRisk: singleObservation.potentialCauses || '',
+          auditor: singleObservation.auditorSignature || '',
+          auditee: singleObservation.auditeeSignature || '',
+          auditorDesignation: singleObservation.auditorDesignation || '',
+          auditeeDesignation: singleObservation.auditeeDesignation || '',
+          observationId: singleObservation.id || ''
+        }
+      });
+    }
+  }, [singleObservation, autoOpened]);
 
   // Rest of your component code...
   // Filter reports by department and audit cycle
@@ -346,35 +350,39 @@ useEffect(() => {
     return null;
   };
 
-  const handleSave = () => {
-    const validationError = validateForm();
-    if (validationError) {
-      alert(validationError);
-      return;
-    }
+const handleSave = () => {
+  const validationError = validateForm();
+  if (validationError) {
+    alert(validationError);
+    return;
+  }
 
-    const reportToSave = {
-      ...formData,
-      id: formData.id || Date.now(),
-      savedDate: new Date().toLocaleString(),
-      dptname: formData.dptname || departmentName,
-      ncsNumber: formData.ncsNumber || ncsNumber // Use ncsNumber here instead of ncsNumberParam
-    };
-
-    let updatedReports;
-    if (editingIndex !== null) {
-      updatedReports = [...savedReports];
-      updatedReports[editingIndex] = reportToSave;
-    } else {
-      updatedReports = [...savedReports, reportToSave];
-    }
-
-    setSavedReports(updatedReports);
-    localStorage.setItem('latestAuditReport', JSON.stringify(reportToSave));
-    clearDraft(draftKey);
-    setShowForms(false);
-    alert('Report saved successfully!');
+  const reportToSave = {
+    ...formData,
+    id: formData.id || Date.now(),
+    savedDate: new Date().toLocaleString(),
+    dptname: formData.dptname || departmentName,
+    ncsNumber: formData.ncsNumber || ncsNumber // Use param fallback
   };
+
+  let updatedReports;
+  if (editingIndex !== null) {
+    updatedReports = [...savedReports];
+    updatedReports[editingIndex] = reportToSave;
+  } else {
+    updatedReports = [...savedReports, reportToSave];
+  }
+
+  setSavedReports(updatedReports);
+  localStorage.setItem('latestAuditReport', JSON.stringify(reportToSave));
+  clearDraft(draftKey);
+
+  // ✅ Force it to show the updated report again (not list)
+  setViewingReport(reportToSave);
+  setShowForms(false);
+
+  alert('Report saved successfully!');
+};
 
   const handleEdit = (index) => {
     dispatch({

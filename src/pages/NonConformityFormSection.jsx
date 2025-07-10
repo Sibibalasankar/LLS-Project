@@ -4,30 +4,40 @@ import PropTypes from 'prop-types';
 const NonConformityFormSection = ({ formData, dispatch, departmentName, singleObservation }) => {
   const [departments, setDepartments] = useState([]);
 
+  const currentUserRole = localStorage.getItem("userRole");
+  const isAuditee = currentUserRole === "auditee";
+  const canEditAll = currentUserRole === "admin" || currentUserRole === "auditor";
+
   useEffect(() => {
     const storedDepartments = JSON.parse(localStorage.getItem("departments") || "[]");
     setDepartments(storedDepartments);
   }, []);
 
   const handleChange = (e) => {
-    dispatch({
-      type: 'UPDATE_FIELD',
-      field: e.target.name,
-      value: e.target.value
-    });
+    if (canEditAll) {
+      dispatch({
+        type: 'UPDATE_FIELD',
+        field: e.target.name,
+        value: e.target.value
+      });
+    }
   };
 
   const handleActivityChange = (index, field, value) => {
-    dispatch({
-      type: 'UPDATE_ACTIVITY',
-      index,
-      field,
-      value
-    });
+    if (isAuditee || canEditAll) {
+      dispatch({
+        type: 'UPDATE_ACTIVITY',
+        index,
+        field,
+        value
+      });
+    }
   };
 
   const addActivityRow = () => {
-    dispatch({ type: 'ADD_ACTIVITY_ROW' });
+    if (isAuditee || canEditAll) {
+      dispatch({ type: 'ADD_ACTIVITY_ROW' });
+    }
   };
 
   const validateAuditCycleNo = (value) => {
@@ -57,6 +67,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                       onChange={handleChange}
                       placeholder="I/2025-26 or II/2026-2027"
                       className={formData.auditCycleNo && !validateAuditCycleNo(formData.auditCycleNo) ? "invalid-input" : ""}
+                      readOnly={!canEditAll}
                     />
                     {formData.auditCycleNo && !validateAuditCycleNo(formData.auditCycleNo) && (
                       <span className="validation-error">Format should be like I/2025-26 or II/2026-2027</span>
@@ -72,7 +83,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                       name="dptname"
                       value={formData.dptname || departmentName || ''}
                       onChange={handleChange}
-                      disabled={!!departmentName}
+                      disabled={!!departmentName || !canEditAll}
                     >
                       {departmentName ? (
                         <option value={departmentName}>{departmentName}</option>
@@ -92,13 +103,25 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                 <td width="33%">
                   <label>NCR. NO.</label>
                   <div className="form-field">
-                    <input type="text" name="ncsNumber" value={formData.ncsNumber} onChange={handleChange} />
+                    <input
+                      type="text"
+                      name="ncsNumber"
+                      value={formData.ncsNumber}
+                      onChange={handleChange}
+                      readOnly={!canEditAll}
+                    />
                   </div>
                 </td>
                 <td width="33%">
                   <label>AUDIT DATE</label>
                   <div className="form-field">
-                    <input type="date" name="auditDate" value={formData.auditDate} onChange={handleChange} />
+                    <input
+                      type="date"
+                      name="auditDate"
+                      value={formData.auditDate}
+                      onChange={handleChange}
+                      readOnly={!canEditAll}
+                    />
                   </div>
                 </td>
               </tr>
@@ -111,8 +134,8 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                       value={Array.isArray(formData.process) ? formData.process.join('\n') : formData.process}
                       onChange={handleChange}
                       rows={3}
+                      readOnly={!canEditAll}
                     />
-
                   </div>
                 </td>
 
@@ -136,7 +159,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                       name="auditee"
                       value={formData.auditee}
                       onChange={handleChange}
-                      readOnly // Make it read-only if you don't want it to be editable
+                      readOnly
                     />
                   </div>
                 </td>
@@ -147,12 +170,13 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
 
         <div className="document-card">
           <div className="document-field">
-            <label>REQUIREMENT (ISO 9001 STD / Quality manual / SOP / Dept.'s Documented Information)</label>
+            <label>REQUIREMENT</label>
             <textarea
               name="requirement"
               value={formData.requirement}
               onChange={handleChange}
               rows={3}
+              readOnly={!canEditAll}
             />
           </div>
         </div>
@@ -165,6 +189,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
               value={formData.nonConformityStatement}
               onChange={handleChange}
               rows={3}
+              readOnly={!canEditAll}
             />
           </div>
         </div>
@@ -177,6 +202,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
               value={formData.objectiveEvidence}
               onChange={handleChange}
               rows={3}
+              readOnly={!canEditAll}
             />
           </div>
         </div>
@@ -190,6 +216,7 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                 value={formData.isoClass}
                 onChange={handleChange}
                 rows={2}
+                readOnly={!canEditAll}
               />
             </div>
           </div>
@@ -202,11 +229,13 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
                 value={formData.potentialRisk}
                 onChange={handleChange}
                 rows={2}
+                readOnly={!canEditAll}
               />
             </div>
           </div>
         </div>
 
+        {/* CORRECTION TABLE (Editable by Auditee or All) */}
         <div className="document-card table-card">
           <label htmlFor="">CORRECTION</label>
           <table className="document-table">
@@ -222,30 +251,29 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
               {formData.activities.map((activity, index) => (
                 <tr key={index}>
                   <td>
-                    <input
-                      type="text"
-                      value={index + 1} // Auto SL No.
-                      readOnly
-                    />
+                    <input type="text" value={index + 1} readOnly />
                   </td>
                   <td>
                     <input
                       type="text"
                       value={activity.activity}
                       onChange={(e) => handleActivityChange(index, 'activity', e.target.value)}
+                      readOnly={!isAuditee && !canEditAll}
                     />
                   </td>
                   <td>
                     <input
-                      type="date" // Calendar input
+                      type="date"
                       value={activity.target}
                       onChange={(e) => handleActivityChange(index, 'target', e.target.value)}
+                      readOnly={!isAuditee && !canEditAll}
                     />
                   </td>
                   <td>
                     <select
                       value={activity.status}
                       onChange={(e) => handleActivityChange(index, 'status', e.target.value)}
+                      disabled={!isAuditee && !canEditAll}
                     >
                       <option value="">Select Status</option>
                       <option value="Open">Open</option>
@@ -257,11 +285,12 @@ const NonConformityFormSection = ({ formData, dispatch, departmentName, singleOb
               ))}
             </tbody>
           </table>
-          <button type="button" className="add-row-btn" onClick={addActivityRow}>
-            <span className="icon">+</span> Add Row
-          </button>
+          {(isAuditee || canEditAll) && (
+            <button type="button" className="add-row-btn" onClick={addActivityRow}>
+              <span className="icon">+</span> Add Row
+            </button>
+          )}
         </div>
-
 
       </div>
     </div>
@@ -274,4 +303,5 @@ NonConformityFormSection.propTypes = {
   departmentName: PropTypes.string,
   singleObservation: PropTypes.object
 };
+
 export default NonConformityFormSection;

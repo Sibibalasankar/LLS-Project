@@ -292,7 +292,8 @@
 
 .signature-field {
     flex: 1;
-    max-width: 45%;
+    max-width: 30%;
+    right: 0;
 }
 
 .signature-field input {
@@ -796,4 +797,18 @@
 }
 .nonconformity-list{
   text-align: start;
+}
+.clear-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #555;
+  border-radius: 4px;
+  transition: 0.2s ease;
+}
+
+.clear-btn:hover {
+  background-color: #f8f8f8;
+  border-color: #999;
 }
