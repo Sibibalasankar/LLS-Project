@@ -38,6 +38,48 @@ const AuditSummary = () => {
   const [activeTab, setActiveTab] = useState("department");
   const [timePeriod, setTimePeriod] = useState("12months");
   const [financialYear, setFinancialYear] = useState("");
+  const [selectedIsoClause, setSelectedIsoClause] = useState("");
+
+  const isoClauseOptions = [
+    { value: "1", label: "1 – Scope" },
+    { value: "2", label: "2 – Normative references" },
+    { value: "3", label: "3 – Terms and definitions" },
+    { value: "4", label: "4 – Context of the organization" },
+    { value: "4.1", label: "4.1 – Understanding the organization and its context" },
+    { value: "4.2", label: "4.2 – Understanding the needs and expectations of interested parties" },
+    { value: "4.3", label: "4.3 – Determining the scope of the quality management system" },
+    { value: "4.4", label: "4.4 – Quality management system and its processes" },
+    { value: "5", label: "5 – Leadership" },
+    { value: "5.1", label: "5.1 – Leadership and commitment" },
+    { value: "5.2", label: "5.2 – Policy" },
+    { value: "5.3", label: "5.3 – Organizational roles, responsibilities and authorities" },
+    { value: "6", label: "6 – Planning" },
+    { value: "6.1", label: "6.1 – Actions to address risks and opportunities" },
+    { value: "6.2", label: "6.2 – Quality objectives and planning to achieve them" },
+    { value: "6.3", label: "6.3 – Planning of changes" },
+    { value: "7", label: "7 – Support" },
+    { value: "7.1", label: "7.1 – Resources" },
+    { value: "7.2", label: "7.2 – Competence" },
+    { value: "7.3", label: "7.3 – Awareness" },
+    { value: "7.4", label: "7.4 – Communication" },
+    { value: "7.5", label: "7.5 – Documented information" },
+    { value: "8", label: "8 – Operation" },
+    { value: "8.1", label: "8.1 – Operational planning and control" },
+    { value: "8.2", label: "8.2 – Requirements for products and services" },
+    { value: "8.3", label: "8.3 – Design and development" },
+    { value: "8.4", label: "8.4 – Control of externally provided processes, products and services" },
+    { value: "8.5", label: "8.5 – Production and service provision" },
+    { value: "8.6", label: "8.6 – Release of products and services" },
+    { value: "8.7", label: "8.7 – Control of nonconforming outputs" },
+    { value: "9", label: "9 – Performance evaluation" },
+    { value: "9.1", label: "9.1 – Monitoring, measurement, analysis and evaluation" },
+    { value: "9.2", label: "9.2 – Internal audit" },
+    { value: "9.3", label: "9.3 – Management review" },
+    { value: "10", label: "10 – Improvement" },
+    { value: "10.1", label: "10.1 – General" },
+    { value: "10.2", label: "10.2 – Nonconformity and corrective action" },
+    { value: "10.3", label: "10.3 – Continual improvement" },
+  ];
 
   const styles = {
     container: {
@@ -389,6 +431,35 @@ const AuditSummary = () => {
 
   const ncRate = totalObservations > 0 ? ((totalNC / totalObservations) * 100).toFixed(1) : 0;
   const complianceRate = totalObservations > 0 ? (((totalOP + totalOFI) / totalObservations) * 100).toFixed(1) : 0;
+  
+  const getNcObservations = () => {
+    return filteredData.filter(obs => obs.result === "NC");
+  };
+
+  const getNcByIsoClause = () => {
+    const clauseCounts = {};
+
+    const filteredObs = getNcObservations().filter((obs) => {
+      const clause = obs.isoClause?.trim();
+      return clause && (selectedIsoClause === "" || clause === selectedIsoClause);
+    });
+
+    filteredObs.forEach((obs) => {
+      const clause = obs.isoClause.trim();
+      clauseCounts[clause] = (clauseCounts[clause] || 0) + 1;
+    });
+
+    return Object.entries(clauseCounts)
+      .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }))
+      .reduce(
+        (acc, [key, val]) => {
+          acc.labels.push(key);
+          acc.data.push(val);
+          return acc;
+        },
+        { labels: [], data: [] }
+      );
+  };
 
   // Chart configurations
   const chartColors = {
@@ -520,8 +591,20 @@ const AuditSummary = () => {
       borderWidth: 1
     }]
   };
+
+  const ncByIsoClauseData = {
+    labels: getNcByIsoClause().labels,
+    datasets: [{
+      label: "Non-Conformities by ISO Clause",
+      data: getNcByIsoClause().data,
+      backgroundColor: chartColors.NC,
+      borderColor: chartColors.NC,
+      borderWidth: 1
+    }]
+  };
+
   const chartOptions = {
-    indexAxis: "y", // ✅ This makes the bar chart horizontal
+    indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -554,8 +637,9 @@ const AuditSummary = () => {
       }
     }
   };
+
   const horizontalStackedOptions = {
-    indexAxis: "y", // Only for horizontal bar
+    indexAxis: "y",
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -580,6 +664,7 @@ const AuditSummary = () => {
       }
     }
   };
+
   const lineChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -619,6 +704,27 @@ const AuditSummary = () => {
           color: chartColors.primary,
           font: { size: 12, weight: '600' }
         }
+      }
+    }
+  };
+
+  const ncByIsoClauseOptions = {
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: chartColors.secondary },
+        grid: { color: "#e9ecef" }
+      },
+      y: {
+        ticks: { color: chartColors.secondary },
+        grid: { color: "#e9ecef" }
       }
     }
   };
@@ -709,6 +815,21 @@ const AuditSummary = () => {
     XLSX.utils.book_append_sheet(wb, ws, `FY ${financialYear} Summary`);
 
     const fileName = `Audit_FY_${financialYear}_Summary.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
+  const downloadIsoClauseData = () => {
+    const { labels, data } = getNcByIsoClause();
+    const formattedData = labels.map((label, index) => ({
+      "ISO Clause": label,
+      "NC Count": data[index]
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(formattedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "NCs by ISO Clause");
+    
+    const fileName = `NCs_by_ISO_Clause_${selectedIsoClause || "All"}_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
 
@@ -822,6 +943,13 @@ const AuditSummary = () => {
             Download FY {financialYear} Data
           </button>
         )}
+        <button
+          onClick={downloadIsoClauseData}
+          style={{ ...styles.downloadButton, backgroundColor: "#e74c3c" }}
+          disabled={getNcObservations().length === 0}
+        >
+          Download NCs by ISO Clause
+        </button>
       </div>
 
       {/* Charts */}
@@ -837,7 +965,6 @@ const AuditSummary = () => {
                 data={activeTab === "department" ? departmentChartData : cycleChartData}
                 options={horizontalStackedOptions}
               />
-
             </div>
           </div>
 
@@ -880,6 +1007,41 @@ const AuditSummary = () => {
               </div>
             </div>
           )}
+
+          {/* NCs by ISO Clause */}
+          <div style={styles.chartContainer}>
+            {getNcObservations().length > 0 && (
+              <>
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ fontWeight: "bold", marginBottom: "8px", display: "block" }}>
+                    Filter by ISO Clause:
+                  </label>
+                  <select
+                    value={selectedIsoClause}
+                    onChange={(e) => setSelectedIsoClause(e.target.value)}
+                    style={{ padding: "8px", borderRadius: "6px", width: "100%", maxWidth: "400px" }}
+                  >
+                    <option value="">All Clauses</option>
+                    {isoClauseOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <h3 style={styles.chartTitle}>
+                  {selectedIsoClause ? `NCs for ISO Clause ${selectedIsoClause}` : "NCs by ISO Clause"}
+                </h3>
+                <div style={{ height: "400px" }}>
+                  <Bar 
+                    data={ncByIsoClauseData} 
+                    options={ncByIsoClauseOptions} 
+                  />
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Detailed Summary Table */}
           <div style={styles.chartContainer}>

@@ -102,9 +102,7 @@ const Observations = ({ observationId: propObservationId, departmentName, auditC
 
   const navigate = useNavigate();
 
-  const getNcObservations = () => {
-    return observations.filter(obs => obs.result === "NC");
-  };
+
 
   const handleOpenActionForm = (observation) => {
     if (observation.result !== "NC") {
