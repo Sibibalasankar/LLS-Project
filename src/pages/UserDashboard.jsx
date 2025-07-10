@@ -8,7 +8,7 @@ import ISOManual from "../pages/IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import AuditNcUserView from "../pages/AuditNcUserView";
 import AuditNcCloser from "../pages/AuditNcCloser";
-
+import AuditNcApproval from "../pages/AuditNcApproval";
 const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [userPermissions, setUserPermissions] = useState([]);
@@ -158,12 +158,16 @@ const renderComponent = () => {
       ) : (
         <UserAuditNcCloser /> // Regular user version
       );
-    case "user-audit-nc-view":
-      return userPermissions.includes("auditNCApproval") ? (
-        <AuditNcUserView />
-      ) : (
-        <PermissionDenied feature="Audit NC Approval" />
-      );
+   case "user-audit-nc-view":
+  if (!userPermissions.includes("auditNCApproval")) {
+    return <PermissionDenied feature="Audit NC Approval" />;
+  }
+  return userRole === "auditor" ? (
+    <AuditNcApproval />
+  ) : (
+    <AuditNcUserView />
+  );
+
     case "iso-manual":
       return userPermissions.includes("isoManual") ? (
         <ISOManual />

@@ -8,6 +8,8 @@ const AuditNcApproval = () => {
     auditCycleNo: '',
     ncsNumber: '',
   });
+const userRole = localStorage.getItem("userRole");
+const userDepartment = localStorage.getItem("userAuditDepartment"); // from login dropdown
 
   useEffect(() => {
     const storedApprovedFiles = JSON.parse(localStorage.getItem('approvedFiles')) || {};
@@ -58,14 +60,29 @@ const AuditNcApproval = () => {
   };
 
   // Filter the approved files based on filter states
-  const filteredFiles = Object.entries(approvedFiles).filter(([reportId, file]) => {
-    const { department, auditCycleNo, ncsNumber } = filters;
-    const matchesDepartment = department ? file.department?.toLowerCase().includes(department.toLowerCase()) : true;
-    const matchesAuditCycleNo = auditCycleNo ? file.auditCycleNo?.toString().includes(auditCycleNo) : true;
-    const matchesNcsNumber = ncsNumber ? file.ncsNumber?.toString().includes(ncsNumber) : true;
+const filteredFiles = Object.entries(approvedFiles).filter(([reportId, file]) => {
+  const { department, auditCycleNo, ncsNumber } = filters;
 
-    return matchesDepartment && matchesAuditCycleNo && matchesNcsNumber;
-  });
+  const actualDepartment = file.department || file.dptname || '';
+
+  const matchesRoleDept = userRole === "admin" 
+    ? true 
+    : actualDepartment === userDepartment;
+
+  const matchesDepartmentFilter = department 
+    ? actualDepartment.toLowerCase().includes(department.toLowerCase()) 
+    : true;
+
+  const matchesAuditCycleNo = auditCycleNo 
+    ? file.auditCycleNo?.toString().includes(auditCycleNo) 
+    : true;
+
+  const matchesNcsNumber = ncsNumber 
+    ? file.ncsNumber?.toString().includes(ncsNumber) 
+    : true;
+
+  return matchesRoleDept && matchesDepartmentFilter && matchesAuditCycleNo && matchesNcsNumber;
+});
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
