@@ -7,9 +7,7 @@ const AuditNcCloser = () => {
   const [decisions, setDecisions] = useState({});
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    window.open('/admin-dashboard/action-report', '_blank');
-  };
+
 
   const handleViewActionReport = (ncsNumber, department, auditCycle) => {
     // Directly open the action report with the NC number as parameter
@@ -18,8 +16,25 @@ const AuditNcCloser = () => {
   };
 
   useEffect(() => {
-    const files = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
-    setSubmittedFiles(files);
+    const allFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const role = localStorage.getItem("userRole");
+    const loginDepartment = localStorage.getItem("userAuditDepartment"); // dropdown selected
+
+    let filteredFiles = {};
+
+    if (role === "admin") {
+      filteredFiles = allFiles; // show all
+    } else if (role === "auditor") {
+      // show only files matching selected login department
+      filteredFiles = Object.fromEntries(
+        Object.entries(allFiles).filter(([_, file]) =>
+          file.department === loginDepartment
+        )
+      );
+    }
+
+    setSubmittedFiles(filteredFiles);
 
     const storedDecisions = JSON.parse(localStorage.getItem('adminDecisions')) || {};
     setDecisions(storedDecisions);
@@ -84,9 +99,7 @@ const AuditNcCloser = () => {
       <div className="card shadow">
         <div className="card-header bg-white top-head-btn">
           <h4 className="mb-0">Audit NC Closer – Submitted Evidence</h4>
-          <button className='nc-btn' onClick={handleClick}>
-            NC Forms
-          </button>
+         
         </div>
 
         <div className="card-body">

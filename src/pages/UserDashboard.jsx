@@ -7,10 +7,12 @@ import UserAuditPlanSheet from "./UserAuditPlanSheet";
 import ISOManual from "../pages/IsoManual";
 import companyLogo from "../assets/images/lls_logo.png";
 import AuditNcUserView from "../pages/AuditNcUserView";
+import AuditNcCloser from "../pages/AuditNcCloser";
 
 const UserDashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [userPermissions, setUserPermissions] = useState([]);
+  const [userRole, setUserRole] = useState('');
   const [employeeData, setEmployeeData] = useState({
     empName: "",
     empId: "",
@@ -67,7 +69,7 @@ const UserDashboard = () => {
               </svg>
               {employeeData.department} {/* Allocated department */}
               {employeeData.department !== employeeData.loginDepartment}
-            </span>
+            </span> 
           </div>
           <div className="info-card">
             <span className="info-label">Certified Since</span>
@@ -97,77 +99,81 @@ const UserDashboard = () => {
     );
   };
 
-  useEffect(() => {
-    const loadEmployeeData = () => {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      if (!currentUser) {
-        navigate("/user-login");
-        return;
-      }
+useEffect(() => {
+  const loadEmployeeData = () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (!currentUser) {
+      navigate("/user-login");
+      return;
+    }
 
-      const allEmployees = JSON.parse(localStorage.getItem("userCredentials") || "[]");
-      const employee = allEmployees.find(emp =>
-        emp.username === currentUser.username ||
-        emp.empId === currentUser.empId
-      );
+    const role = localStorage.getItem("userRole"); // Get the role from localStorage
+    setUserRole(role);
 
-      if (employee) {
-        setEmployeeData({
-          empName: employee.empName,
-          empId: employee.empId,
-          designation: employee.designation,
-          department: employee.department, // Allocated department
-          loginDepartment: currentUser.loginDepartment || currentUser.department, // Fallback to department if loginDepartment doesn't exist
-          certifiedDate: employee.certifiedDate
-        });
-        setUserPermissions(employee.permissions || []);
+    const allEmployees = JSON.parse(localStorage.getItem("userCredentials") || "[]");
+    const employee = allEmployees.find(emp => 
+      emp.empId === currentUser.empId
+    );
 
-        // Update localStorage for backward compatibility
-        localStorage.setItem("userDepartment", employee.department || "");
-      } else {
-        navigate("/user-login");
-      }
-    };
-
-    loadEmployeeData();
-  }, [navigate]);
-
-  const renderComponent = () => {
-    switch (activeComponent) {
-      case "audit-plan-sheet":
-        return userPermissions.includes("auditPlanSheet") ? (
-          <UserAuditPlanSheet />
-        ) : (
-          <PermissionDenied feature="Audit Plan Sheet" />
-        );
-      case "audit-observation":
-        return userPermissions.includes("auditObservation") ? (
-          <AuditObservation />
-        ) : (
-          <PermissionDenied feature="Audit Observation" />
-        );
-      case "audit-nc-closer":
-        return userPermissions.includes("auditNCCloser") ? (
-          <UserAuditNcCloser />
-        ) : (
-          <PermissionDenied feature="Audit NC Closer" />
-        );
-      case "user-audit-nc-view":
-        return userPermissions.includes("auditNCApproval") ? (
-          <AuditNcUserView />
-        ) : (
-          <PermissionDenied feature="Audit NC Approval" />
-        );
-      case "iso-manual":
-        return userPermissions.includes("isoManual") ? (
-          <ISOManual />
-        ) : (
-          <PermissionDenied feature="ISO Manual" />
-        );
-      default:
-        return <WelcomeMessage />;
+    if (employee) {
+      setEmployeeData({
+        empName: employee.empName,
+        empId: employee.empId,
+        designation: employee.designation,
+        department: employee.department,
+        loginDepartment: currentUser.loginDepartment || currentUser.department,
+        certifiedDate: employee.certifiedDate
+      });
+      setUserPermissions(employee.permissions || []);
+      localStorage.setItem("userDepartment", employee.department || "");
+    } else {
+      navigate("/user-login");
     }
   };
+
+  loadEmployeeData();
+}, [navigate]);
+
+const renderComponent = () => {
+  switch (activeComponent) {
+    case "audit-plan-sheet":
+      return userPermissions.includes("auditPlanSheet") ? (
+        <UserAuditPlanSheet />
+      ) : (
+        <PermissionDenied feature="Audit Plan Sheet" />
+      );
+    case "audit-observation":
+      return userPermissions.includes("auditObservation") ? (
+        <AuditObservation />
+      ) : (
+        <PermissionDenied feature="Audit Observation" />
+      );
+    case "audit-nc-closer":
+      if (!userPermissions.includes("auditNCCloser")) {
+        return <PermissionDenied feature="Audit NC Closer" />;
+      }
+      // Conditionally render based on role
+      return userRole === "auditor" ? (
+        <AuditNcCloser /> // Admin version
+      ) : (
+        <UserAuditNcCloser /> // Regular user version
+      );
+    case "user-audit-nc-view":
+      return userPermissions.includes("auditNCApproval") ? (
+        <AuditNcUserView />
+      ) : (
+        <PermissionDenied feature="Audit NC Approval" />
+      );
+    case "iso-manual":
+      return userPermissions.includes("isoManual") ? (
+        <ISOManual />
+      ) : (
+        <PermissionDenied feature="ISO Manual" />
+      );
+    default:
+      return <WelcomeMessage />;
+  }
+};
 
   const PermissionDenied = ({ feature }) => (
     <div className="permission-denied">
