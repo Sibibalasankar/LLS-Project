@@ -7,13 +7,13 @@ const Credits = () => {
       name: "Sibi",
       role: "Full Stack Developer",
       icon: "👨‍💻",
-      specialty: "Frontend & Backend Development with expertise in React and Node.js"
+      specialty: "Builds seamless, end-to-end web solutions by combining powerful backend logic with engaging, user-friendly frontend interfaces."
     },
     {
       name: "Hariharan",
-      role: "Software Engineer",
+      role: "Backend Engineer & UI/UX Developer",
       icon: "🔧",
-      specialty: "System Architecture & API Development with focus on scalable solutions"
+      specialty: "Builds secure, scalable systems with efficient database management and Crafts intuitive and user-focused experiences with aesthetic appeal."
     },
     {
       name: "Priyanka S",
