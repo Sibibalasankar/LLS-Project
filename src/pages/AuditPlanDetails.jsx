@@ -84,19 +84,19 @@ const AuditPlanDetails = ({ department, onClose }) => {
     }));
   };
 
- const handleFormOpen = () => {
-  const draft = loadDraft("auditPlanDraft");
-  if (draft) {
-    if (window.confirm("A draft is available. Do you want to load it?")) {
-      setFormData(draft);
+  const handleFormOpen = () => {
+    const draft = loadDraft("auditPlanDraft");
+    if (draft) {
+      if (window.confirm("A draft is available. Do you want to load it?")) {
+        setFormData(draft);
+      } else {
+        resetForm(); // Open a fresh form if user cancels
+      }
     } else {
-      resetForm(); // Open a fresh form if user cancels
+      resetForm(); // No draft exists, open fresh form
     }
-  } else {
-    resetForm(); // No draft exists, open fresh form
-  }
-  setShowForm(true); // Always open form
-};
+    setShowForm(true); // Always open form
+  };
 
 
   const handleSaveDraft = () => {
@@ -179,32 +179,42 @@ const AuditPlanDetails = ({ department, onClose }) => {
 
     const printWindow = window.open("", "", "width=800,height=600");
     printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Audit Plan</title>
-          <style>
-            body { font-family: Arial, sans-serif; text-align: center; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            h5 {
-              background-color: #FFC000;
-              padding: 10px;
-              border-top: 1px solid black; 
-              border-bottom: 1px solid black;
-              text-align: center;
-            }
-          </style>
-        </head>
-        <body>
-          <h2>Audit Plan Details</h2>
-          <h5 className="iso_title mb-4">
-            INTERNAL AUDIT SCHEDULE - ISO 9001:2015
-          </h5>
-          ${clonedTable.outerHTML}
-        </body>
-      </html>
-    `);
+  <html>
+    <head>
+      <title>Print Audit Plan</title>
+      <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h5 {
+          background-color: #FFC000;
+          padding: 10px;
+          border-top: 1px solid black; 
+          border-bottom: 1px solid black;
+          text-align: center;
+        }
+        .right-footer {
+          text-align: right;
+          margin-top: 20px;
+          font-size: 14px;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>Audit Plan Details</h2>
+      <h5 class="iso_title mb-4">
+        INTERNAL AUDIT SCHEDULE - ISO 9001:2015
+      </h5>
+      ${clonedTable.outerHTML}
+      <div class="right-footer">
+       LLS1/TQM/QA/06/02/00/R02-00-03.05.2022
+      </div>
+    </body>
+  </html>
+`);
+
 
     printWindow.document.close();
     printWindow.print();
@@ -311,7 +321,9 @@ const AuditPlanDetails = ({ department, onClose }) => {
             ))}
         </tbody>
       </table>
-
+      <div className="document-footer">
+        LLS1/TQM/QA/06/02/00/R02-00-03.05.2022
+      </div>
       {showForm && (
         <div className="popup-overlay">
           <div className="popup-form">

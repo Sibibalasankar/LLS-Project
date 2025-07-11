@@ -189,7 +189,7 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
         {currentUserRole === "admin" ? (
           <>
             <div className="document-field">
-              <label><strong>a) Closed / Mixed Re-Action:</strong></label>
+              <label><strong>a) Closed / Need Re-Action:</strong></label>
               <div className="radio-group">
                 <label>
                   <input
@@ -207,7 +207,7 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                     value="Mixed Re-Action"
                     checked={formData.closingType === "Mixed Re-Action"}
                     onChange={handleChange}
-                  /> Mixed Re-Action
+                  /> Need Re-Action
                 </label>
                 <button
                   type="button"
@@ -221,7 +221,7 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
             </div>
 
             <div className="document-field" style={{ marginTop: '1rem' }}>
-              <label><strong>b) Amid similar nonconformity exist, could potentially occur at:</strong></label>
+              <label><strong>b) Arrest similar nonconformity exist, could potentially occur at:</strong></label>
               <div style={{ display: "flex", gap: "1rem" }}>
                 <input
                   type="text"
@@ -245,11 +245,11 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
         ) : (
           <>
             <div className="document-field">
-              <label><strong>a) Closed / Mixed Re-Action:</strong></label>
+              <label><strong>a) Closed / Need Re-Action:</strong></label>
               <p>{formData.closingType || "Not updated"}</p>
             </div>
             <div className="document-field" style={{ marginTop: '1rem' }}>
-              <label><strong>b) Amid similar nonconformity exist, could potentially occur at:</strong></label>
+              <label><strong>b) Arrest similar nonconformity exist, could potentially occur at:</strong></label>
               <p>{formData.similarNcLocation || "Not updated"}</p>
             </div>
           </>

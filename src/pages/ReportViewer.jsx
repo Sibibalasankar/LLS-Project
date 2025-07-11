@@ -555,10 +555,10 @@ const ReportViewer = ({ report, onEdit, onBack, hideBackButton }) => {
               <tr>
                 <td>
                   <p><strong>NCR. CLOSING STATUS</strong></p>
-                  <p><b>a) Closed / Mixed Re-Action:</b> {report.closingType || '-'}</p>
+                  <p><b>a) Closed / Need Re-Action:</b> {report.closingType || '-'}</p>
 
                   <p style={{ marginTop: "0.5rem" }}>
-                    <b> b) Amid similar nonconformity exist, could potentially occur at:</b> {report.similarNcLocation || '-'}</p>
+                    <b> b) Arrest similar nonconformity exist, could potentially occur at:</b> {report.similarNcLocation || '-'}</p>
                 </td>
 
               </tr>
