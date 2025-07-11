@@ -204,8 +204,8 @@ const CorrectiveActionFormSection = ({ formData, dispatch }) => {
                   <input
                     type="radio"
                     name="closingType"
-                    value="Mixed Re-Action"
-                    checked={formData.closingType === "Mixed Re-Action"}
+                    value="Need Re-Action"
+                    checked={formData.closingType === "Need Re-Action"}
                     onChange={handleChange}
                   /> Need Re-Action
                 </label>
